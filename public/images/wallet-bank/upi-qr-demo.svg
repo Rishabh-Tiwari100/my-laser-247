@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 116 116" role="img" aria-labelledby="title desc" shape-rendering="crispEdges">
+  <title id="title">Demo UPI QR code</title>
+  <desc id="desc">A decorative non-scannable QR placeholder for the static payment screen.</desc>
+  <rect width="116" height="116" fill="#fff"/>
+  <g fill="#000">
+    <path d="M8 8h28v28H8zm4 4v20h20V12zm4 4h12v12H16zM80 8h28v28H80zm4 4v20h20V12zm4 4h12v12H88zM8 80h28v28H8zm4 4v20h20V84zm4 4h12v12H16z"/>
+    <path d="M44 8h4v4h-4zm8 0h8v4h-8zm12 0h4v8h-4zm8 0h4v4h-4zM40 16h8v4h-8zm12 0h4v8h-4zm8 4h8v4h-8zm12-4h4v12h-4zM40 28h4v8h-4zm8 0h12v4H48zm16 0h8v8h-8z"/>
+    <path d="M8 44h8v4H8zm12-4h4v12h-4zm8 0h8v4h-8zm12 0h4v8h-4zm8-4h8v12h-8zm12 4h4v4h-4zm8 0h12v8H68zm16 0h4v4h-4zm8 0h16v4H92z"/>
+    <path d="M8 56h4v12H8zm8 0h12v4H16zm16-8h4v16h-4zm8 4h8v4h-8zm12 0h4v12h-4zm8 0h12v4H60zm16-4h4v16h-4zm8 0h8v8h-8zm12 0h12v4H96z"/>
+    <path d="M12 72h8v4h-8zm12-8h4v12h-4zm8 4h8v8h-8zm12-8h4v16h-4zm8 8h12v4H52zm16-8h4v16h-4zm8 8h8v8h-8zm12-8h4v12h-4zm8-4h12v8H96z"/>
+    <path d="M40 80h8v4h-8zm12-4h4v12h-4zm8 4h12v4H60zm16-4h4v8h-4zm8 4h8v8h-8zm12-8h4v16h-4zm8 0h4v8h-4z"/>
+    <path d="M40 92h4v16h-4zm8-4h8v8h-8zm12 0h4v12h-4zm8 0h12v4H68zm16 4h4v12h-4zm8 0h8v4h-8zm12-4h4v20h-4zM48 104h12v4H48zm16 0h8v4h-8zm12-8h4v12h-4zm16 4h8v8h-8z"/>
+    <path d="M44 44h4v4h-4zm16 4h4v4h-4zm8 12h4v4h-4zm-20 4h4v4h-4zm8 8h4v4h-4zm12 4h4v4h-4z"/>
+  </g>
+</svg>

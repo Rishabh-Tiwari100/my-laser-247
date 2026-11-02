@@ -1,0 +1,65 @@
+import { useEffect, useRef, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+
+export type ViewByOption = 'Competition' | 'Time';
+
+const options: ViewByOption[] = ['Competition', 'Time'];
+
+interface ViewByDropdownProps {
+  selected: ViewByOption;
+  onChange: (option: ViewByOption) => void;
+}
+
+export default function ViewByDropdown({ selected, onChange }: ViewByDropdownProps) {
+  const [open, setOpen] = useState(false);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative inline-block" ref={dropdownRef}>
+      {/* Button */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1 rounded-t-sm bg-[linear-gradient(-180deg,#f72424,#bb1c00)] py-[3px] px-1 rounded-[2px] text-xs font-semibold uppercase text-white"
+      >
+        View By
+        <ChevronDown size={14} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute right-0 top-full z-50 mt-[2px] w-40 overflow-hidden rounded-b shadow-lg border border-gray-300 bg-white">
+          {options.map((item) => (
+            <button
+              key={item}
+              onClick={() => {
+                onChange(item);
+                setOpen(false);
+              }}
+              className={`flex w-full items-center justify-center px-4 py-2 text-xs font-bold transition
+                ${
+                  selected === item
+                    ? 'bg-red-600 text-white'
+                    : 'bg-white text-black hover:bg-gray-100'
+                }`}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,10 @@
+<svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect width="26" height="26" rx="5" fill="white"/>
+<rect width="26" height="26" rx="5" fill="url(#pattern0_1193_56189)"/>
+<defs>
+<pattern id="pattern0_1193_56189" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_1193_56189" transform="scale(0.0192308)"/>
+</pattern>
+<image id="image0_1193_56189" width="52" height="52" preserveAspectRatio="none" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAYAAADFeBvrAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAPjSURBVHgB7Vo9TBRhEJ074DgkAgETTQArrARKSLSQFhsNFYbEysRG7aTBUhtaLCSxMiFSYQd2QgGJlBwdV/Fjosjxz3E/Hs4b7js2m1t29/bbY0P2JWTZu/1738y8ebMQWW97c0bXCFG6ZggJBR0hoaAjJBR0hISCjlrbA+620q0vL6iwn5af7Oom5TdS9G89Jfu51S0KEiJOrE/jsz5qnRix/F4Rw1bIbuxQvkg4y5+f8bZasCVU/7BLtg2Pe+jmywFyi8PJeSaYosNPC1QN2NZQtLlBUi6X2KLTxSS5RXo2QU1vB3kxHlE1YEsID7T9ZIKaRwfpYHxOUskpCsVUw6K0fBgqRdtPOFI51MHf55+F1N67GXIK1JWRBOowwuT8hGPZBqnU6yl5QKekTmZX+Ph7pX0oJhbFT7jqQ0i3o8kF2R5PL9sejwjFTWmGWmoc7iO/YNuHzFA1BOWqf9Alq251XNQivVBPp0tJ6WW6UZFTwMNmWfW2n06UCt+MzNIaS31v+Zsy0bZL+poXeLI+IGZVT1BHRNAKqMXLpBziUdfdLsfVWGRBObhOOTOOvy7Ljc1Nt3CQtkxHBaQexCZbrDVcJ9bdQXU97VTbeX7u8fRPqulsoyz3wH1uG3bwTAjYG/vGD9NREoAM31w9kB0g5Ygymnc5INL4Tl3bjpQ2t73Lkq4E43RxjW4M9zs6D1FsGOwVi2SGuh78IaIYY1J2zTmi871cjFPm9vwo/WFngVWNumiie2MzbIL7Je0U0PeQ0m6gdR5SzVcu7NIRNHHD3WVSRtXMVOAdI368OUX9QJmiRaVCoWM/Zlj9cgCB9NwKtbwfkt8Radf3Js3AmAEg5RAxNE8MhTlWK6NZRe3U3b8gis9QHzgHLiTDdVgJtEeo9eMIK9OKqJdV2qmBUAjzMIgmDeJCjiX7hJUNx1QyGGqPEJppNrFZ6i3loKJhViyk2y63gErJyLVJI6Qh8iqDSI7TzCkwOGI8ySV+0Z0fo1TjYcTQSihetDoYGZwolCICFwDXEGmOy37eg2nVmnLxohlFSl3mpEHkiBsp1A8vYED+98C4pdF1A22EQMJYM0g/dHijBQIRjPFKzuEonPgzN9BGyFzgeGBIby1bIEUEM9T550nxaH5AGyHz7IM6AglYFzGrLBaojbwPQ50R+iJkmn1iklLJkvz6TURBi8opuTbDzur4AS2E4mUmUwxmV/HeW0vKxU31g9rZH/9OVwHPhIxyjT6CucbJKy6/4JmQkmsUPd4CVav4reCZEOQaarbDlqVQxT+bWMEzIZjQ1KspCgoi4f/6BBwhoaAjJBR0hISCjv8FC+EaSg1yEgAAAABJRU5ErkJggg=="/>
+</defs>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="700" viewBox="0 0 390 700" preserveAspectRatio="none" role="img" aria-labelledby="title description">
+  <title id="title">Sample payment proof</title>
+  <desc id="description">A sample successful mobile payment receipt for development previews.</desc>
+  <rect width="390" height="700" fill="#eef8ff"/>
+  <rect width="390" height="54" fill="#ffffff"/>
+  <text x="22" y="34" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#12263a">Payment receipt</text>
+  <circle cx="195" cy="132" r="38" fill="#16a34a"/>
+  <path d="M176 132l12 12 25-28" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="195" y="195" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#425466">Payment successful</text>
+  <text x="195" y="244" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#12263a">₹500</text>
+  <rect x="24" y="290" width="342" height="226" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="48" y="331" font-family="Arial, sans-serif" font-size="14" fill="#64748b">Paid to</text>
+  <text x="342" y="331" text-anchor="end" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#12263a">Laser247</text>
+  <line x1="48" y1="353" x2="342" y2="353" stroke="#e2e8f0"/>
+  <text x="48" y="390" font-family="Arial, sans-serif" font-size="14" fill="#64748b">Payment method</text>
+  <text x="342" y="390" text-anchor="end" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#12263a">UPI</text>
+  <line x1="48" y1="412" x2="342" y2="412" stroke="#e2e8f0"/>
+  <text x="48" y="449" font-family="Arial, sans-serif" font-size="14" fill="#64748b">Transaction ID</text>
+  <text x="342" y="449" text-anchor="end" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#12263a">610715564360</text>
+  <line x1="48" y1="471" x2="342" y2="471" stroke="#e2e8f0"/>
+  <text x="48" y="497" font-family="Arial, sans-serif" font-size="14" fill="#64748b">21 Jul 2026, 05:01</text>
+  <rect x="24" y="550" width="342" height="54" rx="9" fill="#0ea5e9"/>
+  <text x="195" y="584" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">UPI PAYMENT</text>
+  <text x="195" y="650" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#64748b">Development preview only</text>
+</svg>

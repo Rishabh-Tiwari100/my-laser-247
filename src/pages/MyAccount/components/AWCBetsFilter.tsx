@@ -1,0 +1,75 @@
+import DatePicker from '@/components/common/DatePicker';
+import { useState } from 'react';
+
+type Props = {
+  buttonText: string;
+  activeTab: 'history' | 'pl';
+};
+
+export default function AWCBetsFilter({ buttonText, activeTab }: Props) {
+  const [fromDate, setFromDate] = useState(new Date());
+  const [toDate, setToDate] = useState(new Date());
+  return (
+    <div className="mb-3">
+      <div className="flex items-end">
+        <div className="h-[28px] w-[70px] bg-[#435a6d] text-white text-[14px] font-bold flex items-center justify-center rounded-t-[2px]">
+          All
+        </div>
+
+        <div className="flex-1 border-b-[4px] border-[#435a6d]" />
+      </div>
+
+      <div className="border-x border-b border-[#a9b4bb] bg-[#dfe6e8] px-3 py-3">
+        <div className="flex items-center gap-1 flex-wrap text-[13px]">
+          <span className="mr-2">Period</span>
+
+          <DatePicker value={fromDate} onChange={setFromDate} />
+
+          <input
+            defaultValue="00:00"
+            className="w-[46px] h-[24px] rounded border border-[#b8b8b8] bg-[#efefef] px-1"
+          />
+
+          <span>to</span>
+
+          <DatePicker value={toDate} onChange={setToDate} />
+
+          <input
+            defaultValue="23:59"
+            className="w-[46px] h-[24px] rounded border border-[#b8b8b8] bg-[#efefef] px-1"
+          />
+        </div>
+
+        <div className="mt-3 flex items-center gap-[8px] flex-wrap">
+          {activeTab === 'history' && (
+            <>
+              <label className="text-[13px]">Filter by Platform</label>
+
+              <select className="h-[28px] w-[120px] rounded border border-[#b8b8b8] bg-white px-2 pr-6 text-[13px] leading-none outline-none">
+                <option>All</option>
+              </select>
+            </>
+          )}
+
+          {activeTab === 'pl' && (
+            <select className="h-[28px] w-[120px] rounded border border-[#b8b8b8] bg-white px-2 pr-6 text-[13px] leading-none outline-none">
+              <option>All</option>
+            </select>
+          )}
+
+          <button className="h-[28px] border border-[#bdbdbd] bg-white px-3 text-[13px] rounded">
+            Just For Today
+          </button>
+
+          <button className="h-[28px] border border-[#bdbdbd] bg-white px-3 text-[13px] rounded">
+            From Yesterday
+          </button>
+
+          <button className="h-[28px] min-w-[115px] rounded border border-[#d18a00] bg-[#f7a81a] font-bold text-[13px]">
+            {buttonText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
