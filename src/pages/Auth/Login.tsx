@@ -11,7 +11,6 @@ import { LoginCredentialType, LoginMethod, useLoginPage } from './hooks/useLogin
 import { useOtpTimer } from '@/hooks';
 import { useSendOtpMutation } from '@/store/api/authApi';
 import { useGetCmsContentQuery } from '@/store/api/cmsApi';
-import { useGetContactSupportQuery } from '@/store/api/userApi';
 import { Icons } from '@/utils/icons';
 import { sanitizeCmsContent } from '@/utils/sanitizeCmsContent';
 import { hasMinimumNationalPhoneLength } from '@/utils/validations';
@@ -57,7 +56,6 @@ function Login() {
     page: '/login',
     type: 'footer',
   });
-  const { data: contactSupport } = useGetContactSupportQuery();
   const cmsFooterContent = cmsContentResponse?.data?.find(
     ({ isActive, type }) => isActive && type === 'footer'
   )?.content;
@@ -75,19 +73,6 @@ function Login() {
     credentialType !== 'otp' ||
     (otpSent && /^\d{6}$/.test(passwordValue));
   const isLoginDisabled = !isValid || !isValidLoginOtp;
-
-  const handleWhatsAppSupport = () => {
-    const whatsapp = contactSupport?.loginWhatsapp;
-
-    if (!whatsapp) {
-      toast.error('WhatsApp support is currently unavailable.', { id: 'login-support-wa' });
-      return;
-    }
-
-    const text = encodeURIComponent('Hello, I need a ready-made ID.');
-    const separator = whatsapp.includes('?') ? '&' : '?';
-    window.open(`${whatsapp}${separator}text=${text}`, '_blank', 'noopener,noreferrer');
-  };
 
   const resetOtpFlow = () => {
     setOtpSent(false);
@@ -374,25 +359,6 @@ function Login() {
                     // disabled={isLoginDisabled}
                     className="!mt-0 !h-10 !rounded-[2px] !bg-black !text-sm !font-semibold !text-[#00c6f3] hover:!bg-[#070707]"
                   />
-                </div>
-
-                <div className="space-y-[4px] text-center">
-                  <p className="text-[12px] font-semibold leading-none text-white">
-                    Get Your Ready-Made ID From WhatsApp
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleWhatsAppSupport}
-                    className="flex h-10 w-full items-center justify-center gap-2 rounded-[3px] bg-[#51b947] text-sm font-bold text-white transition hover:bg-[#45aa3b]"
-                    aria-label="Get ready-made ID from WhatsApp"
-                  >
-                    <img
-                      src="/images/socialMedia/whatsapp.svg"
-                      alt=""
-                      className="h-[18px] w-[18px]"
-                    />
-                    Whatsapp Now
-                  </button>
                 </div>
 
                 <div className="text-center text-sm text-white">Or Login With</div>

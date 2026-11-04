@@ -22,7 +22,7 @@ const AboutUsModal = () => {
         About Us
       </button>
 
-      <Modal open={open} title="Terms & Conditions" onClose={handleClose}>
+      <Modal open={open} title="About Us" onClose={handleClose}>
         <div className="space-y-2">
           <ul>
             <li>

@@ -18,64 +18,18 @@ import {
 } from '@/hooks/redux';
 
 const menuItems = [
-  {
-    label: 'Cricket',
-  },
-  {
-    label: 'Football',
-  },
-  {
-    label: 'Tennis',
-  },
-  {
-    label: 'Horse Racing',
-  },
-  {
-    label: 'FIFA CUP WINNER',
-  },
-  {
-    label: 'WINNER CUP',
-  },
-  {
-    label: 'ELECTION',
-  },
-  {
-    label: 'Kabaddi',
-  },
-  {
-    label: 'Election',
-  },
-  {
-    label: 'Greyhound Racing',
-  },
-  {
-    label: 'Esports',
-  },
-  {
-    label: 'Mixed Martial Arts',
-  },
-  {
-    label: 'Gaelic Games',
-  },
-  {
-    label: 'Volleyball',
-  },
-  { label: 'Handball' },
-  {
-    label: 'Australian Rules',
-  },
-  {
-    label: 'Ice Hockey',
-  },
-  {
-    label: 'Basketball',
-  },
-  {
-    label: 'Baseball',
-  },
-  {
-    label: 'American Football',
-  },
+  { label: 'Cricket' },
+  { label: 'Football' },
+  { label: 'Tennis' },
+  { label: 'Horse Racing' },
+  { label: 'Greyhound Racing' },
+  { label: 'Binary' },
+  { label: 'Basketball' },
+  { label: 'Baseball' },
+  { label: 'Table Tennis' },
+  { label: 'Volleyball' },
+  { label: 'Ice Hockey' },
+  { label: 'Darts' },
 ];
 
 export type IconName = keyof typeof Icons;
@@ -166,7 +120,7 @@ export const useSidebar = ({
   const competitions = competitionsData?.competitions ?? [];
   const { data: contactSupport } = useGetContactSupportQuery();
 
-  const { whatsapp = '', telegram = '', imo = '' } = contactSupport ?? {};
+  const { telegram = '', imo = '' } = contactSupport ?? {};
 
   const handleNavigate = useCallback(
     (label: string) => {
@@ -213,22 +167,11 @@ export const useSidebar = ({
   }, [logout, dispatch, navigate]);
 
   const openContactApp = useCallback(
-    (type: 'whatsapp' | 'telegram' | 'imo') => {
+    (type: 'telegram' | 'imo') => {
       // Simple mobile detection
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
       switch (type) {
-        case 'whatsapp': {
-          if (!whatsapp) {
-            toast.error('WhatsApp support is currently unavailable.', { id: 'support-wa' });
-            return;
-          }
-          const text = encodeURIComponent('Hello, I need assistance.');
-          const separator = whatsapp.includes('?') ? '&' : '?';
-          window.open(`${whatsapp}${separator}text=${text}`, '_blank', 'noopener,noreferrer');
-          break;
-        }
-
         case 'telegram': {
           if (!telegram) {
             toast.error('Telegram support is currently unavailable.', { id: 'support-tg' });
@@ -261,7 +204,7 @@ export const useSidebar = ({
         }
       }
     },
-    [whatsapp, telegram, imo]
+    [telegram, imo]
   );
 
   const getMenuItems = (): MenuItem[] => {

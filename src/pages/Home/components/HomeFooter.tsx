@@ -1,202 +1,45 @@
-import React, { useEffect, useState } from 'react';
-import TAndCModal from './modals/TAndCModal';
 import PrivacyPolicyModal from './modals/PrivacyPolicyModal';
+import TAndCModal from './modals/TAndCModal';
 import RulesAndRegulationsModal from './modals/RulesAndRegulationsModal';
-import KycModal from './modals/KycModal';
+import AboutUsModal from './modals/AboutUsModal';
 import ResponsibleGamingModal from './modals/ResponsibleGamingModal';
-// import AboutUsModal from './modals/AboutUsModal';
-// import SelfExecutionModal from './modals/SelfExecutionModal';
-// import UnderagePolicyModal from './modals/UnderagePolicyModal';
-import { FaChrome, FaFirefoxBrowser } from 'react-icons/fa';
-import { RiFacebookCircleFill, RiInstagramFill, RiWhatsappFill } from 'react-icons/ri';
 
-const HomeFooter = () => {
-  const [activeSocial, setActiveSocial] = useState(0);
-
-  const iconRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
-  const [arrowLeft, setArrowLeft] = React.useState(0);
-
-  const socialLinks = [
-    {
-      icon: <RiWhatsappFill />,
-      content: (
-        <>
-          <a href="tel:+971569450904" className="underline">
-            +971569450904
-          </a>
-          <span className="mx-2">|</span>
-          <a href="tel:+971569753184" className="underline">
-            +971569753184
-          </a>
-        </>
-      ),
-      href: 'https://wa.me/971569450904',
-    },
-    {
-      icon: <RiFacebookCircleFill />,
-      content: (
-        <a
-          href="https://facebook.com/ninewickets"
-          target="_blank"
-          rel="noreferrer"
-          className="underline"
-        >
-          ninewickets
-        </a>
-      ),
-      href: 'https://facebook.com/ninewickets',
-    },
-    {
-      icon: <RiInstagramFill />,
-      content: (
-        <a
-          href="https://instagram.com/ninewickets"
-          target="_blank"
-          rel="noreferrer"
-          className="underline"
-        >
-          @ninewickets
-        </a>
-      ),
-      href: 'https://instagram.com/ninewickets',
-    },
-  ];
-
-  const FooterLinks = [
-    { Modal: <PrivacyPolicyModal /> },
-    { Modal: <TAndCModal /> },
-    { Modal: <RulesAndRegulationsModal /> },
-    { Modal: <KycModal /> },
-    { Modal: <ResponsibleGamingModal /> },
-    // { Modal: <AboutUsModal /> },
-    // { Modal: <SelfExecutionModal /> },
-    // { Modal: <UnderagePolicyModal /> },
-  ];
-
-  const handleSocialHover = (index: number) => {
-    setActiveSocial(index);
-
-    const el = iconRefs.current[index];
-    if (el) {
-      const parentRect = el.parentElement?.parentElement?.getBoundingClientRect();
-      const rect = el.getBoundingClientRect();
-
-      if (parentRect) {
-        setArrowLeft(rect.left - parentRect.left + rect.width / 2);
-      }
-    }
-  };
-
-  useEffect(() => {
-    handleSocialHover(0);
-  }, []);
-
+export default function HomeFooter() {
   return (
-    <footer className="bg-[#efefef] py-4">
-      {/* Social Icons */}
-      <div className="bg-[#ffffff80]">
-        {/* Icons */}
-        <div className="flex justify-center gap-6 pt-3 text-[26px] text-[#8c8c8c]">
-          {socialLinks.map((item, index) => (
-            <button
-              key={index}
-              ref={(el) => {
-                iconRefs.current[index] = el;
-              }}
-              onMouseEnter={() => handleSocialHover(index)}
-              onClick={() => handleSocialHover(index)}
-              className="text-[26px] text-[#8c8c8c] hover:text-[#666]"
-            >
-              {item.icon}
-            </button>
-          ))}
+    <footer className="pt-4 font-helvetica lg:pb-1">
+      <div className="mx-auto flex min-h-[142px] w-full max-w-[670px] items-center rounded-[8px] border border-black/30 bg-white px-[10px] text-[11px] leading-[14px] text-black lg:bg-[#f2f2f2]">
+        <div className="mr-[7px] flex shrink-0 flex-col justify-center border-r border-black/30 pr-[7px]">
+          <img className="my-5 h-auto w-[100px] max-w-full" src="/images/footer/gc.webp" alt="GC" />
         </div>
-
-        {/* Divider directly under icons */}
-        <div className="mt-3 border-t border-[#cfcfcf]" />
-
-        {/* Active Item */}
-        <div className="relative flex justify-center py-2">
-          <div
-            className="
-              absolute
-              -top-[7px]
-              w-3
-              h-3
-              bg-[#f8f8f8]
-              border-r
-              border-b
-              border-[#cfcfcf]
-              rotate-45
-              transition-all
-              duration-200
-            "
-            style={{
-              left: `${arrowLeft}px`,
-              transform: 'translateX(-50%) rotate(45deg)',
-            }}
+        <div className="mr-[5px] shrink-0">
+          <img
+            src="/images/footer/lice.webp"
+            className="my-5 h-auto w-[100px] max-w-full"
+            alt="License"
           />
-
-          <a
-            href={socialLinks[activeSocial]!.href}
-            target="_blank"
-            rel="noreferrer"
-            className="text-[13px] text-black underline"
-          >
-            {socialLinks[activeSocial]!.content}
-          </a>
         </div>
+        <p className="min-w-0 flex-1 pl-[5px] text-left">
+          laser247 is the trading name of Sports Target B.V., a company incorporated and regulated
+          in Curaçao under company number 148053 with it's registered office at Fransche Bloemweg 4,
+          Willemstad, Curaçao.
+        </p>
       </div>
-
-      {/* Browser Icons */}
-      <div className="flex justify-center gap-3 mt-5 text-gray-500 text-xl">
-        <FaChrome />
-        <FaFirefoxBrowser />
-      </div>
-
-      {/* Browser Text */}
-      <p className="text-center text-[11px] text-gray-600 mt-2">
-        Our website works best in the latest and latest previous versions of these browsers: Google
-        Chrome, Firefox
-      </p>
-
-      {/* Policy Links */}
-      <div className="mt-4">
-        <div className="max-w-2xl mx-auto border-t border-gray-400 mb-3" />
-
-        <div className="flex flex-wrap justify-center items-center text-[12px] gap-1 text-gray-700">
-          {FooterLinks.map(({ Modal }, index) => (
-            <React.Fragment key={index}>
-              {index === 0 && <span>-</span>}
-              {Modal}
-              <span>-</span>
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-
-      {/* Betfair + App Download */}
-      <div className="mt-6 mb-8 flex justify-center">
-        <div className="flex items-center border border-gray-400 rounded-md">
-          <div className="px-3 py-2">
-            <img src="/images/skyexchHome/betfair.png" alt="Betfair" className="h-5" />
-          </div>
-
-          {/* Divider */}
-          <div className="h-16 w-px bg-gray-400"></div>
-
-          <div className="px-2 py-1">
-            <img
-              src="/images/skyexchHome/downloadApp.png"
-              alt="Download App"
-              className="h-14 p-1 pl-0 pr-4"
-            />
-            <p className=" text-10 text-left text-gray-800">v1.11 - 2022-03-23 - 3.1MB</p>
-          </div>
-        </div>
+      <div className="hidden lg:block">
+        <p className="mt-3 text-center text-[11px] leading-4 text-[#777]">
+          Our website works best in the newest and last prior version of these browsers: Google
+          Chrome. Firefox
+        </p>
+        <nav
+          aria-label="Footer policies"
+          className="mx-auto mt-1.5 flex max-w-[760px] flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-black/30 pt-2 text-[11px] leading-4 text-black [&_button]:capitalize [&_button]:text-black [&_button]:focus-visible:outline [&_button]:focus-visible:outline-2 [&_button]:focus-visible:outline-blue-500"
+        >
+          <PrivacyPolicyModal />
+          <TAndCModal />
+          <RulesAndRegulationsModal />
+          <AboutUsModal />
+          <ResponsibleGamingModal />
+        </nav>
       </div>
     </footer>
   );
-};
-
-export default HomeFooter;
+}

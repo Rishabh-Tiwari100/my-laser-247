@@ -15,6 +15,7 @@ import { casinoTabs, homeNavigations } from '@/utils/constants/home';
 import { useGetFixtureCountsQuery } from '@/store/api/eventsApi';
 import { useEffect, useState } from 'react';
 import Providers from './components/Providers';
+import HomeFooter from './components/HomeFooter';
 
 const WELCOME_BANNER_PENDING_KEY = 'welcomeBannerPending';
 
@@ -196,7 +197,7 @@ function Home() {
       )}
 
       <div className="flex lg:hidden bg-black text-center w-full overflow-x-auto justify-between whitespace-nowrap overflow-y-hidden">
-        {homeNavigations.map((nav, index) => (
+        {homeNavigations.map((nav, index) =>
           nav.label === 'Fantasy 11' ? (
             <button
               key={index}
@@ -213,12 +214,12 @@ function Home() {
             <Link
               key={index}
               to={nav.href}
-              className={`px-2.5 py-[7px] capitalize text-sm text-white border-r border-[#333] hover:bg-[#1a1a1a] ${nav.label === 'Casino' ? 'animate-menuHighlight'  : ''}`}
+              className={`px-2.5 py-[7px] capitalize text-sm text-white border-r border-[#333] hover:bg-[#1a1a1a] ${nav.label === 'Casino' ? 'animate-menuHighlight' : ''}`}
             >
               {nav.label}
             </Link>
           )
-        ))}
+        )}
       </div>
 
       <CasinoGameLauncher
@@ -263,7 +264,7 @@ function Home() {
                 src="/images/home-images/sports.png"
                 alt=""
               />
-              <p className="flex w-full h-[30px] justify-center capitalize text-[15px] items-center text-white  font-medium pl-[10px] bg-black">
+              <p className="flex w-full h-[30px] capitalize text-[15px] items-center text-white  font-medium pl-[10px] bg-black">
                 Sports
               </p>
               <div className="absolute right-0 top-0 p-[10px_5px_40px] text-left w-[150px] overflow-x-hidden overflow-y-auto max-h-[263px] h-full bg-[linear-gradient(180deg,_#000_0%,_rgba(0,0,0,0.7)_82%,_transparent_100%)]">
@@ -299,7 +300,7 @@ function Home() {
                 alt=""
               />
             </Link>
-            <p className="flex w-full h-[30px] justify-center capitalize text-[15px] items-center text-white  font-medium pl-[10px] bg-black">
+            <p className="flex w-full h-[30px] capitalize text-[15px] items-center text-white  font-medium pl-[10px] bg-black">
               Sports Book
             </p>
           </div>
@@ -324,29 +325,11 @@ function Home() {
       {/* <CasinoTabs activeTab={activeTab} onTabChange={handleTabChange} /> */}
 
       {/* <CasinoGames tab={activeTab} /> */}
-      <Providers/>
+      <Providers />
       <LandingContent />
-      <div>
-        <div className="max-w-[670px] my-3 mx-auto border border-[rgba(0,0,0,.3)] bg-white rounded-[8px] px-[10px] text-[#0009] flex items-center w-full">
-          <h3 className="flex flex-col justify-center border-r border-[rgba(0,0,0,.3)] pr-[7px] mr-[7px] ">
-            <img className="w-[100px] my-5 max-w-full h-auto" src="/images/footer/gc.webp" alt="" />
-          </h3>
-          <div className="mr-[5px]">
-            <img
-              src="/images/footer/lice.webp"
-              className="w-[100px] my-5 max-w-full h-auto"
-              alt="License"
-            />
-          </div>
-          <p className="text-black text-left flex-1 text-[11px] leading-[14px] pl-[5px]">
-            laser247 is the trading name of Sports Target B.V., a company incorporated and regulated
-            in Curaçao under company number 148053 with it's registered office at Fransche Bloemweg
-            4, Willemstad, Curaçao.
-          </p>
-        </div>
-      </div>
+      <HomeFooter />
 
-      <div className="pb-[30px]">
+      <div className="pb-[30px] lg:hidden">
         <div className="flex flex-wrap m-2 gap-2 justify-center">
           <div className="max-w-full flex items-center justify-center gap-[10px]">
             <div className="text-center">

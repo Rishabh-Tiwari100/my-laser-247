@@ -31,14 +31,14 @@ const Sidebar: React.FC<SidebarProps> = ({
     <div
       className={
         reserveDesktopSpace
-          ? 'contents lg:block lg:w-[15%] lg:min-w-[220px] lg:shrink-0'
+          ? 'contents lg:block lg:w-[240px] lg:shrink-0'
           : 'contents'
       }
     >
       <div
-        className={`fixed top-0 left-0 z-[100] h-screen w-full p-[155px_0_70px] bg-white border-r border-gray-300 font-tahoma shadow-lg transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 z-[100] h-screen w-[240px] p-[100px_0_70px] bg-white border-r border-gray-300 font-tahoma shadow-lg transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 lg:fixed lg:top-0 lg:left-0 lg:h-screen lg:w-[15%] lg:min-w-[220px] lg:max-w-none lg:shadow-none`}
+        } lg:translate-x-0 lg:fixed lg:top-0 lg:left-0 lg:h-screen lg:shadow-none`}
       >
         <div className="h-full overflow-hidden scrollbar-hidden">
           {menuItems.map((sport) => {
