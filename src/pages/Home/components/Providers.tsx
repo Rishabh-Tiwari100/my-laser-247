@@ -24,13 +24,13 @@ const providers = [
 
 const Providers = () => {
   return (
-    <div>
+    <div className="mt-4">
       <div className="relative bg-[linear-gradient(-180deg,#f72424,#bb1c00)] text-white flex items-center min-w-full w-full uppercase p-[5px] text-[15px] leading-[1.5]">
         <span className="">OUR PROVIDERS</span>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
+      <div className="mt-2 grid grid-cols-2 gap-1 md:grid-cols-4">
         {providers.map((provider) => (
-          <div key={provider.id} className="relative mb-1 bg-black">
+          <div key={provider.id} className="relative bg-black">
             <Link to={`/providers/${provider.id}`}>
               <img src={provider.img} alt={provider.name} className="img-fluid" />
               <h2 className="relative z-[4] bottom-0 left-0 w-full h-[30px] justify-center capitalize text-white text-[15px] items-center pl-[10px] font-medium flex">

@@ -1,6 +1,6 @@
-@keyframes marquee {
+@keyframes news-marquee {
   from {
-    transform: translateX(10%);
+    transform: translateX(0);
   }
 
   to {
@@ -8,8 +8,16 @@
   }
 }
 
-.animate-marquee {
-  animation-name: marquee;
+.news-marquee-track {
+  animation-name: news-marquee;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .news-marquee-track {
+    animation: none;
+    padding-left: 0;
+  }
 }

@@ -23,13 +23,18 @@ function MainLayout() {
   const isReferralPage = pathname === '/referral' || pathname === '/refer-earn';
   const isMyAccountPage =
     pathname.startsWith('/my-account') && pathname !== '/my-account/2fa';
+  const isProfilePage = pathname === '/my-account/profile' || pathname === '/my-profile';
+  const isOtherAccountPage = [
+    '/change-password', '/user/rules', '/stake-settings', '/bonus-statement',
+    '/wallet', '/affiliate',
+  ].includes(pathname);
   const roleName = useAppSelector(state => state.user.profile?.role?.name)
   const isReportsPage = [
     '/settled-bets', '/bet-history', '/my-bets', '/casino-bet-history',
     '/profit-loss', '/profit-loss-detail', '/turnover-history', '/account-statement', '/statements',
   ].includes(pathname) || pathname.startsWith('/my-account/');
-  const showOpenBetsSidebar = pathname !== '/' && !isReportsPage &&
-    !isPaymentPage && !isTwoFaPage && !isReferralPage;
+  const showOpenBetsSidebar = isProfilePage || (pathname !== '/' && !isReportsPage &&
+    !isOtherAccountPage && !isPaymentPage && !isTwoFaPage && !isReferralPage);
 
   return (
     <div className="flex min-h-screen flex-col font-inter">

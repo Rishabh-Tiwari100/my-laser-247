@@ -46,7 +46,7 @@ export const useLoginPage = (onSuccess?: () => void, loginMethod: LoginMethod = 
     formState: { errors },
   } = form;
   const [login, { isLoading }] = useLoginMutation();
-  const [demoLogin] = useDemoLoginMutation();
+  const [demoLogin, { isLoading: isDemoLoading }] = useDemoLoginMutation();
   const [verifyMfa, { isLoading: isMfaVerifying }] = useVerifyMfaMutation();
   const deviceType = getPlatform();
 
@@ -184,6 +184,7 @@ export const useLoginPage = (onSuccess?: () => void, loginMethod: LoginMethod = 
     showChangePasswordModal,
     showMfaModal,
     isLoading,
+    isDemoLoading,
     isMfaVerifying,
 
     setShowChangePasswordModal,

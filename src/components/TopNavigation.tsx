@@ -1,4 +1,5 @@
 import { Icons } from '@/utils/icons';
+import { useIsAuthenticated } from '@/hooks';
 import CasinoGameLauncher from '@/components/casino/CasinoGameLauncher';
 import { useFantasyGameLauncher } from '@/hooks/useFantasyGameLauncher';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -51,6 +52,10 @@ const menuItems = [
 
 export default function TopNavigation() {
   const location = useLocation();
+  const isAuthenticated = useIsAuthenticated();
+  const visibleItems = isAuthenticated ? menuItems : menuItems.filter((item) =>
+    !['Multi Market', 'Fantasy 11', 'Cock Fight', 'Other', 'Predix', 'Futsal', 'Genius'].includes(item.label)
+  );
   const { activeGameId, isLaunchingFantasy, launchFantasyGame, closeFantasyGame } =
     useFantasyGameLauncher();
 
@@ -59,7 +64,7 @@ export default function TopNavigation() {
       <div className="bg-top-navbar shadow-[0_2px_6px_-2px_rgba(0,0,0,0.16),0_2px_6px_rgba(0,0,0,0.12)]">
         <div className="overflow-x-auto overflow-y-hidden lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden">
           <ul className="flex w-max whitespace-nowrap">
-            {menuItems.map((item, index) => {
+            {visibleItems.map((item, index) => {
               const isFantasyItem = item.label === 'Fantasy 11';
               const classes = `hover:underline relative flex items-center gap-1 px-[9.5px] py-1 text-[12px] font-bold lg:h-[27px] lg:px-[10px] capitalize border-r border-black/10 transition-all ${item.special ? 'bg-log-button text-white' : item.danger ? 'bg-[#d71919] text-black' : 'text-[var(--primary-textcolork)] hover:bg-black/5'} ${item.highlight ? 'highlight-menus' : ''}`;
 

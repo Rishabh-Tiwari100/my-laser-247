@@ -220,10 +220,6 @@ export const useSidebar = ({
       menu = [...menu, ...privateToAffiliateUser];
     }
 
-    if (isDemoUser) {
-      menu = menu.filter((item) => item.path !== '/change-password');
-    }
-
     menu = [...menu, ...publicMenu];
 
     return menu.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));

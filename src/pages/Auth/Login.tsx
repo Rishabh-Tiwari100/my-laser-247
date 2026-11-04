@@ -1,423 +1,100 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Controller } from 'react-hook-form';
-import { isValidPhoneNumber } from 'react-phone-number-input';
-import toast from 'react-hot-toast';
-import AuthBrandingPanel from './components/AuthBrandingPanel';
-import AuthPhoneNumberInput, { PhoneCountry } from './components/AuthPhoneNumberInput';
-import AuthPasswordField from './components/AuthPasswordField';
-import AuthSubmitButton from './components/AuthSubmitButton';
-import { LoginCredentialType, LoginMethod, useLoginPage } from './hooks/useLogin';
-import { useOtpTimer } from '@/hooks';
-import { useSendOtpMutation } from '@/store/api/authApi';
-import { useGetCmsContentQuery } from '@/store/api/cmsApi';
-import { Icons } from '@/utils/icons';
-import { sanitizeCmsContent } from '@/utils/sanitizeCmsContent';
-import { hasMinimumNationalPhoneLength } from '@/utils/validations';
+import { Loader2 } from 'lucide-react';
+import { useLoginPage } from './hooks/useLogin';
 import OtpModal from '@/components/common/OtpModal';
+import AppInstallButtons from './components/AppInstallButtons';
+
+const REMEMBERED_USERNAME_KEY = 'laser247.rememberedUsername';
+
+function readRememberedUsername() {
+  try { return localStorage.getItem(REMEMBERED_USERNAME_KEY) ?? ''; }
+  catch { return ''; }
+}
 
 function Login() {
-  const [loginMethod, setLoginMethod] = useState<LoginMethod>('phone');
   const {
-    form,
-    handleLogin,
-    handleDemoLogin,
-    handleVerifyMfa,
-    handleCloseMfaModal,
-    isLoading,
-    showMfaModal,
-    isMfaVerifying,
-  } = useLoginPage(undefined, loginMethod);
-  const {
-    clearErrors,
-    control,
-    handleSubmit,
-    resetField,
-    watch,
-    formState: { isValid },
-  } = form;
-  const usernameValue = watch('username');
-  const passwordValue = watch('password');
+    form, handleLogin, handleDemoLogin, handleVerifyMfa, handleCloseMfaModal,
+    isLoading, isDemoLoading, showMfaModal, isMfaVerifying,
+  } = useLoginPage();
+  const [rememberMe, setRememberMe] = useState(() => Boolean(readRememberedUsername()));
+  const { register, handleSubmit, setValue, formState: { errors } } = form;
 
-  const [credentialType, setCredentialType] = useState<LoginCredentialType>('password');
-  const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>({
-    code: 'IN',
-    dialCode: '91',
-  });
-  const [otpSent, setOtpSent] = useState(false);
-  const {
-    timeLeft,
-    active: otpTimerActive,
-    start: startOtpTimer,
-    reset: resetOtpTimer,
-  } = useOtpTimer(300);
-  const [sendOtp, { isLoading: otpLoading }] = useSendOtpMutation();
-  const { data: cmsContentResponse } = useGetCmsContentQuery({
-    page: '/login',
-    type: 'footer',
-  });
-  const cmsFooterContent = cmsContentResponse?.data?.find(
-    ({ isActive, type }) => isActive && type === 'footer'
-  )?.content;
-  const sanitizedCmsFooterContent = useMemo(
-    () => sanitizeCmsContent(cmsFooterContent),
-    [cmsFooterContent]
-  );
-
-  const mobileDigits = usernameValue?.replace(/\D/g, '') ?? '';
-  const mobile = mobileDigits ? `+${mobileDigits}` : '';
-  const isValidMobile =
-    mobile.length > 1 && hasMinimumNationalPhoneLength(mobile) && isValidPhoneNumber(mobile);
-  const isValidLoginOtp =
-    loginMethod !== 'phone' ||
-    credentialType !== 'otp' ||
-    (otpSent && /^\d{6}$/.test(passwordValue));
-  const isLoginDisabled = !isValid || !isValidLoginOtp;
-
-  const resetOtpFlow = () => {
-    setOtpSent(false);
-    resetOtpTimer();
-  };
-
-  const selectLoginMethod = (method: LoginMethod) => {
-    setLoginMethod(method);
-    setCredentialType('password');
-    resetOtpFlow();
-    resetField('username');
-    resetField('password');
-    clearErrors();
-  };
-
-  const selectCredentialType = (type: LoginCredentialType) => {
-    if (type === credentialType) return;
-
-    setCredentialType(type);
-    resetOtpFlow();
-    resetField('password');
-    clearErrors('password');
-  };
-
-  const handleSendLoginOtp = async () => {
-    if (!isValidMobile) {
-      toast.error('Please enter a valid mobile number.', { id: 'login-otp' });
-      return;
-    }
-
-    try {
-      await sendOtp({ mobile, country: phoneCountry.code, type: 'login' }).unwrap();
-      toast.success(`OTP sent to ${mobile}`, { id: 'login-otp' });
-      setCredentialType('otp');
-      setOtpSent(true);
-      resetField('password');
-      clearErrors('password');
-      startOtpTimer();
-    } catch (err: any) {
-      toast.error(err?.data?.message || 'Failed to send OTP', { id: 'login-otp' });
-    }
-  };
-
-  const formatOtpTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
+  useEffect(() => {
+    const username = readRememberedUsername();
+    if (username) setValue('username', username);
+  }, [setValue]);
 
   return (
-    <div className="w-full">
-      <div className="grid w-full grid-cols-12">
-        <AuthBrandingPanel type="login" />
-
-        <div className="col-span-12 md:col-span-7 px-3">
-          <div className="mt-5 flex items-center justify-center">
-            <div className="w-full max-w-6xl">
-              <form
-                onSubmit={handleSubmit((data) => handleLogin(data, loginMethod, credentialType))}
-                autoComplete="off"
-                className="space-y-[9px]"
-              >
-                <div className="grid grid-cols-2 overflow-hidden rounded-[7px] border border-white text-sm font-semibold shadow-sm">
-                  <button
-                    type="button"
-                    className={`p-[7px] transition ${
-                      loginMethod === 'phone' ? 'bg-white text-black' : 'bg-transparent text-white'
-                    }`}
-                    onClick={() => selectLoginMethod('phone')}
-                  >
-                    Phone Number
-                  </button>
-                  <button
-                    type="button"
-                    className={`p-[7px] transition ${
-                      loginMethod === 'userId' ? 'bg-white text-black' : 'bg-transparent text-white'
-                    }`}
-                    onClick={() => selectLoginMethod('userId')}
-                  >
-                    User ID
-                  </button>
-                </div>
-
-                {loginMethod === 'phone' ? (
-                  <div>
-                    <Controller
-                      name="username"
-                      control={control}
-                      render={({ field, fieldState: { error } }) => (
-                        <div>
-                          <AuthPhoneNumberInput
-                            value={field.value}
-                            country={phoneCountry}
-                            onCountryChange={setPhoneCountry}
-                            onChange={(value) => {
-                              field.onChange(value);
-                              if (otpSent) {
-                                resetOtpFlow();
-                                resetField('password');
-                              }
-                            }}
-                            onBlur={field.onBlur}
-                            inputRef={field.ref}
-                            name={field.name}
-                            autoComplete="off"
-                          />
-                          {error && (
-                            <p className="block mt-1 text-[12px] font-normal leading-[1.2] text-[#ff0e25]">
-                              {error.message}
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    />
-                  </div>
-                ) : (
-                  <Controller
-                    name="username"
-                    control={control}
-                    render={({ field, fieldState: { error } }) => (
-                      <div>
-                        <div className="relative flex h-10 items-center rounded-[5px] bg-white shadow-sm">
-                          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-black">
-                            <Icons.userFilled className="h-4 w-4" />
-                          </span>
-                          <input
-                            {...field}
-                            type="text"
-                            placeholder="Enter User ID*"
-                            autoComplete="off"
-                            className="h-full w-full border-0 bg-transparent pl-7 pr-3 text-sm text-[#111827] outline-none placeholder:text-[#111827]"
-                          />
-                        </div>
-                        {error && (
-                          <p className="block mt-1 text-[12px] font-normal leading-[1.2] text-[#ff0e25]">
-                            {error.message}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  />
-                )}
-
-                {loginMethod === 'phone' && (
-                  <div className="flex h-6 items-center gap-3 text-sm font-normal text-white">
-                    <label className="flex cursor-pointer items-center gap-2">
-                      <input
-                        type="radio"
-                        name="credentialType"
-                        checked={credentialType === 'password'}
-                        onChange={() => selectCredentialType('password')}
-                        className="sr-only"
-                      />
-                      <span
-                        className={`flex h-[15px] w-[15px] items-center justify-center rounded-full border ${
-                          credentialType === 'password'
-                            ? 'border-white bg-white'
-                            : 'border-white bg-transparent'
-                        }`}
-                      >
-                        {credentialType === 'password' && (
-                          <span className="h-[7px] w-[7px] rounded-full bg-[#5e6f79]" />
-                        )}
-                      </span>
-                      Password
-                    </label>
-
-                    <label className="flex cursor-pointer items-center gap-2">
-                      <input
-                        type="radio"
-                        name="credentialType"
-                        checked={credentialType === 'otp'}
-                        onChange={() => selectCredentialType('otp')}
-                        className="sr-only"
-                      />
-                      <span
-                        className={`flex h-[15px] w-[15px] items-center justify-center rounded-full border ${
-                          credentialType === 'otp'
-                            ? 'border-white bg-white'
-                            : 'border-white bg-transparent'
-                        }`}
-                      >
-                        {credentialType === 'otp' && (
-                          <span className="h-[7px] w-[7px] rounded-full bg-[#5e6f79]" />
-                        )}
-                      </span>
-                      OTP
-                    </label>
-                  </div>
-                )}
-
-                <div className="space-y-[3px]">
-                  {loginMethod === 'userId' || credentialType === 'password' ? (
-                    <AuthPasswordField
-                      name="password"
-                      control={control}
-                      placeholder="Enter Password*"
-                      inputRules={{
-                        noSpace: true,
-                        maxLength: 20,
-                      }}
-                      autoComplete="new-password"
-                      className="[&>div:first-child]:!h-10 [&>div:first-child]:!rounded-[5px] [&_input]:placeholder:!text-[#111827] [&_input]:!text-[#111827] [&_span]:!w-7 [&_button]:!w-9 [&_svg]:!text-black"
-                    />
-                  ) : (
-                    <Controller
-                      name="password"
-                      control={control}
-                      render={({ field, fieldState: { error } }) => (
-                        <div>
-                          <div
-                            className={`flex h-10 items-center overflow-hidden rounded-[5px] ${
-                              otpSent ? 'bg-white' : 'bg-[#bdbdbd]'
-                            } ${error ? 'ring-1 ring-red-500' : ''}`}
-                          >
-                            <div className="min-w-0 flex-1">
-                              <div className="flex h-10 items-center">
-                                <span className="flex h-full w-7 shrink-0 items-center justify-center text-black">
-                                  <Icons.lock className="h-[16px] w-[16px]" />
-                                </span>
-                                <input
-                                  {...field}
-                                  type="text"
-                                  inputMode="numeric"
-                                  maxLength={6}
-                                  onChange={(event) =>
-                                    field.onChange(
-                                      event.target.value.replace(/\D/g, '').slice(0, 6)
-                                    )
-                                  }
-                                  placeholder="Enter OTP*"
-                                  disabled={!otpSent}
-                                  className="h-full w-full min-w-0 border-0 bg-transparent pr-2 text-sm text-[#111827] outline-none placeholder:text-[#111827] disabled:cursor-not-allowed"
-                                  autoComplete="one-time-code"
-                                />
-                              </div>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={handleSendLoginOtp}
-                              disabled={otpLoading || otpTimerActive || !isValidMobile}
-                              className="h-10 min-w-[82px] bg-[#0853c2] px-3 text-sm font-medium uppercase text-white transition disabled:opacity-30"
-                            >
-                              {otpLoading
-                                ? 'Sending...'
-                                : otpTimerActive
-                                  ? formatOtpTime(timeLeft)
-                                  : otpSent
-                                    ? 'RESEND OTP'
-                                    : 'GET OTP'}
-                            </button>
-                          </div>
-                          {error && (
-                            <p className="block mt-1 text-[12px] font-normal leading-[1.2] text-[#ff0e25]">
-                              {error.message}
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    />
-                  )}
-
-                  <div className="text-right leading-4">
-                    <Link
-                      to="/forgot-password"
-                      className="text-sm font-bold text-white underline underline-offset-1 hover:text-[#0cddff]"
-                    >
-                      Forgot Password?
-                    </Link>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-[5px]">
-                  <button
-                    type="button"
-                    onClick={handleDemoLogin}
-                    className="flex h-10 items-center justify-center rounded-[2px] border border-black bg-black text-sm font-semibold text-[#00c6f3] transition hover:bg-[#070707]"
-                  >
-                    Log In With Demo ID
-                  </button>
-                  <AuthSubmitButton
-                    label="Login"
-                    isLoading={isLoading}
-                    // disabled={isLoginDisabled}
-                    className="!mt-0 !h-10 !rounded-[2px] !bg-black !text-sm !font-semibold !text-[#00c6f3] hover:!bg-[#070707]"
-                  />
-                </div>
-
-                <div className="text-center text-sm text-white">Or Login With</div>
-                <div className="flex items-center justify-center gap-2 text-white">
-                  <button type="button" className="h-5 w-5 overflow-hidden rounded-[4px]">
-                    <img
-                      src="/images/footer/telegram.png"
-                      alt="Telegram"
-                      className="h-full w-full"
-                    />
-                  </button>
-                  <button type="button" className="h-5 w-5 overflow-hidden rounded-[4px]">
-                    <img
-                      src="/images/socialMedia/instagram.svg"
-                      alt="Instagram"
-                      className="h-full w-full"
-                    />
-                  </button>
-                  <button type="button" className="h-5 w-5 overflow-hidden rounded-[4px]">
-                    <img
-                      src="/images/footer/facebook.svg"
-                      alt="Facebook"
-                      className="h-full w-full"
-                    />
-                  </button>
-                </div>
-
-                <p className="text-center text-sm text-white">
-                  Don&apos;t have an account ?{' '}
-                  <Link
-                    to="/register"
-                    className="font-bold text-white underline underline-offset-1"
-                  >
-                    Register
-                  </Link>
-                </p>
-
-                {sanitizedCmsFooterContent && (
-                  <div
-                    className="cms-api-content login-cms-content mx-auto max-h-[130px] overflow-y-auto rounded-[5px] border border-white/70 bg-[#243a48] px-3 py-2 text-white shadow-[0_2px_6px_rgba(0,0,0,0.45)]"
-                    dangerouslySetInnerHTML={{ __html: sanitizedCmsFooterContent }}
-                  />
-                )}
-              </form>
-            </div>
-          </div>
-        </div>
+    <section className="mx-auto w-full max-w-[700px] font-helvetica text-white md:grid md:grid-cols-12 md:bg-[linear-gradient(0deg,#1c282d,transparent)] md:px-[30px] md:py-[55px]">
+      <div className="flex flex-col items-center justify-center pb-6 pt-2 md:col-span-5 md:pb-0 md:pt-[45px]">
+        <Link to="/" aria-label="My Laser247 home">
+          <img src="/images/logo.png" alt="My Laser247" className="h-auto w-[170px] max-w-full md:w-[146px]" />
+        </Link>
+        <span className="text-[13px] leading-[18px]">Powered by</span>
+        <img src="/images/skyexchHome/betfair.png" alt="Betfair" className="h-auto w-[146px] brightness-0 invert" />
+        <img src="/images/auth-image.webp" alt="" className="mt-6 hidden h-auto w-[146px] md:block" />
       </div>
 
-      <OtpModal
-        isOpen={showMfaModal}
-        onClose={handleCloseMfaModal}
-        onSubmit={handleVerifyMfa}
-        isLoading={isMfaVerifying}
-        title="Enter MFA OTP"
-        description="Enter the 6-digit code from your authenticator app to complete login."
-        submitLabel="Verify & Login"
-      />
-    </div>
+      <div className="min-w-0 md:col-span-7 md:px-[22px]">
+        <h1 className="mb-5 hidden text-center text-[22px] font-bold leading-[1.5] md:block">
+          Welcome Please Login To Your Account
+        </h1>
+        <form onSubmit={handleSubmit((data) => {
+          try {
+            if (rememberMe) localStorage.setItem(REMEMBERED_USERNAME_KEY, data.username.trim());
+            else localStorage.removeItem(REMEMBERED_USERNAME_KEY);
+          } catch { /* Sign-in remains available when browser storage is disabled. */ }
+          return handleLogin(data, 'userId', 'password');
+        })} className="space-y-1 md:space-y-[15px]" noValidate>
+          <div>
+            <label className="sr-only" htmlFor="login-username">Username</label>
+            <input id="login-username" autoComplete="username" placeholder="Enter Username"
+              aria-invalid={Boolean(errors.username)} aria-describedby={errors.username ? 'login-username-error' : undefined}
+              className="h-10 w-full rounded-[3px] border border-[#ced4da] bg-white px-[14px] text-sm text-black outline-none placeholder:italic placeholder:text-black focus:ring-2 focus:ring-cyan-300 md:h-9"
+              {...register('username')} />
+            {errors.username && <p id="login-username-error" role="alert" className="mt-1 text-xs text-[#ffb7b7]">{errors.username.message}</p>}
+          </div>
+          <div>
+            <label className="sr-only" htmlFor="login-password">Password</label>
+            <input id="login-password" type="password" autoComplete="current-password" placeholder="Enter Password"
+              aria-invalid={Boolean(errors.password)} aria-describedby={errors.password ? 'login-password-error' : undefined}
+              className="h-10 w-full rounded-[3px] border border-[#ced4da] bg-white px-[14px] text-sm text-black outline-none placeholder:italic placeholder:text-black focus:ring-2 focus:ring-cyan-300 md:h-9"
+              {...register('password')} />
+            {errors.password && <p id="login-password-error" role="alert" className="mt-1 text-xs text-[#ffb7b7]">{errors.password.message}</p>}
+          </div>
+          <div>
+            <label className="flex w-fit cursor-pointer items-center gap-[5px] py-1 text-xs font-bold">
+              <input type="checkbox" checked={rememberMe} onChange={(event) => {
+                setRememberMe(event.target.checked);
+                if (!event.target.checked) {
+                  try { localStorage.removeItem(REMEMBERED_USERNAME_KEY); } catch { /* Storage is optional. */ }
+                }
+              }} className="h-3 w-3 accent-[#00bfe5]" />
+              Remember me
+            </label>
+            <p className="text-xs leading-[1.8]">
+              Please review our <Link to="/terms-policy" className="underline">Privacy Policy</Link> and{' '}
+              <Link to="/terms-policy" className="underline">Terms of Service</Link>.
+            </p>
+          </div>
+          <div className="flex flex-col gap-1 md:items-end md:gap-[14px]">
+            <button type="submit" disabled={isLoading || isDemoLoading}
+              className="flex h-10 w-full items-center justify-center rounded-[2px] bg-black px-[30px] text-sm font-semibold text-[#00c6f3] disabled:opacity-60 md:h-9 md:w-auto md:bg-[#ed321c] md:text-base md:uppercase md:text-white">
+              {isLoading ? <Loader2 className="h-5 w-5 animate-spin" aria-label="Logging in" /> : 'Log In'}
+            </button>
+            <button type="button" onClick={handleDemoLogin} disabled={isLoading || isDemoLoading}
+              className="flex h-10 w-full items-center justify-center rounded-[2px] bg-black px-[30px] text-sm font-semibold text-[#00c6f3] disabled:opacity-60 md:h-9 md:w-auto md:bg-[#ed321c] md:text-base md:uppercase md:text-white">
+              {isDemoLoading ? <Loader2 className="h-5 w-5 animate-spin" aria-label="Starting demo" /> : 'Log In With Demo ID'}
+            </button>
+          </div>
+        </form>
+        <AppInstallButtons />
+      </div>
+      <OtpModal isOpen={showMfaModal} onClose={handleCloseMfaModal} onSubmit={handleVerifyMfa}
+        isLoading={isMfaVerifying} title="Enter MFA OTP"
+        description="Enter the 6-digit code from your authenticator app to complete login." submitLabel="Verify & Login" />
+    </section>
   );
 }
 

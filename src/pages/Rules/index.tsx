@@ -1,26 +1,64 @@
-import { rulesContent } from './rules-content';
-
-const [title, ...rules] = rulesContent;
+import { useState } from 'react';
+import { rulesSections } from './rules-content';
 
 const Rules = () => {
+  const [openSections, setOpenSections] = useState<Set<string>>(() => new Set(['speed-cash']));
+
+  const toggleSection = (id: string) => {
+    setOpenSections((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
   return (
-    <main className="w-full bg-[#eeeeee] p-[10px] pb-[30px]">
-      <section aria-labelledby="rules-heading">
-        <h1
-          id="rules-heading"
-          className="mb-[10px] bg-[#212121] px-[5px] py-[5px] text-sm font-semibold text-white"
-        >
-          {title}
-        </h1>
-        <div className="space-y-[10px] text-sm leading-[1.5] text-[#212121]">
-          {rules.map((rule, index) => (
-            <p key={index} className="whitespace-pre-line">
-              {rule}
-            </p>
-          ))}
+    <section
+      aria-labelledby="rules-heading"
+      className="mx-[2px] min-w-0 rounded-[3px] bg-white font-helvetica text-[#212529]"
+    >
+      <h1
+        id="rules-heading"
+        className="m-0 bg-[#343a40] p-[5px] text-[15px] font-medium leading-[1.2] text-white"
+      >
+        Rules
+      </h1>
+      <div className="p-[5px]">
+        <div className="mt-2">
+          {rulesSections.map((section) => {
+            const isOpen = openSections.has(section.id);
+            return (
+              <div key={section.id} className="rounded-[3px]">
+                <h2 className="mb-[5px] bg-log-button p-[10px]">
+                  <button
+                    type="button"
+                    id={`rules-trigger-${section.id}`}
+                    aria-expanded={isOpen}
+                    aria-controls={`rules-panel-${section.id}`}
+                    onClick={() => toggleSection(section.id)}
+                    className="block w-full p-0 text-left text-[15px] font-normal uppercase leading-[1.5] text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  >
+                    {section.title}
+                  </button>
+                </h2>
+                <div
+                  id={`rules-panel-${section.id}`}
+                  role="region"
+                  aria-labelledby={`rules-trigger-${section.id}`}
+                  hidden={!isOpen}
+                >
+                  <div
+                    className="overflow-x-auto p-[5px] text-sm leading-[1.5] [overflow-wrap:anywhere] [&_table]:mb-4 [&_table]:w-full [&_table]:border-collapse [&_table]:border [&_table]:border-[#dee2e6] [&_td]:border [&_td]:border-[#dee2e6] [&_td]:p-3 [&_td]:align-top"
+                    dangerouslySetInnerHTML={{ __html: section.content }}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
   );
 };
 

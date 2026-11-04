@@ -20,6 +20,7 @@ import MyAccount from '../MyAccount';
 import { useGetEventsQuery } from '@/store/api/eventsApi';
 import dayjs from 'dayjs';
 import TopNavigation from '@/components/TopNavigation';
+import GuestHeaderAuth from './GuestHeaderAuth';
 
 interface HeaderProps {
   showOneClickBar: boolean;
@@ -153,7 +154,7 @@ const Header: React.FC<HeaderProps> = ({
           {/* Left: Logo & Search */}
           <div className="flex items-center">
             {/* Mobile Sidebar Toggle */}
-            <div className="w-[125px] shrink-0 h-[70px] lg:w-[185px] flex items-center justify-center lg:justify-start lg:pl-3">
+            <div className={`w-[125px] shrink-0 ${isAuthenticated ? 'h-[70px]' : 'h-[54px]'} lg:h-[70px] lg:w-[185px] flex items-center justify-center lg:justify-start lg:pl-3`}>
               <Link
                 to="/"
                 className="block text-center leading-[70px] w-auto lg:w-[178px] lg:shrink-0"
@@ -293,25 +294,12 @@ const Header: React.FC<HeaderProps> = ({
                 </div>
               </>
             ) : (
-              <div className="flex items-center gap-[0.125rem] relative -top-[4px] right-2">
-                <Link
-                  to="/register"
-                  className="flex rounded-[4px] px-[10px] py-[6px] text-xs mr-[5px] text-white capitalize font-semibold items-center bg-[linear-gradient(-180deg,_#f72424,_#bb1c00)]"
-                >
-                  Register
-                </Link>
-                <Link
-                  to="/login"
-                  className="flex gap-1 rounded-[4px] px-[10px] py-[6px] text-xs mr-[5px] text-white capitalize font-semibold items-center bg-[#243a48]"
-                >
-                  <Icons.user /> Login
-                </Link>{' '}
-              </div>
+              <GuestHeaderAuth />
             )}
           </div>
         </div>
 
-        {!isMfaPage && (
+        {isAuthenticated && !isMfaPage && (
           <div className="lg:hidden flex w-full justify-around gap-[3px] border-y border-[#a6a6a6a3] p-[3px]">
             <Link
               to="/deposit"
@@ -338,7 +326,7 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         )}
         {/* Bottom Section: Navigation */}
-        <div className="hidden md:block">
+        <div className="hidden lg:block">
           <TopNavigation />
         </div>
       </header>

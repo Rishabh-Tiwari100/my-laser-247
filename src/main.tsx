@@ -26,6 +26,9 @@ import '@fontsource/inter/600.css'; // Semi-bold
 import '@fontsource/inter/700.css'; // Bold
 import '@/styles/globals.css';
 import DisableDevtool from 'disable-devtool';
+import { initializePwa } from '@/utils/pwa';
+
+initializePwa();
 
 // if (import.meta.env.VITE_APP_ENV === 'production') {
 //   DisableDevtool();

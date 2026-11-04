@@ -7,7 +7,7 @@ function AuthLayout() {
 
   return (
     <div className="relative h-screen overflow-y-auto bg-auth-gradient z-[2]">
-      <div className="min-h-full p-[40px_10px] flex flex-col items-center justify-center bg-custom-overlay">
+      <div className={`min-h-full flex flex-col items-center bg-custom-overlay ${pathname === '/login' ? 'px-[22px] pb-8 pt-10 md:justify-center md:px-3 md:py-16' : 'justify-center p-[40px_10px]'}`}>
         <Outlet />
         {pathname !== '/login' && <LandingContent page={pathname} className="w-full max-w-6xl" />}
       </div>

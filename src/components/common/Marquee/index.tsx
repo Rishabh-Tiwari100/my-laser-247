@@ -20,35 +20,33 @@ const Marquee: React.FC<MarqueeProps> = ({
   tagName = 'NEWS',
   className,
   contentClassName,
-  duration = 20,
-  pauseOnHover = false,
+  duration = 30,
+  pauseOnHover = true,
 }) => {
-
   const isAuthenticated = useIsAuthenticated();
   const { data } = useGetNotificationsQuery(undefined, { skip: !isAuthenticated });
-  const aletNotifications = data?.data?.Alert ?? [];
-  const items = aletNotifications?.map(item => item?.body ?? "");
-
+  const alertNotifications = data?.data?.Alert ?? [];
+  const items = alertNotifications.map((item) => item?.body ?? '').filter(Boolean);
 
   return (
     <div
       className={cn(
-        'flex items-center h-[26px] overflow-hidden bg-[linear-gradient(180deg,#2a3a43_27%,#1c282d_83%)] leading-[26px]',
+        'mb-px flex h-[26px] min-w-0 items-center overflow-hidden font-helvetica leading-[26px] text-white [background:var(--commentary,linear-gradient(180deg,#2a3a43_27%,#1c282d_83%))]',
         className
       )}
     >
       {/* Fixed Tag */}
-      <div className="text-white relative shrink-0 h-full p-[4px_25px_4px_4px] flex items-center after:content-[''] after:absolute after:right-0 after:top-0 after:h-[30px] after:w-[12px] after:bg-[url('/icons/right-icon.png')] after:bg-contain after:bg-no-repeat">
-        <Icon className="text-sm mr-[2px]" />
+      <h4 className="relative z-[1] m-0 flex h-full shrink-0 items-center p-[4px_15px_4px_4px] text-xs font-normal text-white [background:var(--commentary,linear-gradient(180deg,#2a3a43_27%,#1c282d_83%))] after:absolute after:right-0 after:top-0 after:h-[26px] after:w-[11px] after:bg-[url('/icons/right-icon.png')] after:bg-contain after:bg-no-repeat after:content-['']">
+        <Icon className="mr-[2px] shrink-0 text-[20px]" aria-hidden="true" />
         <span>{tagName}</span>
-      </div>
+      </h4>
 
       {/* Marquee */}
-      <div className="flex-1 overflow-hidden whitespace-nowrap">
+      <div className="group min-w-0 flex-1 overflow-hidden whitespace-nowrap">
         <div
           className={cn(
-            'inline-block min-w-max animate-marquee',
-            pauseOnHover && 'hover:[animation-play-state:paused]',
+            'news-marquee-track inline-block min-w-full whitespace-nowrap pl-[100%] text-xs font-bold text-[color:var(--marquee,#fff)]',
+            pauseOnHover && 'group-hover:[animation-play-state:paused]',
             contentClassName
           )}
           style={{
@@ -56,9 +54,9 @@ const Marquee: React.FC<MarqueeProps> = ({
           }}
         >
           {items.map((item, index) => (
-            <span key={index} className="inline-flex items-center px-4 text-[red] text-base">
+            <span key={index} className="inline-flex items-center">
               {item}
-              {index !== items.length - 1 && <span className="ml-4">|</span>}
+              {index !== items.length - 1 && <span className="mx-4" aria-hidden="true">|</span>}
             </span>
           ))}
         </div>

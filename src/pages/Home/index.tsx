@@ -7,6 +7,7 @@ import CasinoGameLauncher from '@/components/casino/CasinoGameLauncher';
 import { useFantasyGameLauncher } from '@/hooks/useFantasyGameLauncher';
 import { Link, useLocation } from 'react-router-dom';
 import NewLaunch from './components/NewLaunch';
+import MyFavourites from './components/MyFavourites';
 import CasinoTabs, { CasinoTab } from './components/CasinoTabs';
 import CasinoGames from './components/CasinoGames';
 import LandingContent from './components/LandingContent';
@@ -49,21 +50,21 @@ function Home() {
 
   const popularCasinoGames = [
     {
-      name: 'Cock  Fight',
-      img: '/images/home-images/cock-fight.gif',
-      link: '/casino?search=cock',
+      name: 'Creedroomz',
+      img: '/images/home-images/creed-roomz.gif',
+      link: '/casino?search=creedroomz',
     },
     {
       name: 'Lightning',
       img: '/images/home-images/lightning.gif',
       link: '/casino?search=lightning',
     },
-    { name: 'Sexy', img: '/images/home-images/sexy.gif', link: '/casino?search=sexy' },
     {
-      name: 'Marble Run',
-      img: '/images/home-images/marble-run.gif',
-      link: '/casino?search=marble',
+      name: 'Instalive',
+      img: '/images/home-images/insta-live.gif',
+      link: '/casino?search=instalive',
     },
+    { name: 'Sexy', img: '/images/home-images/sexy.gif', link: '/casino?search=sexy' },
     {
       name: 'Aviator',
       img: '/images/home-images/aviator.webp',
@@ -190,11 +191,9 @@ function Home() {
     <div className="relative lg:container mx-auto">
       {/* Full Width Marquee */}
 
-      {isAuthenticated && (
-        <div className="pt-[0.125rem]">
-          <Marquee icon={FiMic} tagName="News" duration={40} />
-        </div>
-      )}
+      <div className="pt-[0.125rem]">
+        <Marquee icon={FiMic} tagName="News" />
+      </div>
 
       <div className="flex lg:hidden bg-black text-center w-full overflow-x-auto justify-between whitespace-nowrap overflow-y-hidden">
         {homeNavigations.map((nav, index) =>
@@ -307,7 +306,7 @@ function Home() {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-[2px] lg:gap-2 mt-2">
+      <div className="grid grid-cols-4 gap-1 mt-2">
         {popularCasinoGames.map((item) => (
           <div className="relative">
             <Link to={item?.link} className="block">
@@ -321,6 +320,7 @@ function Home() {
       </div>
 
       <NewLaunch />
+      <MyFavourites />
 
       {/* <CasinoTabs activeTab={activeTab} onTabChange={handleTabChange} /> */}
 

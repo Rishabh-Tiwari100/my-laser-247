@@ -24,12 +24,6 @@ const AuthLayout = loadable(() => import('@/layouts/AuthLayout'), {
 const Login = loadable(() => import('@/pages/Auth/Login'), {
   fallback: <NotOutLoader />,
 });
-const Register = loadable(
-  () => import('@/pages/Auth/Register').then((module) => ({ default: module.Register })),
-  {
-    fallback: <NotOutLoader />,
-  }
-);
 const ForgotPassword = loadable(() => import('@/pages/Auth/ForgotPassword'), {
   fallback: <NotOutLoader />,
 });
@@ -212,7 +206,7 @@ export function App() {
       <Route element={<GuestRoute />}>
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<Navigate to="/login" replace />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
         </Route>
       </Route>
@@ -288,6 +282,10 @@ export function App() {
           <Route path="/turnover-history" element={<Turnover />} />
           <Route path="/account-statement" element={<Account />} />
           <Route path="/statements" element={<Account />} />
+          <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/user/rules" element={<Rules />} />
+          <Route path="/my-profile" element={<MyProfile />} />
+          <Route path="/bonus-statement" element={<BonusStatement />} />
           <Route element={<UserEligibilityRoute />}>
             <Route path="/deposit" element={<Deposit />} />
             <Route path="/withdraw" element={<Withdraw />} />
@@ -295,14 +293,10 @@ export function App() {
           </Route>
 
           <Route element={<DemoProtectedRoute />}>
-            <Route path="/change-password" element={<ChangePassword />} />
             <Route path="/my-account/update-mobile-number" element={<UpdateMobileNumber />} />
-            <Route path="/user/rules" element={<Rules />} />
             <Route path="/referral" element={<ReferralPage />} />
             <Route path="/refer-earn" element={<ReferralPage />} />
-            <Route path="/my-profile" element={<MyProfile />} />
             <Route path="/wallet" element={<MyWallet />} />
-            <Route path="/bonus-statement" element={<BonusStatement />} />
           </Route>
 
           <Route element={<AffiliateUserRoute />}>
