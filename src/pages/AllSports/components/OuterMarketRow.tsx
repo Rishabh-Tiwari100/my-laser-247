@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import OddButton from '@/components/common/OddButton';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { cn, formatMatchTime, getBlockedStatus } from '@/utils';
 import { useIsAuthenticated } from '@/hooks';
 import { Icons } from '@/utils/icons';
@@ -38,6 +38,7 @@ const oddsFallback = [
 
 const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }) => {
   const navigate = useNavigate();
+  const isDashboard = useLocation().pathname === '/dashboard';
   const isAuthenticated = useIsAuthenticated();
   const {
     eventName,
@@ -92,11 +93,12 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
   return (
     <div
       onClick={handleNavigate}
-      className="cursor-pointer border-solid border-b border-gray-300 bg-white hover:bg-stone-100 transition md:py-1 md:px-2.5 last:border-b-slate"
+      className={cn('cursor-pointer border-solid border-b border-gray-300 bg-white hover:bg-stone-100 transition md:py-1 md:px-2.5 last:border-b-slate', isDashboard && 'border-[#ededed] min-h-[47px] p-0 md:p-0 lg:min-h-[46px] lg:px-[8px] lg:py-[5px]')}
     >
-      <div className="flex min-h-[42px] items-center px-2 py-1 md:hidden">
+      <div className={cn('flex min-h-[42px] items-center px-2 py-1 md:hidden', isDashboard && 'min-h-[47px] px-[7px] py-[3px] md:flex lg:hidden')}>
         <div className="min-w-0 flex-1">
-          <div className="flex h-[18px] items-center gap-1">
+          <div className={cn('flex h-[18px] items-center gap-1', isDashboard && 'max-lg:pl-[10px] max-lg:gap-[3px]')}>
+            {showLiveIndicator && <span className={cn('hidden font-bold text-[#508d0e]', isDashboard && 'max-lg:inline max-lg:text-[13px]')}>In-Play</span>}
             {tags.map((tag) => (
               <span
                 key={tag}
@@ -105,7 +107,7 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
                 <img src={tagIcons[tag]} alt={tag} className="max-h-[15px] max-w-[15px]" />
               </span>
             ))}
-            <span className="truncate text-[10px] font-normal text-[#8a969e]">
+            <span className={cn('truncate text-[10px] font-normal text-[#8a969e]', isDashboard && 'max-lg:text-[9px] max-lg:text-[#f00]')}>
               {dayjs(time).format('DD/MM/YYYY HH:mm')}
             </span>
           </div>
@@ -114,17 +116,17 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
             <span
               className={`size-[7px] shrink-0 rounded-full border border-gray-400 ${showLiveIndicator ? 'bg-[#508d0e]' : 'bg-[#cbd3d8]'}`}
             />
-            <span className="truncate text-[#168bd2]">{eventName}</span>
+            <span className={cn('truncate text-[#168bd2]', isDashboard && 'max-lg:text-[14px] max-lg:font-semibold')}>{eventName}</span>
           </div>
         </div>
 
         <Icons.pin className="ml-2 size-5 shrink-0 rounded-full border border-[#91a5b0] p-0.5 text-[#91a5b0]" />
       </div>
 
-      <div className="hidden flex-1 grid-cols-12 md:grid">
+      <div className={cn('hidden flex-1 grid-cols-12 md:grid', isDashboard && 'max-lg:hidden')}>
         {/* Match Info */}
         <div className="col-span-10 md:col-span-7 flex justify-between gap-x-1">
-          <div className="flex gap-x-2">
+          <div className={cn("flex gap-x-2", isDashboard && "lg:gap-0")}>
             {showLiveIndicator ? (
               <div className="mt-1 self-start rounded-full inline-flex items-start p-1 md:p-0.5">
                 <span className="p-[3.5px] rounded-full bg-[#508d0e] border border-gray-400" />
@@ -136,13 +138,13 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
             )}
 
             <div>
-              <div className="text-xs text-primary-blue line-clamp-1">{eventName}</div>
-              <div className="flex items-center gap-x-2 text-xs font-bold text-gray-500 mt-0.5">
+              <div className={cn('text-xs text-primary-blue line-clamp-1', isDashboard && 'text-[13px] text-[#168bd2] font-semibold')}>{eventName}</div>
+              <div className={cn("flex items-center gap-x-2 text-xs font-bold text-gray-500 mt-0.5", isDashboard && "lg:gap-[5px] lg:text-[13px]")}>
                 {showLiveIndicator ? <p className="text-[#508d0e]">In-Play</p> : null}
                 <div className="flex gap-x-1">
                   {tags.map((tag) => (
                     <span
-                      className={`p-[2px] rounded-[2px] size-[18px] ${tag === 'bookmaker' ? 'bg-[#226bc3]' : 'bg-[#0a92a5]'}`}
+                      className={`p-[2px] rounded-[2px] size-[18px] ${isDashboard ? 'lg:text-[10px]' : ''} ${tag === 'bookmaker' ? 'bg-[#226bc3]' : 'bg-[#0a92a5]'}`}
                     >
                       <img
                         key={tag}
@@ -152,7 +154,7 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
                       />
                     </span>
                   ))}
-                  <span className="text-[11px] text-[#6c757d] font-thin">
+                  <span className={cn("text-[11px] text-[#6c757d] font-thin", isDashboard && "lg:text-[10px]")}>
                     {dayjs(time).format('DD/MM/YYYY HH:mm')}
                   </span>
                 </div>
@@ -162,7 +164,7 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
         </div>
 
         {/* Odds - Desktop */}
-        <div className="col-span-4 hidden md:flex justify-center gap-2">
+        <div className={cn('col-span-4 hidden md:flex justify-center gap-2', isDashboard && 'lg:gap-[3px]')}>
           <OddsRow
             isLeague={isLeague}
             allOdds={allOdds}
@@ -172,7 +174,7 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
         </div>
         <button
           type="button"
-          className="col-span-2 md:col-span-1 flex items-center justify-end pr-[5px]"
+          className={cn("col-span-2 md:col-span-1 flex items-center justify-end pr-[5px]", isDashboard && "lg:justify-center")}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -185,7 +187,7 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
         >
           <img
             src={isPinned ? "/icons/pin-green.svg" : "/icons/pin-white.svg"}
-            className="size-5"
+            className={cn("size-5", isDashboard && "lg:size-[22px]")}
             alt="Pin"
           />
         </button>

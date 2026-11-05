@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronRight, Loader2 } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
+import { cn } from '@/utils';
 import { useSidebar } from '@/hooks/useSidebar';
 
 interface SidebarProps {
@@ -18,6 +19,11 @@ const Sidebar: React.FC<SidebarProps> = ({
     setIsSidebarOpen,
   });
 
+  const { pathname } = useLocation();
+  const isDashboard = pathname === '/dashboard';
+  const visibleMenuItems = pathname === '/dashboard'
+    ? [...menuItems.slice(0, -1), { label: 'Rugby' }, menuItems[menuItems.length - 1]!, { label: 'Futsal' }]
+    : menuItems;
   const [expandedSport, setExpandedSport] = useState<string | null>(null);
 
   const toggleSport = (sport: string) => {
@@ -36,12 +42,10 @@ const Sidebar: React.FC<SidebarProps> = ({
       }
     >
       <div
-        className={`fixed top-0 left-0 z-[100] h-screen w-[240px] p-[100px_0_70px] bg-white border-r border-gray-300 font-tahoma shadow-lg transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 lg:fixed lg:top-0 lg:left-0 lg:h-screen lg:shadow-none`}
+        className={cn('fixed top-0 left-0 z-[100] h-screen w-[240px] p-[100px_0_70px] bg-white border-r border-gray-300 font-tahoma shadow-lg transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:left-0 lg:shadow-none', isSidebarOpen ? 'translate-x-0' : '-translate-x-full', isDashboard ? 'lg:top-[98px] lg:h-[calc(100vh-98px)] lg:p-0 lg:z-50' : 'lg:top-0 lg:h-screen')}
       >
-        <div className="h-full overflow-hidden scrollbar-hidden">
-          {menuItems.map((sport) => {
+        <div className={cn("h-full overflow-hidden scrollbar-hidden", isDashboard && "lg:overflow-y-auto")}>
+          {visibleMenuItems.map((sport) => {
             const sportName = sport.label === 'Football' ? 'Soccer' : sport.label;
 
             const sportCompetitions = competitions.filter(
@@ -59,14 +63,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                     toggleSport(sport.label);
                     handleSelectSport(sport.label);
                   }}
-                  className="flex items-center justify-between w-full px-[14px] py-2 text-[13px] border-b border-[#ededed] hover:bg-[#ededed] transition-colors"
+                  className={cn("flex items-center justify-between w-full px-[14px] py-2 text-[13px] border-b border-[#ededed] hover:bg-[#ededed] transition-colors", isDashboard && "lg:min-h-[31px] lg:px-[10px] lg:py-[5px]")}
                 >
                   <span>{sport.label}</span>
 
                   {isOpen ? (
-                    <ChevronDown size={16} className="border border-black rounded-[2px] p-px" />
+                    <ChevronDown size={16} className={cn("border border-black rounded-[2px] p-px", isDashboard && "lg:size-[13px] lg:p-0 lg:rounded-none lg:border-[#304d5d] lg:text-[#304d5d] lg:stroke-[3px]")} />
                   ) : (
-                    <ChevronRight size={16} className="border border-black rounded-[2px] p-px" />
+                    <ChevronRight size={16} className={cn("border border-black rounded-[2px] p-px", isDashboard && "lg:size-[13px] lg:p-0 lg:rounded-none lg:border-[#304d5d] lg:text-[#304d5d] lg:stroke-[3px]")} />
                   )}
                 </button>
 

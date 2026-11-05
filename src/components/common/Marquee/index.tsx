@@ -11,6 +11,7 @@ interface MarqueeProps {
   tagName?: string;
   className?: string;
   contentClassName?: string;
+  tagClassName?: string;
   duration?: number;
   pauseOnHover?: boolean;
 }
@@ -20,6 +21,7 @@ const Marquee: React.FC<MarqueeProps> = ({
   tagName = 'NEWS',
   className,
   contentClassName,
+  tagClassName,
   duration = 30,
   pauseOnHover = true,
 }) => {
@@ -36,7 +38,7 @@ const Marquee: React.FC<MarqueeProps> = ({
       )}
     >
       {/* Fixed Tag */}
-      <h4 className="relative z-[1] m-0 flex h-full shrink-0 items-center p-[4px_15px_4px_4px] text-xs font-normal text-white [background:var(--commentary,linear-gradient(180deg,#2a3a43_27%,#1c282d_83%))] after:absolute after:right-0 after:top-0 after:h-[26px] after:w-[11px] after:bg-[url('/icons/right-icon.png')] after:bg-contain after:bg-no-repeat after:content-['']">
+      <h4 className={cn("relative z-[1] m-0 flex h-full shrink-0 items-center p-[4px_15px_4px_4px] text-xs font-normal text-white [background:var(--commentary,linear-gradient(180deg,#2a3a43_27%,#1c282d_83%))] after:absolute after:right-0 after:top-0 after:h-[26px] after:w-[11px] after:bg-[url('/icons/right-icon.png')] after:bg-contain after:bg-no-repeat after:content-['']", tagClassName)}>
         <Icon className="mr-[2px] shrink-0 text-[20px]" aria-hidden="true" />
         <span>{tagName}</span>
       </h4>

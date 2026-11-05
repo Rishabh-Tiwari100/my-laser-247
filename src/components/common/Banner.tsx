@@ -1,5 +1,7 @@
-const Banner = () => (
-  <picture className="my-[5px] block">
+import { cn } from '@/utils';
+
+const Banner = ({ className }: { className?: string }) => (
+  <picture className={cn("my-[5px] block", className)}>
     <source
       media="(min-width: 1024px)"
       srcSet="/images/banners/bnr1.png"

@@ -1,9 +1,3 @@
-import PrivacyPolicyModal from './modals/PrivacyPolicyModal';
-import TAndCModal from './modals/TAndCModal';
-import RulesAndRegulationsModal from './modals/RulesAndRegulationsModal';
-import AboutUsModal from './modals/AboutUsModal';
-import ResponsibleGamingModal from './modals/ResponsibleGamingModal';
-
 export default function HomeFooter() {
   return (
     <footer className="pt-4 font-helvetica lg:pb-1">
@@ -31,13 +25,13 @@ export default function HomeFooter() {
         </p>
         <nav
           aria-label="Footer policies"
-          className="mx-auto mt-1.5 flex max-w-[760px] flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-black/30 pt-2 text-[11px] leading-4 text-black [&_button]:capitalize [&_button]:text-black [&_button]:focus-visible:outline [&_button]:focus-visible:outline-2 [&_button]:focus-visible:outline-blue-500"
+          className="mx-auto mt-1.5 flex max-w-[760px] flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-black/30 pt-2 text-[11px] leading-4 text-black"
         >
-          <PrivacyPolicyModal />
-          <TAndCModal />
-          <RulesAndRegulationsModal />
-          <AboutUsModal />
-          <ResponsibleGamingModal />
+          <span className="capitalize">Privacy Policy</span>
+          <span className="capitalize">Terms and conditions</span>
+          <span className="capitalize">Rules and Regulations</span>
+          <span className="capitalize">About Us</span>
+          <span className="capitalize">Responsible Gaming</span>
         </nav>
       </div>
     </footer>

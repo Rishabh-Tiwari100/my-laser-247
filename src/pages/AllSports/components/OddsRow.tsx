@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom';
 import OddButton from '@/components/common/OddButton';
 import clsx from 'clsx';
 import OuterOddButton from './OuterOddButton';
@@ -15,6 +16,7 @@ interface Props {
 }
 
 const OddsRow = ({ allOdds, blockedStatus, length, isLeague }: Props) => {
+  const isDashboard = useLocation().pathname === '/dashboard';
   const groupedOdds: OddType[][] = [];
 
   for (let i = 0; i < allOdds.length; i += 2) {
@@ -38,6 +40,7 @@ const OddsRow = ({ allOdds, blockedStatus, length, isLeague }: Props) => {
                 price={isDisabled ? null : odd.price}
                 position={hasPrice ? 1 : 2}
                 // className={clsx(isDisabled ? 'opacity-50' : 'opacity-100')}
+                className={isDashboard ? odd.type === 'back' ? 'lg:h-[34px] lg:bg-[#72bbef]' : 'lg:h-[34px] lg:bg-[#faa9bd]' : undefined}
                 isLeague={isLeague}
               />
             );

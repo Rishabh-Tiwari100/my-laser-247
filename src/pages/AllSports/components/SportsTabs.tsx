@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { cn } from '@/utils';
 import { Search } from 'lucide-react';
 import EventSearchModal from '@/components/common/EventSearchModal';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useIsAuthenticated } from '@/hooks';
+import { useFantasyGameLauncher } from '@/hooks/useFantasyGameLauncher';
+import CasinoGameLauncher from '@/components/casino/CasinoGameLauncher';
 
 export const tabs = [
   {
@@ -155,6 +159,21 @@ export const tabs = [
 export default function SportsTabs() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const isDashboard = pathname === '/dashboard';
+  const isAuthenticated = useIsAuthenticated();
+  const { activeGameId, isLaunchingFantasy, launchFantasyGame, closeFantasyGame } = useFantasyGameLauncher();
+  const dashboardNames = [
+    'Cricket', 'Football', 'Tennis', 'Fantasy 11', 'Cock Fight', 'Casino', 'Sports book',
+    'Horse Racing', 'Greyhound Racing', 'Other', 'Binary', 'Kabaddi', 'Politics',
+    'Basketball', 'Baseball', 'Table Tennis', 'Volleyball', 'Ice Hockey', 'Rugby',
+    'Mixed Martial Arts', 'Darts', 'Futsal', 'Genius', 'Predix',
+  ];
+  const visibleTabs = pathname === '/dashboard'
+    ? dashboardNames.filter((name) => isAuthenticated || !['Fantasy 11', 'Cock Fight', 'Predix'].includes(name))
+      .map((name, index) => tabs.find((tab) => tab.name === name) ?? {
+        id: 100 + index, name, icon: name === 'Fantasy 11' ? '/icons/cricket.svg' : '/icons/trophy.webp', active: false,
+      })
+    : tabs;
   const tabRoutes: Record<string, string> = {
     Cricket: '/sports/cricket',
     Football: '/sports/football',
@@ -187,25 +206,31 @@ export default function SportsTabs() {
 
   return (
     <>
-    <nav className="relative w-full border-b border-[#c8ced3] bg-white max-lg:border-0 max-lg:bg-[#243a48]" aria-label="Sports">
-      <div className="flex min-h-[38px] overflow-x-auto whitespace-nowrap px-1.5 max-lg:min-h-[42px] max-lg:items-end max-lg:gap-px max-lg:pr-11">
-        {tabs.map((tab) => (
+    <nav className={cn("relative w-full border-b border-[#c8ced3] bg-white max-lg:border-0 max-lg:bg-[#243a48]", isDashboard && "order-3 border-b-[3px] border-b-white max-lg:border-b-[3px] max-lg:border-t-[8px] max-lg:border-t-[#213b49] lg:order-4 lg:border-b-[#213b49]")} aria-label="Sports">
+      <div className={cn("flex min-h-[38px] overflow-x-auto whitespace-nowrap px-1.5 max-lg:min-h-[42px] max-lg:items-end max-lg:gap-px max-lg:pr-11", isDashboard && "min-h-[26px] px-0 max-lg:min-h-[37px] max-lg:pl-0 max-lg:[scrollbar-width:none]")}>
+        {visibleTabs.map((tab) => (
           <button
             key={tab.id}
+            type="button"
+            disabled={tab.name === 'Fantasy 11' && (isLaunchingFantasy || activeGameId !== null)}
             ref={active === tab.id ? activeTabRef : null}
             onClick={() => {
+              if (tab.name === 'Fantasy 11') {
+                void launchFantasyGame();
+                return;
+              }
               setActive(tab.id);
               const route = tabRoutes[tab.name];
               if (route) navigate(route);
             }}
             aria-current={active === tab.id ? 'page' : undefined}
-            className={`flex h-[37px] shrink-0 items-center gap-1.5 border-b-[3px] px-[14px] text-[13px] font-bold leading-none transition-colors duration-200 max-lg:mt-[5px] max-lg:h-[37px] max-lg:gap-1 max-lg:border max-lg:border-b-0 max-lg:px-3 max-lg:text-[11px] ${active === tab.id
+            className={cn(`flex h-[37px] shrink-0 items-center gap-1.5 border-b-[3px] px-[14px] text-[13px] font-bold leading-none transition-colors duration-200 max-lg:mt-[5px] max-lg:h-[37px] max-lg:gap-1 max-lg:border max-lg:border-b-0 max-lg:px-3 max-lg:text-[11px] ${active === tab.id
               ? 'border-white bg-[#212121] text-white max-lg:rounded-t-[9px]'
               : 'border-transparent text-[#3b5160] hover:bg-[#212121] hover:text-white max-lg:text-white/90 max-lg:hover:rounded-t-[9px] hover:max-lg:border hover:max-lg:border-white max-lg:border-b-0'
-              }`}
+              }`, isDashboard && 'h-[26px] px-[14px] text-[13px] max-lg:mt-0 max-lg:h-[34px] max-lg:text-[13px]')}
           >
             <img
-              src={`https://www.lasercric.com${tab.icon}`}
+              src={tab.name === 'Cricket' ? '/icons/cricket.svg' : tab.name === 'Football' ? '/icons/soccer.svg' : tab.name === 'Tennis' ? '/icons/tennis.svg' : tab.icon.startsWith('/icons/') ? tab.icon : `https://www.lasercric.com${tab.icon}`}
               alt={tab.name}
               className="hidden size-5 shrink-0 object-contain invert max-lg:block"
             />
@@ -223,6 +248,7 @@ export default function SportsTabs() {
         <Search className="h-5 w-5" strokeWidth={2.5} />
       </button>
     </nav>
+    <CasinoGameLauncher open={activeGameId !== null} gameId={activeGameId} title="Fantasy 11" closePath={pathname} onClose={closeFantasyGame} />
     <EventSearchModal open={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );

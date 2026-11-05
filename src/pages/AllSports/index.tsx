@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
+import Marquee from '@/components/common/Marquee';
 import TabFilter from '@/components/common/TabFilter';
 import { Loader2, Search } from 'lucide-react';
 
@@ -8,6 +9,7 @@ import FootballSection from './components/sports/FootballSection';
 import TennisSection from './components/sports/TennisSection';
 import BetResult from '@/pages/BetResult';
 
+import { cn } from '@/utils';
 import { useAllSports } from './hooks/useAllSports';
 import { useHomePage } from '../Home/hooks/useHomePage';
 import { FaCheck, FaPlus } from 'react-icons/fa6';
@@ -23,6 +25,7 @@ const AllSports: React.FC = () => {
   const [viewBy, setViewBy] = useState<ViewByOption>('Time');
   const [isLiveSelected, setIsLiveSelected] = useState(false);
   const [isVirtualSelected, setIsVirtualSelected] = useState(false);
+  const [isPremiumSelected, setIsPremiumSelected] = useState(false);
 
   const normalizedSportName = sportName.toLowerCase();
   const sport =
@@ -31,7 +34,8 @@ const AllSports: React.FC = () => {
       : normalizedSportName === 'tennis'
         ? 'Tennis'
         : 'Cricket';
-  const isDashboard = window.location.pathname.includes('dashboard');
+  const { pathname } = useLocation();
+  const isDashboard = pathname === '/dashboard';
   const { isAuthenticated } = useHomePage();
   const pageMatchFilter = isVirtualSelected && !isLiveSelected ? 'virtual' : isLiveSelected ? 'live' : 'all';
 
@@ -43,12 +47,18 @@ const AllSports: React.FC = () => {
     isInplay,
     isMultiMarket,
     allEvents,
-    cricketEvents,
-    footballEvents,
-    tennisEvents,
+    cricketEvents: allCricketEvents,
+    footballEvents: allFootballEvents,
+    tennisEvents: allTennisEvents,
     filterResultTab,
   } = useAllSports(sport, viewBy, pageMatchFilter);
 
+  const cricketEvents = isDashboard && isPremiumSelected
+    ? allCricketEvents.filter((event) => event.tags.includes('premium')) : allCricketEvents;
+  const footballEvents = isDashboard && isPremiumSelected
+    ? allFootballEvents.filter((event) => event.tags.includes('premium')) : allFootballEvents;
+  const tennisEvents = isDashboard && isPremiumSelected
+    ? allTennisEvents.filter((event) => event.tags.includes('premium')) : allTennisEvents;
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const visibleEventCount = isInplay
     ? allEvents.length
@@ -60,7 +70,7 @@ const AllSports: React.FC = () => {
 
   return (
     <div
-      className={`flex flex-col font-tamoha ${isAuthenticated ? 'pt-[0.125rem]' : ''}`}
+      className={cn('flex flex-col font-tamoha', isAuthenticated && 'pt-[0.125rem]', isDashboard && 'p-0 lg:pt-[2px] [font-family:Arial,Helvetica,sans-serif]')}
     >
       {isMultiMarket ? (
         <>
@@ -72,7 +82,14 @@ const AllSports: React.FC = () => {
         </>
       ) : (
         <div className="flex flex-col flex-1 min-h-0 scrollbar-hidden">
-          {(isDashboard || isInplay) && <ExchangeSportsbookHeader />}
+          {isDashboard && (
+            <>
+              <Marquee tagName="News" className="order-0 mb-px h-[26px] leading-[26px] lg:h-[28px]" tagClassName="text-xs lg:pl-[5px]" contentClassName="lg:font-[Georgia,serif] lg:text-[14px]" />
+              <Banner className="order-1 m-0 lg:border-b lg:border-white" />
+              <ExchangeSportsbookHeader />
+            </>
+          )}
+          {isInplay && <ExchangeSportsbookHeader />}
           {isInplay && (
             <>
               <div
@@ -115,22 +132,17 @@ const AllSports: React.FC = () => {
             </>
           )}
 
-          {!isInplay && (
+          {!isInplay && !isDashboard && (
             <Banner />
           )}
 
-          {isDashboard && (
-            <div className="bg-[#212121] py-[5px] mt-[7px] text-xs font-semibold text-white font-tahoma border-b border-[#c8ced3] hidden lg:flex items-center justify-between px-2">
-              <div className="h-5"> Highlights</div>
-            </div>
-          )}
           {!isInplay && <SportsTabs />}
 
           {!isInplay && (
-            <div className={isAuthenticated ? 'pt-[0.125rem]' : ``}>
+            <div className={isDashboard ? 'order-4 p-0 lg:order-3' : isAuthenticated ? 'pt-[0.125rem]' : ''}>
 
               {/* Always visible */}
-              <div className="bg-[#212121] py-[5px] mt-[7px] text-xs font-semibold text-white font-tahoma border-b border-[#c8ced3] flex items-center justify-between px-2">
+              <div className={cn('bg-[#212121] py-[5px] mt-[7px] text-xs font-semibold text-white font-tahoma border-b border-[#c8ced3] flex items-center justify-between px-2', isDashboard && 'm-0 min-h-[29px] px-[3px] py-[2px] lg:min-h-[25px] lg:bg-[#213b49] lg:px-[5px] lg:py-px')}>
                 {isDashboard ? (
                   'Highlights'
                 ) : (
@@ -149,17 +161,17 @@ const AllSports: React.FC = () => {
                     {sport}
                   </div>
                 )}
-                <div className="flex gap-2 items-center">
+                <div className={cn("flex gap-2 items-center", isDashboard && "max-lg:gap-[5px]")}>
                   <div className="flex items-center gap-[2px]">
                     <button
                       type="button"
                       aria-pressed={isLiveSelected}
                       onClick={() => setIsLiveSelected((current) => !current)}
-                      className={`flex items-center justify-center rounded-[25px] border px-2.5 text-[12px] whitespace-nowrap ${
+                      className={cn(`flex items-center justify-center rounded-[25px] border px-2.5 text-[12px] whitespace-nowrap ${isDashboard ? 'min-h-[23px] gap-[3px] px-[6px] text-[11px] font-normal lg:min-h-[22px] lg:px-2.5 lg:text-xs' : ''} ${
                         isLiveSelected
                           ? 'border-[#00ad78] bg-[#00ad78] text-white'
                           : 'border-white bg-transparent text-white'
-                      }`}
+                      }`)}
                     >
                       {isLiveSelected ? <FaCheck aria-hidden="true" /> : <FaPlus aria-hidden="true" />}
                       LIVE
@@ -168,11 +180,11 @@ const AllSports: React.FC = () => {
                       type="button"
                       aria-pressed={isVirtualSelected}
                       onClick={() => setIsVirtualSelected((current) => !current)}
-                      className={`flex items-center justify-center rounded-[25px] border px-2.5 text-[12px] whitespace-nowrap ${
+                      className={cn(`flex items-center justify-center rounded-[25px] border px-2.5 text-[12px] whitespace-nowrap ${isDashboard ? 'min-h-[23px] gap-[3px] px-[6px] text-[11px] font-normal lg:min-h-[22px] lg:px-2.5 lg:text-xs' : ''} ${
                         isVirtualSelected
                           ? 'border-[#00ad78] bg-[#00ad78] text-white'
                           : 'border-white bg-transparent text-white'
-                      }`}
+                      }`)}
                     >
                       {isVirtualSelected ? (
                         <FaCheck aria-hidden="true" />
@@ -181,6 +193,13 @@ const AllSports: React.FC = () => {
                       )}
                       VIRTUAL
                     </button>
+                    {isDashboard && (
+                      <button type="button" aria-pressed={isPremiumSelected}
+                        onClick={() => setIsPremiumSelected((selected) => !selected)}
+                        className={`hidden lg:flex min-h-[22px] gap-[3px] font-normal items-center justify-center rounded-[25px] border px-2.5 text-[12px] whitespace-nowrap ${isPremiumSelected ? 'border-[#00ad78] bg-[#00ad78] text-white' : 'border-white text-white'}`}>
+                        {isPremiumSelected ? <FaCheck aria-hidden="true" /> : <FaPlus aria-hidden="true" />} PREMIUM
+                      </button>
+                    )}
                   </div>
                   <ViewByDropdown selected={viewBy} onChange={setViewBy} />
                 </div>
@@ -190,12 +209,12 @@ const AllSports: React.FC = () => {
           {activeTab === 'Bet Result' ? (
             <BetResult />
           ) : isLoading ? (
-            <div className="flex justify-center items-center gap-x-1 py-8 text-white">
+            <div className={cn("flex justify-center items-center gap-x-1 py-8 text-white", isDashboard && "order-5 text-[#213b49]")}>
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               Loading events...
             </div>
           ) : (
-            <div className={isInplay ? 'space-y-0' : 'space-y-3'}>
+            <div className={`${isDashboard ? 'order-5 bg-white' : ''} ${isInplay ? 'space-y-0' : 'space-y-3'}`}>
               <>
                 {(sport === 'Cricket' || selectedSportTab === 'Cricket' || isInplay) && (
                   <CricketSection

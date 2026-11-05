@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useIsAuthenticated } from '@/hooks';
 
 interface NavItem {
@@ -25,10 +25,11 @@ interface BottomNavProps {
 
 const BottomNav = ({ isProfileMenuOpen, onProfileClick }: BottomNavProps) => {
   const isAuthenticated = useIsAuthenticated();
+  const isDashboard = useLocation().pathname === '/dashboard';
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-[5000000000000001] h-[50px] w-full bg-footer-gradient lg:hidden"
+      className={`fixed bottom-0 left-0 right-0 z-[5000000000000001] h-[50px] w-full lg:hidden ${isDashboard ? 'bg-gradient-to-b from-[#263e4c] to-[#172b38]' : 'bg-footer-gradient'}`}
       role="navigation"
       aria-label="Bottom navigation"
     >

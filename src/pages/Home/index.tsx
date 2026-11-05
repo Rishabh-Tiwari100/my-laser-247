@@ -42,10 +42,28 @@ function Home() {
   const inplayCounts = fixtureCountsData?.counts.inplay;
 
   const sports = [
-    { name: 'In-Play', count: inplayCounts?.all ?? 0, path: '/inplay' },
     { name: 'Cricket', count: inplayCounts?.sports.Cricket ?? 0, path: '/inplay' },
     { name: 'Football', count: inplayCounts?.sports.Football ?? 0, path: '/inplay' },
     { name: 'Tennis', count: inplayCounts?.sports.Tennis ?? 0, path: '/inplay' },
+    { name: 'Casino', count: 0, path: '/inplay' },
+    { name: 'Sports book', count: 0, path: '/inplay' },
+    { name: 'Horse Racing', count: 0, path: '/inplay' },
+    { name: 'Greyhound Racing', count: 0, path: '/inplay' },
+    { name: 'Other', count: 0, path: '/inplay' },
+    { name: 'Binary', count: 0, path: '/inplay' },
+    { name: 'Kabaddi', count: 0, path: '/inplay' },
+    { name: 'Politics', count: 0, path: '/inplay' },
+    { name: 'Basketball', count: 0, path: '/inplay' },
+    { name: 'Baseball', count: 0, path: '/inplay' },
+    { name: 'Table Tennis', count: 0, path: '/inplay' },
+    { name: 'Volleyball', count: 0, path: '/inplay' },
+    { name: 'Ice Hockey', count: 0, path: '/inplay' },
+    { name: 'Rugby', count: 0, path: '/inplay' },
+    { name: 'Mixed Martial Arts', count: 0, path: '/inplay' },
+    { name: 'Darts', count: 0, path: '/inplay' },
+    { name: 'Futsal', count: 0, path: '/inplay' },
+    { name: 'Genius', count: 0, path: '/inplay' },
+    { name: 'Predix', count: 0, path: '/inplay' },
   ];
 
   const popularCasinoGames = [
@@ -266,7 +284,7 @@ function Home() {
               <p className="flex w-full h-[30px] capitalize text-[15px] items-center text-white  font-medium pl-[10px] bg-black">
                 Sports
               </p>
-              <div className="absolute right-0 top-0 p-[10px_5px_40px] text-left w-[150px] overflow-x-hidden overflow-y-auto max-h-[263px] h-full bg-[linear-gradient(180deg,_#000_0%,_rgba(0,0,0,0.7)_82%,_transparent_100%)]">
+              <div className="absolute right-0 top-0 p-[10px_5px_40px] text-left w-[180px] lg:w-[190px] overflow-x-hidden overflow-y-auto max-h-[263px] h-full bg-[linear-gradient(180deg,_#000_0%,_rgba(0,0,0,0.7)_82%,_transparent_100%)]">
                 <p className="inline-flex h-5 max-w-[58px] items-center rounded-[3px] bg-gradient-to-b from-[#fb3434] to-[#e80505] pr-[5px] text-[12px] font-bold leading-5 text-white mt-[5px] mb-0">
                   <span className="mr-[5px] flex h-full items-center justify-center rounded-l-[3px] bg-gradient-to-b from-white to-[#e8e8e8] px-[3px]">
                     <span className="live-icon animate-twinkling" />
@@ -274,10 +292,10 @@ function Home() {
                   LIVE
                 </p>
                 <div className="pb-5 px-[5px]">
-                  {sports.map((sport, index) => (
+                  {sports.map((sport) => (
                     <div
-                      key={index}
-                      className="flex cursor-pointer items-center justify-between text-[10px] lg:text-xs"
+                      key={sport.name}
+                      className="flex cursor-pointer items-center justify-between gap-2 text-[10px] lg:text-xs"
                     >
                       <h3 className="text-white font-normal capitalize leading-[1.8] ">
                         {sport.name}
@@ -366,24 +384,24 @@ function Home() {
         <div className="mt-[10px]">
           <ul className="flex items-center justify-center flex-wrap">
             <li className="inline-block px-[10px]">
-              <Link className="text-[11px] text-white underline" to="#">
+              <span className="text-[11px] text-white underline">
                 privacy Policy
-              </Link>
+              </span>
             </li>
             <li className="inline-block px-[10px]">
-              <Link className="text-[11px] text-white underline" to="#">
+              <span className="text-[11px] text-white underline">
                 terms and conditions
-              </Link>
+              </span>
             </li>
             <li className="inline-block px-[10px]">
-              <Link className="text-[11px] text-white underline" to="#">
+              <span className="text-[11px] text-white underline">
                 about us
-              </Link>
+              </span>
             </li>
             <li className="inline-block px-[10px]">
-              <Link className="text-[11px] text-white underline" to="#">
+              <span className="text-[11px] text-white underline">
                 responsible gaming
-              </Link>
+              </span>
             </li>
           </ul>
         </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/utils';
 import { Icons } from '@/utils/icons';
 import { valueFormatter } from '@/utils';
 import { Runner } from '@/types/market';
@@ -75,7 +75,7 @@ const OuterOddButton: React.FC<OuterOddButtonProps> = ({
       ref={buttonRef}
       disabled={disabled}
       onClick={onClick}
-      className={clsx(
+      className={cn(
         'font-semibold transition-all duration-150 h-[32px] text-black flex items-center justify-center gap-0.5 py-1',
         {
           [type === 'back' ? 'bg-odd-blue-100' : 'bg-odd-pink-100']: position === 3,

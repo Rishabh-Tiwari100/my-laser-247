@@ -6,33 +6,30 @@ const Footer = () => {
     <div className="max-lg:hidden border-t border-[rgba(0,0,0,.3)] !my-10 pt-1.5">
       <div className="block text-[#0009] text-[13px] leading-[22px] my-2.5 text-center">
         <div className="">
-          <Link to="#" className="ml-[5px] text-white text-sm">
+          <span className="ml-[5px] text-white text-sm">
             Privacy Policy
-          </Link>
+          </span>
           <Link
             to="#"
             className="ml-[5px] text-white text-sm before:mx-[10px] before:content-['|'] before:inline-block"
           >
             KYC
           </Link>
-          <Link
-            to="#"
+          <span
             className="ml-[5px] text-white text-sm before:mx-[10px] before:content-['|'] before:inline-block"
           >
             Terms and conditions
-          </Link>
-          <Link
-            to="#"
+          </span>
+          <span
             className="ml-[5px] text-white text-sm before:mx-[10px] before:content-['|'] before:inline-block"
           >
             Rules and Regulations
-          </Link>
-          <Link
-            to="#"
+          </span>
+          <span
             className="ml-[5px] text-white text-sm before:mx-[10px] before:content-['|'] before:inline-block"
           >
             Responsible Gambling
-          </Link>
+          </span>
         </div>
       </div>
     </div>
