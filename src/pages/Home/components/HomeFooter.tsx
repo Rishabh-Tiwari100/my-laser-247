@@ -18,7 +18,7 @@ export default function HomeFooter() {
           Willemstad, Cura&ccedil;ao.
         </p>
       </div>
-      <div>
+      <div className="hidden lg:block">
         <p className="mt-3 hidden text-center text-[11px] leading-4 text-[#777] lg:block">
           Our website works best in the newest and last prior version of these browsers: Google
           Chrome. Firefox
