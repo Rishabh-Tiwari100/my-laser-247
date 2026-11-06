@@ -21,7 +21,7 @@ export function useMarketDetails(sportName?: string) {
   const [activeFancyTab, setActiveFancyTab] = useState('All');
   const [activePremiumTab, setActivePremiumTab] = useState('All');
   const [showLiveScore, setShowLiveScore] = useState(true);
-  const [iframeHeight, setIframeHeight] = useState(140);
+  const [iframeHeight, setIframeHeight] = useState(190);
   const { state } = useLocation();
   const [isLiveTvOpen, setIsLiveTvOpen] = useState(true);
 
@@ -74,8 +74,8 @@ export function useMarketDetails(sportName?: string) {
   const handleSetIframeHeight = useCallback(() => {
     // const height=width<
     setIframeHeight((prev) => {
-      if (prev === 140) return 400;
-      return 140;
+      if (prev === 190) return 400;
+      return 190;
     });
   }, []);
 
@@ -104,6 +104,7 @@ export function useMarketDetails(sportName?: string) {
     fancyMarketsData,
     fancyTabs,
     premiumTabs,
+    premiumMarketsData: premiumMarket,
     isLiveTvOpen,
     setIsLiveTvOpen,
     allMarkets,

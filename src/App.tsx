@@ -122,9 +122,6 @@ const UpdateMobileNumber = loadable(() => import('@/pages/MyAccount/UpdateMobile
 const BalanceOverview = loadable(() => import('@/pages/MyAccount/BalanceOverview'), {
   fallback: <NotOutLoader />,
 });
-const MyBets = loadable(() => import('@/pages/MyAccount/MyBets'), {
-  fallback: <NotOutLoader />,
-});
 
 const TwoFaSetupAuth = loadable(() => import('@/pages/TwoFA/SetupAuth'), {
   fallback: <NotOutLoader />,
@@ -261,7 +258,7 @@ export function App() {
               path="account-statement"
               element={<Navigate to="/account-statement" replace />}
             />
-            <Route path="my-bets" element={<MyBets />} />
+            <Route path="my-bets" element={<Navigate to="/my-bets" replace />} />
             <Route path="bet-history" element={<Navigate to="/settled-bets" replace />} />
             <Route path="profit-loss" element={<ProfitLoss />} />
             <Route path="activity-log" element={<ActivityLog />} />

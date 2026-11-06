@@ -128,7 +128,7 @@ const NormalMarketRow = ({ data, market, min, max }: NormalMarketRowProps) => {
   const isBookmaker = [market?.marketType, market?.marketName].some((value) =>
     value?.toLowerCase().includes('bookmaker')
   );
-  const visibleOdds = isBookmaker ? odds.filter(({ position }) => position === 0) : odds;
+  const visibleOdds = odds;
 
   const handleSelectOdds = useCallback(
     async (priceKey: keyof Runner, sizeKey: keyof Runner, betOn: BetOn, position: number) => {
@@ -198,9 +198,19 @@ const NormalMarketRow = ({ data, market, min, max }: NormalMarketRowProps) => {
 
   return (
     <>
-      <div className={cn("bg-white border border-[#7e97a7] grid items-center")}>
+      <div
+        className={cn(
+          'grid items-center border-x border-b border-[#7e97a7] text-black',
+          isBookmaker ? 'bg-[#faf8d8]' : 'bg-white lg:[&:nth-of-type(even)]:bg-[#ececec]'
+        )}
+      >
         <div className="grid grid-cols-12">
-          <div className={cn("col-span-7 md:col-span-5 flex items-center pr-2", market?.marketName?.toLowerCase() == "bookmaker" && "bg-[#faf8d8]")}>
+          <div
+            className={cn(
+              'col-span-7 lg:col-span-5 flex items-center pr-2',
+              market?.marketName?.toLowerCase() == 'bookmaker' && 'bg-[#faf8d8]'
+            )}
+          >
             <p className="min-w-0 overflow-auto flex-1 font-bold flex items-center text-xs pl-[5px]">
               {data?.runnerName}
             </p>
@@ -215,10 +225,23 @@ const NormalMarketRow = ({ data, market, min, max }: NormalMarketRowProps) => {
               </span>
             ) : null}
           </div>
-          <div className="col-span-5 md:col-span-7">
-            <div className="w-full relative rounded-[6px] grid grid-cols-12">
+          <div className="col-span-5 lg:col-span-7">
+            <div className="relative grid w-full grid-cols-12">
               {visibleOdds.map(({ priceKey, sizeKey, bg, hideOnMobile, betOn, position }) => {
                 const selectedOdd = isSelectedOdd(betOn, position);
+
+                if (isBookmaker && position !== 0) {
+                  return (
+                    <div
+                      key={priceKey}
+                      className="hidden h-[43px] flex-col items-center justify-center text-[12px] lg:col-span-2 lg:flex"
+                      style={{ background: bg }}
+                    >
+                      <span>-</span>
+                      <span className="text-[10px]">-</span>
+                    </div>
+                  );
+                }
 
                 return (
                   <button
@@ -231,7 +254,7 @@ const NormalMarketRow = ({ data, market, min, max }: NormalMarketRowProps) => {
                       background: bg,
                       boxShadow: selectedOdd ? 'inset 0 0 0 2px #111827' : undefined,
                     }}
-                    className={`${hideOnMobile ? 'max-md:hidden' : ''} col-span-6 ${isBookmaker ? '' : 'md:col-span-2'} text-[13px] font-semibold py-1 text-black h-[42.2px] disabled:opacity-50`}
+                    className={`${hideOnMobile ? 'max-lg:hidden' : ''} col-span-6 lg:col-span-2 border-r border-white/50 text-[13px] lg:text-[12px] font-semibold py-1 text-black h-[42.5px] lg:h-[43px] disabled:opacity-50`}
                   >
                     {data?.[priceKey] ?? '-'}
                     <span className="block font-medium text-[10px] text-black">

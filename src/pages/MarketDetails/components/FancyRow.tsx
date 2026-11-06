@@ -152,8 +152,8 @@ const FancyRow = ({
 
   return (
     <>
-      <div className="grid lg:min-h-[85px] grid-cols-12 border-b border-[#8da9b7] bg-white font-helvetica text-black">
-        <div className="col-span-7 flex min-w-0 items-center px-1.5">
+      <div className="grid min-h-[45px] grid-cols-12 border-b border-[#8da9b7] bg-white font-helvetica text-black lg:grid-cols-[11fr_7fr]">
+        <div className="col-span-7 flex min-w-0 items-center px-[4px] lg:col-span-1">
           <button
             type="button"
             onClick={onTogglePin}
@@ -167,7 +167,7 @@ const FancyRow = ({
               className="w-[18px] min-w-[18px] h-auto"
             />
           </button>
-          <p className="min-w-0 flex-1 truncate text-xs font-semibold italic leading-[1.5]">
+          <p className="min-w-0 flex-1 text-[12px] font-bold leading-[18px]">
             {runner?.runnerName}
             <span className="mt-0.5 block text-[9px] not-italic leading-none text-[#315195] lg:hidden">
               Min/Max {formatStakeLimitRange(min, max)}
@@ -209,8 +209,8 @@ const FancyRow = ({
           ) : null}
         </div>
 
-        <div className="col-span-5 flex min-w-0 flex-col">
-          <div className="relative grid h-[43px] grid-cols-2">
+        <div className="col-span-5 grid min-w-0 grid-cols-1 lg:col-span-1 lg:grid-cols-4">
+          <div className="relative grid h-[44px] grid-cols-2 lg:col-span-2">
             <button
               type="button"
               aria-pressed={isLaySelected}
@@ -240,8 +240,8 @@ const FancyRow = ({
               </div>
             )}
           </div>
-          <div className="hidden lg:flex flex-1 items-center px-1 text-[9px] font-semibold font-helvetica">
-            Min/Max {formatStakeLimitRange(min, max)}
+          <div className="hidden items-center justify-center px-[3px] text-center text-[9px] font-normal font-helvetica lg:col-span-2 lg:flex">
+            {formatStakeLimitRange(min, max)}
           </div>
         </div>
       </div>

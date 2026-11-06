@@ -1,12 +1,9 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
-import CustomInput from '@/components/common/CustomInput';
 import { changePasswordSchema, ChangePasswordFormData } from '@/utils/validations';
 import { useChangePasswordMutation } from '@/store/api/authApi';
 import toast from 'react-hot-toast';
-import PasswordInput from '@/components/common/PasswordInput';
 
 interface ChangePasswordProps {
   setShowChangePasswordModal?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -16,9 +13,9 @@ function ChangePassword({ setShowChangePasswordModal }: ChangePasswordProps) {
   const [changePassword, { isLoading }] = useChangePasswordMutation();
 
   const {
-    control,
+    register,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
     reset,
   } = useForm<ChangePasswordFormData>({
     resolver: zodResolver(changePasswordSchema),
@@ -49,40 +46,62 @@ function ChangePassword({ setShowChangePasswordModal }: ChangePasswordProps) {
   };
 
   return (
-    <div className="w-full lg:w-[87%] lg:px-3 my-1">
-      <h3 className="bg-[#212121] px-2 py-[6px] text-sm font-semibold leading-[17px] text-white">
+    <section
+      className="mt-[5px] lg:mt-[8px] w-full bg-white font-helvetica text-[14px] text-black"
+      aria-labelledby="change-password-title"
+    >
+      <h1
+        id="change-password-title"
+        className="m-0 flex h-[28px] items-center bg-[#212121] px-[6px] text-[14px] font-bold leading-[21px] text-white"
+      >
         Change Password
-      </h3>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-[10px] py-[10px]">
-        <PasswordInput<ChangePasswordFormData>
-          name="oldPassword"
-          control={control}
-          placeholder="Enter Current Password*"
-          autoComplete="current-password"
-        />
-
-        <PasswordInput<ChangePasswordFormData>
-          name="newPassword"
-          control={control}
-          placeholder="Enter New Password*"
-          autoComplete="new-password"
-        />
-
-        <PasswordInput<ChangePasswordFormData>
-          name="confirmPassword"
-          control={control}
-          placeholder="Enter Confirm New Password*"
-          autoComplete="new-password"
-        />
-        <Button
+      </h1>
+      <form onSubmit={handleSubmit(onSubmit)} className="p-[10px]" noValidate>
+        <div className={setShowChangePasswordModal ? 'w-full' : 'w-full lg:w-[calc(50%_-_12px)]'}>
+          {(
+            [
+              { name: 'oldPassword', label: 'Old Password', autoComplete: 'current-password' },
+              { name: 'newPassword', label: 'New Password', autoComplete: 'new-password' },
+              { name: 'confirmPassword', label: 'Confirm Password', autoComplete: 'new-password' },
+            ] as const
+          ).map(({ name, label, autoComplete }) => (
+            <div key={name}>
+              <label
+                htmlFor={name}
+                className="block text-[14px] font-normal leading-[21px] text-[#6c757d]"
+              >
+                {label}
+              </label>
+              <input
+                {...register(name)}
+                id={name}
+                type="password"
+                autoComplete={autoComplete}
+                aria-invalid={Boolean(errors[name])}
+                aria-describedby={errors[name] ? `${name}-error` : undefined}
+                className="block h-[37.375px] w-full rounded-[3px] border border-[#ced4da] bg-white px-[14.4px] py-[7.2px] text-[14px] leading-[21px] text-[#212529] shadow-[0_1px_4px_#0000001a] outline-none focus:border-[#80bdff] focus:ring-1 focus:ring-[#80bdff]"
+              />
+              {errors[name] && (
+                <p
+                  id={`${name}-error`}
+                  role="alert"
+                  className="mt-[3px] text-[12px] leading-[18px] text-red-600"
+                >
+                  {errors[name]?.message}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+        <button
           type="submit"
           disabled={isLoading || isSubmitting}
-          className="h-[35px] w-full rounded-[3px] bg-[#212121] text-sm font-semibold text-white hover:bg-[#212121] disabled:opacity-70"
+          className="mt-[12px] h-[37.375px] rounded-[2px] border border-transparent bg-[#212121] px-[14.4px] py-[7.2px] text-[14px] font-normal uppercase leading-[21px] text-white hover:bg-[#333] disabled:cursor-wait disabled:opacity-70"
         >
           {isLoading || isSubmitting ? 'Changing Password...' : 'Change Password'}
-        </Button>
+        </button>
       </form>
-    </div>
+    </section>
   );
 }
 

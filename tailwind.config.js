@@ -245,6 +245,10 @@ module.exports = {
             opacity: '.3',
           },
         },
+        'event-status': {
+          '0%': { opacity: '1', backgroundColor: '#ffff00', color: '#000' },
+          '100%': { opacity: '0.2', backgroundColor: '#ff0000', color: '#000' },
+        },
         swapLeft: {
           '0%': {
             transform: 'translateX(0) scale(1)',
@@ -297,6 +301,7 @@ module.exports = {
         menuHighlight: 'menuHighlight 1s ease-in-out infinite',
         tagmenu: 'tagmenu 2s ease-in-out infinite',
         twinkling: 'twinkling 1.4s ease infinite',
+        'event-status': 'event-status 0.6s ease-in-out infinite alternate',
         'swap-left': 'swapLeft .8s ease-in-out infinite',
         'swap-right': 'swapRight .8s ease-in-out infinite',
         blinker: 'blinker 1s linear infinite',

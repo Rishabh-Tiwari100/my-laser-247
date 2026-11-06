@@ -1,9 +1,9 @@
+import MarketOddsHeader from './MarketOddsHeader';
+import { mdiInformation } from '@mdi/js';
 import React from 'react';
 import { Market } from '@/store/api/catalogueApi';
 import BookmakerMarketRow from './BookmakerMarketRow';
-import { useParams } from 'react-router-dom';
-import { useCashOut } from '@/hooks/useCashOut';
-import { formatStakeLimitRange, type StakeLimitValue } from './stakeLimit';
+import { type StakeLimitValue } from './stakeLimit';
 
 const BookmakerMarket = ({
   isFavorite = false,
@@ -16,54 +16,25 @@ const BookmakerMarket = ({
   min: StakeLimitValue;
   max: StakeLimitValue;
 }) => {
-  const { eventId } = useParams();
-  const { handleCashout, bestOption, isAuthenticated, isCashoutAvailable } = useCashOut(
-    eventId,
-    data,
-    min,
-    max
-  );
-  const isTwoRunnerMarket = (data?.runners?.length ?? 0) === 2;
-  const isCashoutEnabled = isTwoRunnerMarket && isCashoutAvailable && Boolean(bestOption);
-
   return (
     <div>
       <div className="">
         <div className="grid grid-cols-12 border border-[#7e97a7] text-white">
           <div className="col-span-12">
-            <p className="uppercase h-[30px] text-white font-semibold pr-[30px] pl-[10px] relative text-xs bg-primary-theme flex items-center">
+            <p className="uppercase h-[31px] text-white font-bold pr-[10px] pl-[10px] relative text-[12px] bg-[#213b49] flex items-center">
+              <img src="/icons/pin.svg" alt="" className="mx-[5px] h-auto w-[22px] shrink-0" />
               <span className="max-w-[160px] leading-[normal]">{data?.marketName}</span>
-              <span className="text-[10px] leading-[normal]">
-                {isAuthenticated && isTwoRunnerMarket ? (
-                  <button
-                    type="button"
-                    className="ml-[5px] rounded-[3px] bg-[#ffe500] p-[2px_5px] font-medium text-black disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled={!isCashoutEnabled}
-                    onClick={handleCashout}
-                  >
-                    Cashout
-                  </button>
-                ) : null}
-              </span>
+              <svg
+                viewBox="0 0 24 24"
+                className="ml-[5px] h-[14px] w-[14px] shrink-0 fill-current"
+                aria-hidden="true"
+              >
+                <path d={mdiInformation} />
+              </svg>
             </p>
           </div>
         </div>
-        <div className="grid h-9 grid-cols-12 border border-[#7e97a7] bg-[#bed5d8] text-black">
-          <dl className="col-span-7 flex items-center gap-2 px-2 leading-none md:col-span-5">
-            <dt className="text-[9px] font-bold text-[#315195]">Min/Max</dt>
-            <dd className="text-[9px] font-semibold">
-              {formatStakeLimitRange(min, max)}
-            </dd>
-          </dl>
-          <div className="col-span-5 grid grid-cols-2 overflow-hidden rounded-t-xl md:col-span-7">
-            <div className="flex items-center justify-center bg-[#72bbef] text-[13px] font-semibold">
-              Back
-            </div>
-            <div className="flex items-center justify-center bg-[#faa9ba] text-[13px] font-semibold">
-              Lay
-            </div>
-          </div>
-        </div>
+        <MarketOddsHeader min={min} max={max} bookmaker />
       </div>
       {data?.runners?.map((item, idx) => (
         <BookmakerMarketRow

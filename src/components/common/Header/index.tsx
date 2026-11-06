@@ -38,6 +38,8 @@ const Header: React.FC<HeaderProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   const isDashboard = location.pathname === '/dashboard';
+  const isEventDetails = location.pathname.includes('/market-details/');
+  const isCompactHeader = isEventDetails || ['/account-statement', '/my-bets', '/change-password'].includes(location.pathname);
   const isMfaPage = location.pathname.includes('2fa');
 
   const isAuthenticated = useIsAuthenticated();
@@ -151,11 +153,22 @@ const Header: React.FC<HeaderProps> = ({
     <>
       <header className="sticky top-0 z-[1000] w-full bg-theme-navbar font-sans text-xs lg:font-helvetica">
         {/* Top Section: Logo, Search, and Auth Section */}
-        <div className={cn('flex items-center justify-between lg:h-[70px] lg:gap-4 lg:pr-8 lg:[&>div:first-child]:min-w-0 lg:[&>div:first-child]:flex-1 lg:[&>div:last-child]:shrink-0', isDashboard ? 'h-[51px] min-h-[51px] lg:min-h-[70px]' : 'min-h-[54px] md:min-h-[70px]')}>
+        <div
+          className={cn(
+            'flex items-center justify-between lg:h-[70px] lg:gap-4 lg:pr-8 lg:[&>div:first-child]:min-w-0 lg:[&>div:first-child]:flex-1 lg:[&>div:last-child]:shrink-0',
+            isCompactHeader
+              ? 'h-[50px] min-h-[50px] lg:min-h-[70px]'
+              : isDashboard
+                ? 'h-[51px] min-h-[51px] lg:min-h-[70px]'
+                : 'min-h-[54px] md:min-h-[70px]'
+          )}
+        >
           {/* Left: Logo & Search */}
           <div className="flex items-center">
             {/* Mobile Sidebar Toggle */}
-            <div className={`shrink-0 ${isDashboard ? 'w-[155px] h-[51px]' : isAuthenticated ? 'w-[125px] h-[70px]' : 'w-[125px] h-[54px]'} lg:h-[70px] lg:w-[185px] flex items-center justify-center lg:justify-start lg:pl-3`}>
+            <div
+              className={`shrink-0 ${isCompactHeader ? 'w-[155px] h-[50px]' : isDashboard ? 'w-[155px] h-[51px]' : isAuthenticated ? 'w-[125px] h-[70px]' : 'w-[125px] h-[54px]'} lg:h-[70px] lg:w-[185px] flex items-center justify-center lg:justify-start lg:pl-3`}
+            >
               <Link
                 to="/"
                 className="block text-center leading-[70px] w-auto lg:w-[178px] lg:shrink-0"
@@ -300,8 +313,13 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {isAuthenticated && !isMfaPage && (
-          <div className={cn('lg:hidden w-full justify-around gap-[3px] border-y border-[#a6a6a6a3] p-[3px]', isDashboard ? 'hidden' : 'flex')}>
+        {isAuthenticated && !isMfaPage && !isCompactHeader && (
+          <div
+            className={cn(
+              'lg:hidden w-full justify-around gap-[3px] border-y border-[#a6a6a6a3] p-[3px]',
+              isDashboard ? 'hidden' : 'flex'
+            )}
+          >
             <Link
               to="/deposit"
               className="flex h-8 w-1/2 items-center justify-center border border-white bg-gradient-to-b from-[#007b15] to-[#138e00] p-1.5 text-center text-xs font-black uppercase text-white"

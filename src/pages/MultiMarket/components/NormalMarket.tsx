@@ -3,7 +3,6 @@ import React from 'react';
 import NormalMarketRow from './NormalMarketRow';
 import { Market } from '@/store/api/catalogueApi';
 import { useParams } from 'react-router-dom';
-import { useCashOut } from '@/hooks/useCashOut';
 import toast from 'react-hot-toast';
 import { useAddToMultiMarketMutation } from '@/store/api/eventsApi';
 
@@ -18,14 +17,6 @@ const NormalMarket = ({
   min: number;
   max: number;
 }) => {
-  const { handleCashout, bestOption, isAuthenticated, isCashoutAvailable } = useCashOut(
-    eventId,
-    data,
-    min,
-    max
-  );
-  const isTwoRunnerMarket = (data?.runners?.length ?? 0) === 2;
-  const isCashoutEnabled = isTwoRunnerMarket && isCashoutAvailable && Boolean(bestOption);
   const [addToMultiMarket] = useAddToMultiMarketMutation();
 
   const onTogglePin = (isPinned: boolean) => {
@@ -63,18 +54,6 @@ const NormalMarket = ({
                 />
               </button>
               <span className="max-w-[160px] leading-[normal]">{data?.marketName}</span>
-              <span className="text-[10px] leading-[normal]">
-                {isAuthenticated && isTwoRunnerMarket ? (
-                  <button
-                    type="button"
-                    className="ml-[5px] rounded-[3px] bg-[#ffe500] p-[2px_5px] font-medium text-black disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled={!isCashoutEnabled}
-                    onClick={handleCashout}
-                  >
-                    Cashout
-                  </button>
-                ) : null}
-              </span>
             </p>
           </div>
         </div>

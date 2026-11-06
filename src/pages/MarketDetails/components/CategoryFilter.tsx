@@ -25,16 +25,16 @@ const CategoryFilter: React.FC<TabsProps> = ({
         category === 'PREMIUM' && 'bg-primary-orange border-t border-t-slate/5'
       )}
     >
-      <div className="bg-gradient-to-b from-[#0a92a5] from-[15%] to-[#076875] flex-wrap overflow-x-auto flex items-center p-[2px] w-full">
+      <div className="flex w-full items-center overflow-x-auto bg-gradient-to-b from-[#0a92a5] from-[15%] to-[#076875] p-[2px] [scrollbar-width:none]">
         {tabs.map((tab) => (
           <div
             key={tab}
-            className="first:rounded-l-[5px] last:rounded-r-[5px] bg-[#e3fcff75] p-[2px] leading-none"
+            className="min-w-fit flex-1 bg-[#e3fcff75] p-[2px] leading-none first:rounded-l-[5px] last:rounded-r-[5px]"
           >
             <button
               type="button"
               className={cn(
-                `w-full text-nowrap text-xs px-2.5 uppercase relative font-black text-[#243a48] ${activeTab === tab ? 'bg-white underline rounded-[5px]' : ''}`
+                `relative w-full whitespace-nowrap px-[8px] text-[12px] font-bold text-[#243a48] ${activeTab === tab ? 'rounded-[5px] bg-white' : ''}`
               )}
               onClick={() => setActiveTab(tab)}
             >

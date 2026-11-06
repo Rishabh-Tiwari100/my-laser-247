@@ -1,7 +1,8 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import dayjs from 'dayjs';
-import { CalendarDays, Download, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import { mdiCalendarMonthOutline } from '@mdi/js';
 import { useGetDepositWithdrawRequestQuery } from '@/store/api/accountApi';
 import { useGetMyTransactionsQuery } from '@/store/api/transactionApi';
 import type { Transaction, TransactionsParams } from '@/store/api/transactionApi';
@@ -13,56 +14,33 @@ import { formatContextLabel } from '@/utils';
 const PAGE_SIZE = 25;
 
 const recordTypeOptions = [
-  { label: 'All', value: 'ALL' },
+  { label: 'All Sports', value: 'ALL' },
   { label: 'Sports', value: 'Sports' },
   { label: 'Casino', value: 'Casino' },
 ] as const;
 
 type RecordTypeFilter = (typeof recordTypeOptions)[number]['value'];
 
-const transactionTypeOptions = [
-  { label: 'All', value: 'ALL' },
-  { label: 'Debit', value: 'Debit' },
-  { label: 'Credit', value: 'Credit' },
-];
-
-const subtypeOptions = [
-  { label: 'All', value: 'ALL' },
-  { label: 'Won', value: 'Won' },
-  { label: 'Lost', value: 'Lost' },
-  { label: 'Bonus', value: 'Bonus' },
-  { label: 'Sports Rollback', value: 'Rollback' },
-  { label: 'Casino Rollback', value: 'CasinoBetRefund' },
-  { label: 'Deposit', value: 'Deposit' },
-  { label: 'Withdrawal', value: 'Withdrawal' },
-];
-
 interface StatementFilters {
   fromDate: string;
   toDate: string;
   recordType: RecordTypeFilter;
-  subtype: string;
-  type: string;
-  search: string;
 }
 
-const defaultFromDate = dayjs().subtract(2, 'day').format('YYYY-MM-DD');
+const defaultFromDate = dayjs().subtract(7, 'day').format('YYYY-MM-DD');
 const defaultToDate = dayjs().format('YYYY-MM-DD');
 
 const createInitialFilters = (): StatementFilters => ({
   fromDate: defaultFromDate,
   toDate: defaultToDate,
   recordType: 'ALL',
-  subtype: 'ALL',
-  type: 'ALL',
-  search: '',
 });
 
 const toRecordTypeFilter = (value: string): RecordTypeFilter =>
   recordTypeOptions.some((option) => option.value === value) ? (value as RecordTypeFilter) : 'ALL';
 
 const formatStatementDate = (value: string) =>
-  value && dayjs(value).isValid() ? dayjs(value).format('DD/MM/YYYY') : '';
+  value && dayjs(value).isValid() ? dayjs(value).format('DD-MM-YYYY') : '';
 
 const formatTimestamp = (value?: string | null) => {
   if (!value || !dayjs(value).isValid()) return '-';
@@ -93,16 +71,13 @@ const getDescription = (transaction: Transaction) => {
   return '-';
 };
 
-const escapeCsvCell = (value: unknown) => `"${String(value ?? '').replace(/"/g, '""')}"`;
-
-const fieldClassName =
-  'statement-field flex min-w-0 flex-col gap-[2px] leading-[15px] [&>span:first-child]:h-[15px]';
+const fieldClassName = 'flex min-w-0 flex-col gap-[3px] text-[10px] uppercase leading-[14px]';
 const controlClassName =
-  'h-[34px] w-full rounded-[4px] border border-[#aeb3b7] bg-white px-[14px] font-[Arial,Helvetica,sans-serif] text-[14px] leading-[32px] text-[#090909] outline-none focus:border-[#283f50] focus:shadow-[0_0_0_1px_rgba(40,63,80,0.12)]';
+  'h-[34px] w-full rounded-[4px] border border-[#aaa] bg-white px-[8px] text-[14px] normal-case leading-[32px] text-black outline-none focus:border-[#243a48] focus:ring-1 focus:ring-[#243a48]';
 const tableCellClassName =
-  'h-[31px] border border-[#bfc1c3] px-[5px] py-0 leading-[30px] max-md:h-auto max-md:py-[5px] max-md:leading-[17px]';
+  'h-[33px] border border-[#d9dfe4] px-[5px] py-[4px] text-left align-middle leading-[20px]';
 const paginationButtonClassName =
-  'h-[29px] min-w-[21px] border border-[#d3d3d3] bg-white px-[7px] font-[Arial,Helvetica,sans-serif] text-[11px] font-bold text-[#050505]';
+  'rounded-[3px] px-[10px] py-[6px] text-[14px] font-bold text-[#555] hover:bg-[#eee] disabled:cursor-default disabled:text-[#999] disabled:hover:bg-transparent';
 
 function Account() {
   const [draftFilters, setDraftFilters] = useState<StatementFilters>(createInitialFilters);
@@ -129,20 +104,15 @@ function Account() {
     }
 
     if (appliedFilters.recordType !== 'ALL') params.recordType = appliedFilters.recordType;
-    if (appliedFilters.subtype !== 'ALL') params.contextType = appliedFilters.subtype;
-    if (appliedFilters.type !== 'ALL') params.type = appliedFilters.type;
-    if (appliedFilters.search.trim()) params.search = appliedFilters.search.trim();
 
     return params;
   }, [appliedFilters, currentPage]);
 
-  const { data, isLoading, isFetching } = useGetMyTransactionsQuery(queryParams);
+  const { data, isLoading, isFetching, isError, refetch } = useGetMyTransactionsQuery(queryParams);
 
   const transactions = data?.data ?? [];
   const totalItems = data?.pagination?.totalItems ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
-  const firstEntry = totalItems === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
-  const lastEntry = totalItems === 0 ? 0 : Math.min(currentPage * PAGE_SIZE, totalItems);
 
   const updateFilter = <Key extends keyof StatementFilters>(
     key: Key,
@@ -153,252 +123,172 @@ function Account() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (currentPage === 1 && JSON.stringify(draftFilters) === JSON.stringify(appliedFilters)) {
+      void refetch();
+    }
     setCurrentPage(1);
     setAppliedFilters({ ...draftFilters });
-  };
-
-  const handleDownload = () => {
-    const header = ['Profit & Loss', 'Description', 'Balance', 'Date/Time', 'Remarks'];
-    const rows = transactions.map((transaction) => [
-      formatAmount(transaction.amount),
-      getDescription(transaction),
-      formatBalance(transaction.availableBalance),
-      formatTimestamp(transaction.timestamp),
-      transaction.remark || '-',
-    ]);
-    const csv = [header, ...rows].map((row) => row.map(escapeCsvCell).join(',')).join('\n');
-    const file = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-    const url = URL.createObjectURL(file);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `account-statement-${dayjs().format('YYYY-MM-DD')}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
   };
 
   const loading = isLoading || isFetching;
 
   return (
-    <div className="account-statement-page pb-2 font-[Arial,Helvetica,sans-serif] text-[12px] text-[#050505] max-md:min-h-[calc(100vh-95px)]">
+    <div className="min-h-[calc(100dvh-98px)] bg-[#eee] pb-[12px] font-helvetica text-[12px] text-black">
       <form
-        className="statement-filter-panel border-b border-[#222] bg-white px-[11px] pb-[13px] pt-[12px] max-md:p-[10px_8px]"
+        className="mb-[3px] mt-[8px] grid grid-cols-2 items-end gap-x-[10px] gap-y-[10px] border-y border-[#222] bg-white px-[8px] pb-[5px] pt-[5px] lg:mb-[10px] lg:grid-cols-4 lg:gap-x-[24px] lg:px-[5px] lg:pt-[10px]"
         onSubmit={handleSubmit}
       >
-        <div className="statement-filter-grid grid grid-cols-2 gap-x-2 gap-y-[7px]">
-          <label className={fieldClassName}>
-            <span>From Date</span>
-            <span className="statement-date-control relative flex h-[34px] w-full items-center justify-between overflow-hidden rounded-[4px] border border-[#aeb3b7] bg-white py-0 pl-[14px] pr-[12px] font-[Arial,Helvetica,sans-serif] text-[14px] leading-[32px] text-[#090909] outline-none focus-within:border-[#283f50] focus-within:shadow-[0_0_0_1px_rgba(40,63,80,0.12)]">
-              <span>{formatStatementDate(draftFilters.fromDate)}</span>
-              <CalendarDays
-                className="h-[14px] w-[14px] shrink-0 stroke-[2.5]"
+        {(['fromDate', 'toDate'] as const).map((field) => (
+          <label key={field} className={fieldClassName}>
+            <span>{field === 'fromDate' ? 'From Date' : 'To Date'}</span>
+            <span className="relative flex h-[34px] items-center justify-between rounded-[4px] border border-[#aaa] bg-white pl-[8px] pr-[14px] text-[14px] normal-case text-black focus-within:ring-1 focus-within:ring-[#243a48]">
+              <span>{formatStatementDate(draftFilters[field])}</span>
+              <svg
+                viewBox="0 0 24 24"
+                className="h-[15px] w-[15px] shrink-0 fill-current"
                 aria-hidden="true"
-              />
+              >
+                <path d={mdiCalendarMonthOutline} />
+              </svg>
               <input
-                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                aria-label="From Date"
                 type="date"
-                value={draftFilters.fromDate}
-                max={draftFilters.toDate}
-                onChange={(event) => updateFilter('fromDate', event.target.value)}
+                aria-label={field === 'fromDate' ? 'From Date' : 'To Date'}
+                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                value={draftFilters[field]}
+                min={field === 'toDate' ? draftFilters.fromDate : undefined}
+                max={field === 'fromDate' ? draftFilters.toDate : undefined}
+                onChange={(event) => updateFilter(field, event.target.value)}
+                required
               />
             </span>
           </label>
-
-          <label className={fieldClassName}>
-            <span>To Date</span>
-            <span className="statement-date-control relative flex h-[34px] w-full items-center justify-between overflow-hidden rounded-[4px] border border-[#aeb3b7] bg-white py-0 pl-[14px] pr-[12px] font-[Arial,Helvetica,sans-serif] text-[14px] leading-[32px] text-[#090909] outline-none focus-within:border-[#283f50] focus-within:shadow-[0_0_0_1px_rgba(40,63,80,0.12)]">
-              <span>{formatStatementDate(draftFilters.toDate)}</span>
-              <CalendarDays
-                className="h-[14px] w-[14px] shrink-0 stroke-[2.5]"
-                aria-hidden="true"
-              />
-              <input
-                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                aria-label="To Date"
-                type="date"
-                value={draftFilters.toDate}
-                min={draftFilters.fromDate}
-                onChange={(event) => updateFilter('toDate', event.target.value)}
-              />
-            </span>
-          </label>
-
-          <label className={fieldClassName}>
-            <span>Type</span>
-            <select
-              className={`${controlClassName} cursor-pointer`}
-              value={draftFilters.recordType}
-              onChange={(event) =>
-                updateFilter('recordType', toRecordTypeFilter(event.target.value))
-              }
-            >
-              {recordTypeOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className={fieldClassName}>
-            <span>Sub Type</span>
-            <select
-              className={`statement-muted-control ${controlClassName} cursor-pointer bg-[#e3e6e9]`}
-              value={draftFilters.subtype}
-              onChange={(event) => updateFilter('subtype', event.target.value)}
-            >
-              {subtypeOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className={fieldClassName}>
-            <span>Transaction Type</span>
-            <select
-              className={`statement-muted-control ${controlClassName} cursor-pointer bg-[#e3e6e9]`}
-              value={draftFilters.type}
-              onChange={(event) => updateFilter('type', event.target.value)}
-            >
-              {transactionTypeOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className={fieldClassName}>
-            <span>Search Bet</span>
-            <input
-              className={`${controlClassName} placeholder:text-[#667080] placeholder:opacity-100 [&::-webkit-search-cancel-button]:hidden`}
-              type="search"
-              value={draftFilters.search}
-              placeholder="Search"
-              onChange={(event) => updateFilter('search', event.target.value)}
-            />
-          </label>
-        </div>
-
-        <div className="statement-actions mt-2 grid h-[35px] grid-cols-[minmax(0,1fr)_40px] gap-[3px]">
-          <button
-            type="submit"
-            className="statement-submit-button flex items-center justify-center rounded-[4px] border-0 bg-[#222] text-[14px] font-bold text-white hover:bg-[#111]"
+        ))}
+        <label className={fieldClassName}>
+          <span>Sports</span>
+          <select
+            className={controlClassName}
+            value={draftFilters.recordType}
+            onChange={(event) => updateFilter('recordType', toRecordTypeFilter(event.target.value))}
           >
-            Submit
-          </button>
-          <button
-            type="button"
-            className="statement-download-button flex items-center justify-center rounded-[4px] border-0 bg-[#222] text-white hover:bg-[#111] disabled:cursor-not-allowed disabled:opacity-[0.76]"
-            aria-label="Download account statement"
-            title="Download account statement"
-            onClick={handleDownload}
-            disabled={transactions.length === 0}
-          >
-            <Download className="h-[18px] w-[18px] stroke-[3]" aria-hidden="true" />
-          </button>
-        </div>
+            {recordTypeOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex h-[34px] items-center justify-center rounded-[4px] bg-[#222] text-[14px] text-white hover:bg-[#333] disabled:cursor-wait disabled:opacity-70"
+        >
+          Get Statement
+        </button>
       </form>
-
-      <section className="statement-section mt-[10px] bg-white" aria-labelledby="statement-title">
+      <section className="bg-white" aria-labelledby="statement-title">
         <h1
           id="statement-title"
-          className="m-0 flex h-[29px] items-center bg-[#222] px-[6px] text-[14px] font-bold leading-[29px] text-white"
+          className="m-0 flex h-[28px] items-center bg-[#222] px-[6px] text-[14px] font-bold leading-[21px] text-white"
         >
           Account Statement
         </h1>
-
-        <div className="statement-table-area px-[10px] pb-0 pt-2 max-md:px-[8px]">
-          <div className="statement-table-scroll overflow-x-auto rounded-[5px]">
-            <table className="statement-table w-full table-auto border-collapse bg-white text-[12px] text-[#050505]">
-              <thead>
-                <tr>
-                  <th
-                    scope="col"
-                    className="h-[28px] border border-[#bfc1c3] bg-[#0b4d70] px-[5px] py-0 text-center text-[12px] font-bold leading-[27px] text-white"
-                  >
-                    PROFIT &amp; LOSS
-                  </th>
-                  <th
-                    scope="col"
-                    className="h-[28px] border border-[#bfc1c3] bg-[#0b4d70] px-[5px] py-0 text-center text-[12px] font-bold leading-[27px] text-white"
-                  >
-                    DESCRIPTION
-                  </th>
-                  <th
-                    scope="col"
-                    className="h-[28px] border border-[#bfc1c3] bg-[#0b4d70] px-[5px] py-0 text-center text-[12px] font-bold leading-[27px] text-white"
-                  >
-                    BALANCE
-                  </th>
-                </tr>
-              </thead>
-              <tbody aria-busy={loading}>
-                {loading ? (
-                  Array.from({ length: 8 }).map((_, index) => <StatementLoadingRows key={index} />)
-                ) : transactions.length > 0 ? (
-                  transactions.map((transaction, index) => (
-                    <StatementRows
-                      key={transaction.id || `${transaction.timestamp}-${index}`}
-                      transaction={transaction}
-                      onOpenStatementInfo={() => setStatementInfoTransaction(transaction)}
-                      onOpenDepositWithdrawInfo={() => setDepositWithdrawInfo(transaction)}
-                    />
-                  ))
-                ) : (
-                  <tr className="statement-empty-row">
-                    <td
-                      colSpan={3}
-                      className="h-[62px] border border-[#bfc1c3] text-center text-[#666]"
+        <div
+          className="overflow-x-auto px-[8px] pt-[8px] lg:px-0 lg:pt-0"
+          tabIndex={0}
+          role="region"
+          aria-label="Account statement transactions"
+        >
+          <table className="w-full min-w-[1000px] border-collapse whitespace-nowrap bg-white text-[12px] text-black">
+            <colgroup>
+              <col className="w-[28px]" />
+              <col className="w-[124px]" />
+              <col className="w-[48px]" />
+              <col className="w-[64px]" />
+              <col className="w-[44px]" />
+              <col className="w-[60px]" />
+              <col />
+              <col className="w-[84px]" />
+            </colgroup>
+            <thead>
+              <tr className="h-[29px] bg-[#e4e4e4] text-[11px] font-normal uppercase text-black">
+                {['NO', 'DATE', 'TOTAL', 'BALANCE', 'D/C', 'SPORTS', 'DESCRIPTION', 'DETAILS'].map(
+                  (title) => (
+                    <th
+                      key={title}
+                      scope="col"
+                      className="border border-[#d9dfe4] px-[5px] py-[5px] text-left font-normal leading-[18px]"
                     >
-                      No account statement found
-                    </td>
-                  </tr>
+                      {title}
+                    </th>
+                  )
                 )}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="statement-pagination flex min-h-[42px] flex-wrap items-center justify-between gap-3 pt-[7px] text-[11px] font-bold text-[#050505]">
-            <span>
-              Showing {firstEntry} to {lastEntry} of {totalItems} entries
-            </span>
-
-            <nav className="flex items-stretch" aria-label="Account statement pagination">
-              {currentPage > 1 && (
-                <button
-                  className={`${paginationButtonClassName} rounded-l-[4px]`}
-                  type="button"
-                  onClick={() => setCurrentPage((page) => page - 1)}
-                >
-                  « Previous
-                </button>
+              </tr>
+            </thead>
+            <tbody aria-busy={loading}>
+              {loading ? (
+                Array.from({ length: 8 }, (_, index) => (
+                  <tr key={index}>
+                    {Array.from({ length: 8 }, (_, cell) => (
+                      <td key={cell} className={tableCellClassName}>
+                        <span className="block h-[12px] animate-pulse rounded bg-[#e8ebed] motion-reduce:animate-none" />
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : transactions.length ? (
+                transactions.map((transaction, index) => (
+                  <StatementRows
+                    key={transaction.id || index}
+                    transaction={transaction}
+                    rowNumber={(currentPage - 1) * PAGE_SIZE + index + 1}
+                    onOpenStatementInfo={() => setStatementInfoTransaction(transaction)}
+                    onOpenDepositWithdrawInfo={() => setDepositWithdrawInfo(transaction)}
+                  />
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={8}
+                    className="h-[50px] border border-[#d9dfe4] text-center text-[#666]"
+                  >
+                    {isError
+                      ? 'Unable to load account statement. Please try again.'
+                      : 'No account statement found'}
+                  </td>
+                </tr>
               )}
-              <button
-                type="button"
-                className={`active ${paginationButtonClassName} relative z-[1] ${currentPage > 1 ? '-ml-px' : 'rounded-l-[4px]'} !border-[#243a48] !bg-[#243a48] px-[6px] !text-white ${currentPage >= totalPages ? 'rounded-r-[4px]' : ''}`}
-                aria-current="page"
-              >
-                {currentPage}
-              </button>
-              {currentPage < totalPages && (
-                <button
-                  className={`${paginationButtonClassName} -ml-px rounded-r-[4px]`}
-                  type="button"
-                  onClick={() => setCurrentPage((page) => page + 1)}
-                >
-                  Next »
-                </button>
-              )}
-            </nav>
-          </div>
+            </tbody>
+          </table>
         </div>
+        <nav
+          className="flex min-h-[60px] items-center justify-end gap-[6px] px-[12px] py-[10px]"
+          aria-label="Account statement pagination"
+        >
+          <button
+            type="button"
+            className={paginationButtonClassName}
+            disabled={currentPage <= 1 || loading}
+            onClick={() => setCurrentPage((page) => page - 1)}
+          >
+            « Previous
+          </button>
+          <button
+            type="button"
+            aria-current="page"
+            className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#252c32] text-[14px] font-bold text-white shadow-[0_2px_5px_#0005]"
+          >
+            {currentPage}
+          </button>
+          <button
+            type="button"
+            className={paginationButtonClassName}
+            disabled={currentPage >= totalPages || loading}
+            onClick={() => setCurrentPage((page) => page + 1)}
+          >
+            Next »
+          </button>
+        </nav>
       </section>
-
       {statementInfoTransaction && (
         <StatementInfoModal
           transaction={statementInfoTransaction}
@@ -416,6 +306,7 @@ function Account() {
 }
 
 interface StatementRowsProps {
+  rowNumber: number;
   transaction: Transaction;
   onOpenStatementInfo: () => void;
   onOpenDepositWithdrawInfo: () => void;
@@ -455,75 +346,65 @@ const isCasinoBetTransaction = (transaction: Transaction) => {
 const canOpenDepositWithdrawInfo = (transaction: Transaction) =>
   Boolean(
     getDepositWithdrawRequestId(transaction) ||
-      getTransactionUtr(transaction) ||
-      transaction.image ||
-      transaction.meta?.image ||
-      transaction.meta?.proofImage
+    getTransactionUtr(transaction) ||
+    transaction.image ||
+    transaction.meta?.image ||
+    transaction.meta?.proofImage
   );
 
 function StatementRows({
   transaction,
+  rowNumber,
   onOpenStatementInfo,
   onOpenDepositWithdrawInfo,
 }: StatementRowsProps) {
   const isCredit = isCreditTransaction(transaction);
   const description = getDescription(transaction);
   const isDepositWithdraw = isDepositWithdrawTransaction(transaction);
-  const canOpenStatementInfo = isBetRelatedTransaction(transaction);
-  const handleDescriptionClick = isDepositWithdraw && canOpenDepositWithdrawInfo(transaction)
-    ? onOpenDepositWithdrawInfo
-    : canOpenStatementInfo
-      ? onOpenStatementInfo
-      : undefined;
-
+  const onDetails =
+    isDepositWithdraw && canOpenDepositWithdrawInfo(transaction)
+      ? onOpenDepositWithdrawInfo
+      : isBetRelatedTransaction(transaction)
+        ? onOpenStatementInfo
+        : undefined;
+  const sport = transaction.meta?.sportName ?? transaction.meta?.sport ?? '';
+  const timestamp =
+    transaction.timestamp && dayjs(transaction.timestamp).isValid()
+      ? dayjs(transaction.timestamp).format('DD/MM/YYYY HH:mm:ss')
+      : '-';
   return (
-    <>
-      <tr className="statement-main-row h-[31px]">
-        <td
-          className={`${tableCellClassName} align-middle text-left font-bold ${isCredit ? 'statement-credit text-[#0bc90b]' : 'statement-debit text-[#f11616]'}`}
-        >
-          {formatAmount(transaction.amount)}
-        </td>
-        <td
-          className={`${tableCellClassName} statement-description-cell overflow-hidden text-ellipsis whitespace-nowrap text-center max-md:overflow-visible max-md:whitespace-normal`}
-        >
-          {handleDescriptionClick ? (
-            <button
-              type="button"
-              className="max-w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap border-0 bg-transparent p-0 font-[Arial,Helvetica,sans-serif] text-[12px] leading-[30px] text-[#050505] underline underline-offset-1 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-1 focus-visible:outline-[#243a48] max-md:overflow-visible max-md:whitespace-normal max-md:leading-[17px]"
-              aria-label={`View statement report for ${description}`}
-              title={description}
-              onClick={handleDescriptionClick}
-            >
-              {description}
-            </button>
-          ) : (
-            <span
-              className="block overflow-hidden text-ellipsis whitespace-nowrap leading-[30px] max-md:overflow-visible max-md:whitespace-normal max-md:leading-[17px]"
-              title={description}
-            >
-              {description}
-            </span>
-          )}
-        </td>
-        <td
-          className={`${tableCellClassName} statement-balance-cell align-middle text-center font-bold text-[#0bc90b]`}
-        >
-          {formatBalance(transaction.availableBalance)}
-        </td>
-      </tr>
-      <tr className="statement-detail-row h-[31px] bg-[#e7e7e7]">
-        <td className={`${tableCellClassName} whitespace-nowrap max-md:text-[11px]`}>
-          {formatTimestamp(transaction.timestamp)}
-        </td>
-        <td
-          className={`${tableCellClassName} overflow-hidden text-ellipsis whitespace-nowrap`}
-          colSpan={2}
-        >
-          <strong className="font-bold">Remarks :</strong> {transaction.remark || '-'}
-        </td>
-      </tr>
-    </>
+    <tr>
+      <td className={tableCellClassName}>{rowNumber}</td>
+      <td className={tableCellClassName}>{timestamp}</td>
+      <td
+        className={
+          tableCellClassName +
+          (isCredit ? ' font-bold text-[#00c900]' : ' font-bold text-[#f11616]')
+        }
+      >
+        {formatBalance(Math.abs(Number(transaction.amount)))}
+      </td>
+      <td className={tableCellClassName}>{formatBalance(transaction.availableBalance)}</td>
+      <td className={tableCellClassName}>{isCredit ? 'Credit' : 'Debit'}</td>
+      <td className={tableCellClassName}>
+        {typeof sport === 'string' || typeof sport === 'number' ? sport : ''}
+      </td>
+      <td className={tableCellClassName} title={transaction.remark || undefined}>
+        {description}
+      </td>
+      <td className={tableCellClassName}>
+        {onDetails && (
+          <button
+            type="button"
+            onClick={onDetails}
+            aria-label={'View statement report for ' + description}
+            className="rounded-[1px] bg-[#222] px-[6px] py-[2px] text-[11px] font-bold uppercase leading-[16px] text-white hover:bg-[#444]"
+          >
+            {isDepositWithdraw ? 'Details' : 'Show Bet'}
+          </button>
+        )}
+      </td>
+    </tr>
   );
 }
 
@@ -1291,34 +1172,6 @@ function StatementInfoRow({
         {commission}
       </td>
     </tr>
-  );
-}
-
-function StatementLoadingRows() {
-  const loadingBarClassName = 'block h-2 w-[58%] animate-pulse rounded-[3px] bg-[#d6d6d6] mx-auto';
-
-  return (
-    <>
-      <tr className="statement-main-row statement-loading-row h-[31px]">
-        <td className={tableCellClassName}>
-          <span className={`${loadingBarClassName} ml-0 w-[40%]`} />
-        </td>
-        <td className={tableCellClassName}>
-          <span className={loadingBarClassName} />
-        </td>
-        <td className={tableCellClassName}>
-          <span className={loadingBarClassName} />
-        </td>
-      </tr>
-      <tr className="statement-detail-row statement-loading-row h-[31px] bg-[#e7e7e7]">
-        <td className={tableCellClassName}>
-          <span className={`${loadingBarClassName} ml-0 w-[40%]`} />
-        </td>
-        <td className={tableCellClassName} colSpan={2}>
-          <span className={loadingBarClassName} />
-        </td>
-      </tr>
-    </>
   );
 }
 

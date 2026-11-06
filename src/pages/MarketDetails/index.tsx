@@ -1,15 +1,12 @@
-import BackButton from '@/components/common/BackButton';
-import MarketHeader from '@/components/common/MarketHeader';
+import Marquee from '@/components/common/Marquee';
+import EventDetailsHeader from './components/EventDetailsHeader';
+import FancyMarketHeader from './components/FancyMarketHeader';
 import MarketPanel from '@/pages/MarketDetails/components/MarketPanel';
-import { Icons } from '@/utils/icons';
-import dayjs from 'dayjs';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Runner } from '@/types/market';
+import { getFilteredMarkets } from './helpers';
+import { useParams } from 'react-router-dom';
 import { cn } from '@/utils';
-import LiveTabs from './components/LiveTabs';
 import { useMarketDetails } from './hooks/useMarketDetails';
 import { Loader2 } from 'lucide-react';
-import { useDeviceWidth } from '@/hooks/useDeviceWidth';
 import { VscTriangleDown } from 'react-icons/vsc';
 import CategoryFilter from './components/CategoryFilter';
 import NormalMarket from './components/NormalMarket';
@@ -26,9 +23,9 @@ const getFancyMarketPinKey = (market: any) => {
   const runner = Array.isArray(market?.runners) ? market.runners[0] : market?.runners;
   return String(
     market?.marketId ??
-    market?.id ??
-    runner?.selectionId ??
-    `${market?.marketName ?? market?.name ?? ''}-${runner?.runnerName ?? ''}`
+      market?.id ??
+      runner?.selectionId ??
+      `${market?.marketName ?? market?.name ?? ''}-${runner?.runnerName ?? ''}`
   );
 };
 
@@ -43,41 +40,39 @@ function MarketDetails() {
     defaultMarketFilterSettings
   );
   const [openTV, setOpenTV] = useState(false);
-  const [openScorecard, setOpenScorecard] = useState(false);
+  const [openScorecard, setOpenScorecard] = useState(true);
 
   const sport = sportName.charAt(0).toUpperCase() + sportName.slice(1);
-  const navigate = useNavigate();
-  const width = useDeviceWidth();
   const {
     isLoadingEventDetails,
 
     liveScoreRef,
     activeCatTab,
     setActiveCatTab,
-    showLiveScore,
     activePremiumTab,
     setActivePremiumTab,
     activeFancyTab,
     setActiveFancyTab,
-    setShowLiveScore,
     handleSetIframeHeight,
 
     iframeHeight,
     liveScoreUrl,
     liveTvUrl,
-    categoryTabs,
     startTime,
     eventName,
 
     fancyMarketsData,
     fancyTabs,
     premiumTabs,
+    premiumMarketsData,
     allMarkets,
-    isLiveTvOpen,
-    setIsLiveTvOpen,
     inplay,
     isFavorite,
   } = useMarketDetails(sport);
+
+  useEffect(() => {
+    if (fancyTabs.length <= 1 && premiumTabs.length > 1) setActiveCatTab('Premium');
+  }, [fancyTabs.length, premiumTabs.length, setActiveCatTab]);
 
   useEffect(() => {
     try {
@@ -178,113 +173,22 @@ function MarketDetails() {
     <div
       ref={marketDetailsRef}
       className={cn(
-        'flex flex-col gap-4 mt-[7px]',
+        'mt-[3px] flex flex-col gap-[3px] font-helvetica text-black',
         marketFilterSettings.showFullScreen &&
-        'fixed inset-0 z-[5000000000000001] m-0 overflow-auto bg-white p-[7px]'
+          'fixed inset-0 z-[5000000000000001] m-0 overflow-auto bg-white p-[7px]'
       )}
     >
-      <div className="flex items-center text-xs">
-        <div className="clip-path-[polygon(0_0,100%_0,calc(100%_-_23px)_100%,100%_100%,0_100%)] mr-2 ml-[5px]">
-          <div className="flex h-[45px] min-w-[80px] items-center bg-[url('/icons/start-time-bg.svg')] bg-[length:145px] bg-right bg-no-repeat bg-transparent pl-[10px] pr-[20px] text-white -ml-[5px]">
-            <p className="text-[11px] leading-[1.2]">
-              {inplay ? 'In-Play' : dayjs(startTime).format('DD/MM/YYYY HH:mm')}
-            </p>
-          </div>
-        </div>
-
-        <div
-          className="
-    flex flex-1 flex-nowrap items-center
-    whitespace-nowrap overflow-x-auto
-    gap-[10px]
-    border-0
-    [scrollbar-width:none]
-    [clip-path:polygon(calc(0%_+_23px)_0%,100%_0,100%_100%,100%_100%,0%_100%)]
-    -ml-[15px]
-    pl-[5px]
-  "
-        >
-          <li className="flex-1 whitespace-nowrap max-w-[130px] min-w-[130px]">
-            <button className="bg-[url('/icons/start-time-bg.svg')] text-white border border-transparent w-full border-none relative [background-size:100%] h-9 px-5">
-              <span className="relative z-[2] flex justify-between gap-2.5 items-center top-0">
-                <p className="font-semibold leading-[1.2] text-left text-[10px] uppercase overflow-hidden whitespace-normal">
-                  Main Market
-                </p>
-                <img
-                  src="/icons/menu.webp"
-                  alt=""
-                  className="[filter:brightness(0)_saturate(100%)_invert(100%)_sepia(100%)_saturate(1%)_hue-rotate(25deg)_brightness(103%)_contrast(101%)] h-[14px] w-auto max-w-full"
-                />
-              </span>
-            </button>
-          </li>
-        </div>
-      </div>
-      <div className="flex flex-col lg:flex-row gap-y-2 min-h-full w-full">
-        <div className="flex-1">
-          {/* {liveTvUrl && isLiveTvOpen && (
-            <div className="w-full overflow-hidden border border-[#d5d5d5] bg-black py-0">
-              <div className="relative mx-auto w-1/2">
-                <iframe
-                  src={liveTvUrl}
-                  title="Live TV"
-                  className="block h-[270px] w-full"
-                  allow="autoplay; fullscreen"
-                  sandbox="allow-scripts allow-same-origin allow-popups"
-                />
-
-                <button
-                  onClick={() => setIsLiveTvOpen(false)}
-                  className="absolute right-2 top-2 z-20 flex h-10 w-10 items-center justify-center rounded-lg border border-white/30 bg-black/70 text-white hover:bg-black"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-          )} */}
-
-          <div className="w-auto sm:w-fit min-w-[170px] flex items-center justify-between gap-[6px] text-white px-[15px] py-[6px] sm:py-1">
-            <button
-              type="button"
-              onClick={() => setIsFilterModalOpen(true)}
-              className="bg-primary-theme h-9 border border-[#304451] text-[11px] font-semibold flex items-center justify-center rounded-[6px] my-[2px] uppercase text-center px-1.5 py-2 sm:p-[10px] w-full"
-              aria-label="Open hide show filter"
-            >
-              <img src="/icons/filter.svg" alt="" className="align-middle max-w-[15px] w-full" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsOpenBetsVisible(true)}
-              className="whitespace-nowrap bg-primary-theme h-9 border border-[#304451] text-[11px] font-semibold flex items-center justify-center rounded-[6px] my-[2px] uppercase text-center px-1.5 py-2 sm:p-[10px] w-full"
-            >
-              Bets
-            </button>
-            <button
-              type="button"
-              onClick={() => setOpenTV((prev) => !prev)}
-              className="whitespace-nowrap bg-primary-theme h-9 border border-[#304451] text-[11px] font-semibold flex items-center justify-center gap-1 rounded-[6px] my-[2px] uppercase text-center px-1.5 py-2 sm:p-[10px] w-full text-[#22c55e] animate-pulse"
-            >
-              <img
-                src={openTV ? '/icons/tv-fill.svg' : '/icons/tv.svg'}
-                alt=""
-                className="![filter:brightness(0)_saturate(100%)_invert(63%)_sepia(85%)_saturate(497%)_hue-rotate(87deg)_brightness(91%)_contrast(87%)] max-w-[15px] shrink-0"
-              />
-              <span className="leading-none">Live TV</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setOpenScorecard((prev) => !prev)}
-              className="whitespace-nowrap bg-primary-theme h-9 border border-[#304451] text-[11px] font-semibold flex items-center justify-center gap-1 rounded-[6px] my-[2px] uppercase text-center px-1.5 py-2 sm:p-[10px] w-full text-[#22c55e] animate-pulse"
-            >
-              <img
-                src="/icons/scorecard.webp"
-                alt=""
-                className="![filter:brightness(0)_saturate(100%)_invert(63%)_sepia(85%)_saturate(497%)_hue-rotate(87deg)_brightness(91%)_contrast(87%)] max-w-[15px] shrink-0"
-              />
-              <span className="leading-none">Scorecard</span>
-            </button>
-          </div>
-
+      <Marquee tagName="News" />
+      <EventDetailsHeader
+        eventName={eventName}
+        startTime={startTime}
+        inplay={inplay}
+        scorecardOpen={openScorecard}
+        onToggleScorecard={() => setOpenScorecard((value) => !value)}
+        onOpenBets={() => setIsOpenBetsVisible(true)}
+      />
+      <div className="flex min-h-full w-full flex-col gap-y-[3px] lg:flex-row">
+        <div className="min-w-0 flex-1">
           <OpenBetsModal
             open={isOpenBetsVisible}
             onClose={() => setIsOpenBetsVisible(false)}
@@ -292,10 +196,11 @@ function MarketDetails() {
             eventId={eventId}
           />
 
-          {openScorecard && (
+          {openScorecard && liveScoreUrl && (
             <div
+              id="event-scorecard"
               ref={liveScoreRef}
-              className="mb-[6px] w-full overflow-hidden border border-[#2d3f4d] bg-[#1b1b1b]"
+              className="mb-[3px] w-full overflow-hidden border border-[#bfc9cf] bg-[#a3a3a3]"
             >
               {liveScoreUrl ? (
                 <div
@@ -309,7 +214,7 @@ function MarketDetails() {
                     scrolling="no"
                     sandbox="allow-scripts allow-same-origin allow-popups"
                   />
-                  <div className="absolute bottom-0 left-0 flex w-full justify-center bg-[#1b1b1b]">
+                  <div className="absolute bottom-0 left-0 hidden w-full justify-center bg-[#1b1b1b] lg:flex">
                     <button
                       type="button"
                       onClick={handleSetIframeHeight}
@@ -319,7 +224,7 @@ function MarketDetails() {
                       <VscTriangleDown
                         className={cn(
                           'text-lg transition-transform duration-300',
-                          iframeHeight > 140 && 'rotate-180'
+                          iframeHeight > 190 && 'rotate-180'
                         )}
                       />
                     </button>
@@ -352,6 +257,14 @@ function MarketDetails() {
           )}
 
           {/* Normal Market */}
+          {!allMarkets?.length && fancyTabs.length <= 1 && premiumTabs.length <= 1 && (
+            <p
+              role="status"
+              className="border border-[#bfc9cf] bg-white px-[12px] py-[24px] text-center text-[13px] text-[#526575]"
+            >
+              No markets are currently available for this event.
+            </p>
+          )}
           {visibleNormalMarkets?.map((market, idx) => {
             const MarketComponent = isBookmakerMarket(market) ? BookmakerMarket : NormalMarket;
 
@@ -366,9 +279,41 @@ function MarketDetails() {
             );
           })}
 
-          {fancy.length > 0 && (
+          {(fancyTabs.length > 1 || premiumTabs.length > 1) && (
             <>
-              {!marketFilterSettings.hideFancyTabs && (
+              <div className="flex flex-col border-x border-[#7e97a7] text-[13px] font-bold text-white">
+                {fancyTabs.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveCatTab('Fancy')}
+                    aria-pressed={activeCatTab === 'Fancy'}
+                    className={cn(
+                      'h-[31px] px-[10px] text-left',
+                      activeCatTab === 'Fancy'
+                        ? 'bg-gradient-to-b from-[#0a92a5] to-[#076875]'
+                        : 'bg-[#213b49]'
+                    )}
+                  >
+                    Fancy Bet
+                  </button>
+                )}
+                {premiumTabs.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveCatTab('Premium')}
+                    aria-pressed={activeCatTab === 'Premium'}
+                    className={cn(
+                      'flex h-[31px] items-center gap-[8px] px-[10px] text-left',
+                      activeCatTab === 'Premium'
+                        ? 'bg-gradient-to-b from-[#0a92a5] to-[#076875]'
+                        : 'bg-[#213b49]'
+                    )}
+                  >
+                    Premium <span className="bg-[#126778] px-[4px] text-[9px]">NEW</span>
+                  </button>
+                )}
+              </div>
+              {activeCatTab === 'Fancy' && !marketFilterSettings.hideFancyTabs && (
                 <CategoryFilter
                   tabs={fancyTabs}
                   category="FANCY"
@@ -377,42 +322,24 @@ function MarketDetails() {
                 />
               )}
 
-              {pinnedFancyMarkets.length > 0 && (
-                <div className="mb-[18px] border-x border-b border-[#b9cbd3] bg-[#eef0f2] pb-px container-fluid">
-                  <div className="grid h-10 grid-cols-12 items-end border-b border-[#7e97a7] bg-white">
-                    <div className="col-span-7 flex h-full items-center px-[7px] text-[13px] font-bold uppercase text-black">
-                      PIN FANCY MARKET
-                    </div>
-                    <div className="col-span-5 grid h-full grid-cols-2 text-[13px] font-bold text-black">
-                      <div className="flex items-center justify-center bg-[#f3a1b5]">No</div>
-                      <div className="flex items-center justify-center bg-[#72b9e8]">Yes</div>
-                    </div>
-                  </div>
-                  {pinnedFancyMarkets.map((market) => {
-                    const marketKey = getFancyMarketPinKey(market);
-                    return (
-                      <FancyRow
-                        key={`pinned-${marketKey}`}
-                        data={market}
-                        min={market?.minBetAmount ?? 0}
-                        max={market?.maxBetAmount ?? 0}
-                        isPinned
-                        onTogglePin={() => togglePinnedFancy(market)}
-                      />
-                    );
-                  })}
+              {activeCatTab === 'Fancy' && pinnedFancyMarkets.length > 0 && (
+                <div className="mb-[3px] border-x border-b border-[#b9cbd3] bg-white pb-px">
+                  <FancyMarketHeader title="PIN FANCY MARKET" />
+                  {pinnedFancyMarkets.map((market) => (
+                    <FancyRow
+                      key={`pinned-${getFancyMarketPinKey(market)}`}
+                      data={market}
+                      min={market?.minBetAmount ?? 0}
+                      max={market?.maxBetAmount ?? 0}
+                      isPinned
+                      onTogglePin={() => togglePinnedFancy(market)}
+                    />
+                  ))}
                 </div>
               )}
-
-              {unpinnedFancyMarkets.length > 0 && (
-                <div className="mb-4 border-x border-b border-[#b9cbd3] bg-[#eef0f2] pb-px container-fluid">
-                  <div className="grid h-11 grid-cols-12 items-end border-b border-[#7e97a7] bg-white">
-                    <div className="col-span-7"></div>
-                    <div className="col-span-5 grid h-8 grid-cols-2 text-[13px] font-bold text-black">
-                      <div className="flex items-center justify-center bg-[#f3a1b5]">No</div>
-                      <div className="flex items-center justify-center bg-[#72b9e8]">Yes</div>
-                    </div>
-                  </div>
+              {activeCatTab === 'Fancy' && unpinnedFancyMarkets.length > 0 && (
+                <div className="mb-[3px] border-x border-b border-[#b9cbd3] bg-white pb-px">
+                  <FancyMarketHeader />
                   {unpinnedFancyMarkets?.map((market) => {
                     const marketKey = getFancyMarketPinKey(market);
                     return (
@@ -428,13 +355,33 @@ function MarketDetails() {
                   })}
                 </div>
               )}
+              {activeCatTab === 'Premium' && (
+                <>
+                  <CategoryFilter
+                    tabs={premiumTabs}
+                    category="PREMIUM"
+                    activeTab={activePremiumTab}
+                    setActiveTab={setActivePremiumTab}
+                  />
+                  {getFilteredMarkets(premiumMarketsData, activePremiumTab, sport).map(
+                    (market, index) => (
+                      <MarketPanel
+                        key={market.marketId ?? index}
+                        eventName={market.marketName}
+                        marketName={market.marketName}
+                        marketData={market}
+                        runnersData={market.runners ?? []}
+                        marketCategory="PREMIUM"
+                        min={market.minBetAmount}
+                        max={market.maxBetAmount}
+                      />
+                    )
+                  )}
+                </>
+              )}
             </>
           )}
         </div>
-
-        {width > 1024 ? (
-          <div className="block">{/* <BetSlip liveTvUrl={liveTvUrl} /> */}</div>
-        ) : null}
       </div>
       <MarketFilterModal
         open={isFilterModalOpen}
