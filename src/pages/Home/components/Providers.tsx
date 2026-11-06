@@ -24,29 +24,25 @@ const providers = [
 
 const Providers = () => {
   return (
-    <div className="mt-4">
-      <div className="relative bg-[linear-gradient(-180deg,#f72424,#bb1c00)] text-white flex items-center min-w-full w-full uppercase p-[5px] text-[15px] leading-[1.5]">
+    <div className="mt-[2px] lg:mt-[4px]">
+      <div className="relative mb-[3px] flex min-w-full w-full items-center bg-[linear-gradient(-180deg,#f72424,#bb1c00)] px-[5px] py-[8px] text-[16px] uppercase leading-[17.6px] text-white">
         <span className="">OUR PROVIDERS</span>
       </div>
-      <div className="mt-2 grid grid-cols-2 gap-1 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-[2px] md:grid-cols-4 lg:gap-[4px]">
         {providers.map((provider) => (
           <div key={provider.id} className="relative bg-black">
-            <Link to={`/providers/${provider.id}`}>
-              <img src={provider.img} alt={provider.name} className="img-fluid" />
-              <h2 className="relative z-[4] bottom-0 left-0 w-full h-[30px] justify-center capitalize text-white text-[15px] items-center pl-[10px] font-medium flex">
-                {provider.name}{' '}
-                <Link to={`/providers/${provider.id}`} className="home-animated text-xs">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                  <span></span>
+            <Link to={`/providers/${provider.id}`} className="block">
+              <img src={provider.img} alt={provider.name} className="block aspect-[1.67] w-full object-cover" />
+            </Link>
+              <div className="relative flex h-[30px] w-full items-center justify-center bg-black text-[12px] font-normal capitalize text-white lg:text-[15px]">
+                <Link to={`/providers/${provider.id}`}>{provider.name}</Link>
+                <Link to={`/providers/${provider.id}`} className="absolute bottom-[2px] right-[4px] flex h-[20px] w-[78px] items-center justify-center overflow-hidden rounded-[3px] border border-[#aaa] bg-white text-[10px] leading-none text-black lg:text-[12px]">
                   Play Now
-                  <svg viewBox="0 0 24 24" className="size-4 inline">
+                  <svg viewBox="0 0 24 24" className="inline size-3">
                     <path fill="#8b0000" d="M8,5.14V19.14L19,12.14L8,5.14Z"></path>
                   </svg>
                 </Link>
-              </h2>
-            </Link>
+              </div>
           </div>
         ))}
       </div>

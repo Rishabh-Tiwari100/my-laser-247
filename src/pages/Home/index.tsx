@@ -104,33 +104,6 @@ function Home() {
     },
   ];
 
-  const secondaryNavigations = [
-    {
-      path: '/sports/cricket',
-      label: 'Evolution',
-    },
-    {
-      path: '/sports/cricket',
-      label: 'FIFA CUP WINNER',
-    },
-    {
-      path: '/sports/cricket',
-      label: 'WINNER CUP',
-    },
-    {
-      path: '/sports/cricket',
-      label: 'ELECTION',
-    },
-    {
-      path: '/sports/cricket',
-      label: 'Kabaddi',
-    },
-    {
-      path: '/sports/cricket',
-      label: 'Election',
-    },
-  ];
-
   const [activeTab, setActiveTab] = useState<CasinoTab | undefined>(casinoTabs[0]);
 
   const handleTabChange = (tab: CasinoTab) => {
@@ -205,21 +178,21 @@ function Home() {
       : null;
 
   return (
-    <div className="relative lg:container mx-auto">
+    <div className="relative mx-auto w-full px-px font-helvetica min-[576px]:max-w-[540px] md:max-w-[720px] min-[992px]:max-w-[960px] lg:px-[2px] min-[1200px]:max-w-[1140px] min-[1400px]:max-w-[1344px]">
       {/* Full Width Marquee */}
 
       <div className="pt-[0.125rem]">
         <Marquee icon={FiMic} tagName="News" />
       </div>
 
-      <div className="flex lg:hidden bg-black text-center w-full overflow-x-auto justify-between whitespace-nowrap overflow-y-hidden">
+      <div aria-label="Homepage sports" className="flex h-[35px] w-full overflow-x-auto overflow-y-hidden whitespace-nowrap bg-black text-center font-helvetica text-[13px] lg:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {homeNavigations.map((nav, index) =>
           nav.label === 'Fantasy 11' ? (
             <button
               key={index}
               type="button"
               disabled={isLaunchingFantasy || activeGameId !== null}
-              className="animate-menuHighlight  px-2.5 py-[7px] capitalize text-sm text-white border-r border-[#333] hover:bg-[#1a1a1a] disabled:cursor-wait disabled:opacity-70"
+              className="animate-menuHighlight shrink-0 px-[10px] py-[8px] text-[13px] text-white border-r border-[#333] hover:bg-[#1a1a1a] disabled:cursor-wait disabled:opacity-70"
               aria-disabled={isLaunchingFantasy || activeGameId !== null}
               aria-busy={isLaunchingFantasy}
               onClick={() => void launchFantasyGame()}
@@ -230,7 +203,7 @@ function Home() {
             <Link
               key={index}
               to={nav.href}
-              className={`px-2.5 py-[7px] capitalize text-sm text-white border-r border-[#333] hover:bg-[#1a1a1a] ${nav.label === 'Casino' ? 'animate-menuHighlight' : ''}`}
+              className={`shrink-0 px-[10px] py-[8px] text-[13px] text-white border-r border-[#333] hover:bg-[#1a1a1a] `}
             >
               {nav.label}
             </Link>
@@ -246,24 +219,9 @@ function Home() {
         onClose={closeFantasyGame}
       />
 
-      <div className="">
-        <ul className="flex lg:hidden shadow-[inset_0_-10px_20px_#01929f] bg-[linear-gradient(180deg,_#3729fa,_#2f64f6_80%,_#2f67f6)] overflow-x-auto whitespace-nowrap">
-          {secondaryNavigations.map((nav, index) => (
-            <li key={index}>
-              <Link
-                to={nav.path}
-                className="block w-full animate-[blinker_1s_linear_infinite] p-[5px] text-center text-[12px] font-semibold uppercase text-white"
-              >
-                {nav.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <Link to="/popular-events" className="my-[5px] block w-full">
+      <Link to="/popular-events" className="mb-[6px] block w-full">
         <img
-          className="h-[66px] lg:h-[250px] max-w-full w-full"
+          className="block h-auto max-w-full w-full"
           src="/images/home-images/main-banner.gif"
           alt=""
         />
@@ -272,62 +230,63 @@ function Home() {
       {welcomeBannerOverlay}
 
       <div>
-        <div className="grid md:grid-cols-2 gap-2">
-          <div className="relative">
-            <Link to="/inplay" className="block">
+        <div aria-label="Sports highlights" className="grid grid-cols-1 gap-[2px] md:grid-cols-2 lg:gap-[4px]">
+          <div className="relative min-w-0 overflow-hidden bg-black">
+            <Link to="/inplay" className="block" aria-label="Sports">
               <img
-                className="w-full max-w-full h-auto"
+                className="block aspect-[73/28] w-full object-cover"
                 src="/images/home-images/sports.png"
                 alt=""
               />
-              <p className="flex w-full h-[30px] capitalize text-[15px] items-center text-white  font-medium pl-[10px] bg-black">
+              <p className="flex h-[30px] w-full items-center justify-center bg-black px-[2px] text-[12px] font-normal capitalize leading-[13.2px] text-white lg:text-[15px]">
                 Sports
               </p>
-              <div className="absolute right-0 top-0 p-[10px_5px_40px] text-left w-[180px] lg:w-[190px] overflow-x-hidden overflow-y-auto max-h-[263px] h-full bg-[linear-gradient(180deg,_#000_0%,_rgba(0,0,0,0.7)_82%,_transparent_100%)]">
-                <p className="inline-flex h-5 max-w-[58px] items-center rounded-[3px] bg-gradient-to-b from-[#fb3434] to-[#e80505] pr-[5px] text-[12px] font-bold leading-5 text-white mt-[5px] mb-0">
+            </Link>
+              <div aria-label="Live sports" className="absolute right-0 top-0 h-full w-[105px] overflow-x-hidden overflow-y-auto bg-[linear-gradient(180deg,#000_0%,rgba(0,0,0,0.7)_82%,transparent_100%)] px-[2px] py-[8px] text-left lg:w-[150px] lg:px-[5px] lg:py-[10px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <p className="mt-[2px] mb-px inline-flex h-[18px] w-[69px] items-center rounded-[3px] bg-gradient-to-b from-[#fb3434] to-[#e80505] pr-[10px] text-[12px] font-bold leading-[18px] text-white lg:mt-px lg:h-[20px] lg:w-[59px] lg:pr-[5px] lg:leading-5">
                   <span className="mr-[5px] flex h-full items-center justify-center rounded-l-[3px] bg-gradient-to-b from-white to-[#e8e8e8] px-[3px]">
                     <span className="live-icon animate-twinkling" />
                   </span>
                   LIVE
                 </p>
-                <div className="pb-5 px-[5px]">
+                <div className="pb-2">
                   {sports.map((sport) => (
-                    <div
+                    <Link
                       key={sport.name}
-                      className="flex cursor-pointer items-center justify-between gap-2 text-[10px] lg:text-xs"
+                      to={sport.path}
+                      className="flex items-center justify-between gap-1 text-[10px] lg:text-xs"
                     >
-                      <h3 className="text-white font-normal capitalize leading-[1.8] ">
+                      <h3 className="whitespace-nowrap text-white font-normal capitalize leading-[20px] ">
                         {sport.name}
                       </h3>
-                      <span className="text-[#333] bg-white rounded-[3px] px-[3px] min-w-6 h-[14px] lg:h-4 leading-[16px]">
+                      <span className="h-[14px] min-w-[14px] shrink-0 rounded-[3px] bg-white px-[2px] text-center leading-[14px] text-[#333] lg:h-4 lg:leading-4">
                         {sport.count}
                       </span>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </div>
-            </Link>
           </div>
-          <div className="relative mb-[5px]">
-            <Link to="#">
+          <div className="relative min-w-0 overflow-hidden bg-black">
+            <Link to="#" className="block" aria-label="Sports Book">
               <img
-                className="w-full max-w-full h-auto"
+                className="block aspect-[73/28] w-full object-cover"
                 src="/images/home-images/sportsbook.webp"
                 alt=""
               />
             </Link>
-            <p className="flex w-full h-[30px] capitalize text-[15px] items-center text-white  font-medium pl-[10px] bg-black">
+            <p className="flex h-[30px] w-full items-center justify-center bg-black px-[2px] text-[12px] font-normal capitalize leading-[13.2px] text-white lg:text-[15px]">
               Sports Book
             </p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-1 mt-2">
+      <div className="mt-[2px] grid grid-cols-4 gap-[2px] lg:mt-[4px] lg:gap-[4px]">
         {popularCasinoGames.map((item) => (
           <div className="relative">
             <Link to={item?.link} className="block">
-              <img src={item.img} className="h-[70px] md:h-[255px] w-full max-w-full" />
+              <img src={item.img} className="block aspect-[1.3] w-full object-cover" />
               <p className="flex w-full h-[30px] bg-black justify-center capitalize text-white text-[11px] sm:text-[13px] lg:text-[15px] items-center font-medium pl-[2px] sm:pl-[6px] lg:pl-[10px]">
                 {item.name}
               </p>
@@ -345,65 +304,6 @@ function Home() {
       <Providers />
       <HomeFooter />
 
-      <div className="pb-[30px] lg:hidden">
-        <div className="flex flex-wrap m-2 gap-2 justify-center">
-          <div className="max-w-full flex items-center justify-center gap-[10px]">
-            <div className="text-center">
-              <Link to="#">
-                <img className="w-[150px] max-w-full" src="/images/footer/btn-app.webp" alt="" />
-              </Link>
-            </div>
-            <div className="bg-[linear-gradient(180deg,#414141,#1a1a1a)] rounded-[4px] flex w-[150px] border border-black h-full">
-              <Link to="#" className="flex gap-[5px] text-[13px] items-center text-white">
-                <div className="bg-black h-full w-[33px] flex items-center justify-center text-white">
-                  <img
-                    src="/images/footer/blog.svg"
-                    className="w-auto max-w-full filter brightness-[100]"
-                  />
-                </div>
-                <div className="text-white">Blogs</div>
-              </Link>
-            </div>
-          </div>
-        </div>
-        <ul className="flex justify-center gap-[10px] mt-2">
-          <li>
-            <Link to="#" className="">
-              <img src="/images/footer/telegram.png" alt="" className="max-w-10 w-auto" />
-            </Link>
-          </li>
-          <li>
-            <Link to="#" className="">
-              <img src="/images/footer/instagram.png" alt="" className="max-w-10 w-auto" />
-            </Link>
-          </li>
-        </ul>
-
-        <div className="mt-[10px]">
-          <ul className="flex items-center justify-center flex-wrap">
-            <li className="inline-block px-[10px]">
-              <span className="text-[11px] text-white underline">
-                privacy Policy
-              </span>
-            </li>
-            <li className="inline-block px-[10px]">
-              <span className="text-[11px] text-white underline">
-                terms and conditions
-              </span>
-            </li>
-            <li className="inline-block px-[10px]">
-              <span className="text-[11px] text-white underline">
-                about us
-              </span>
-            </li>
-            <li className="inline-block px-[10px]">
-              <span className="text-[11px] text-white underline">
-                responsible gaming
-              </span>
-            </li>
-          </ul>
-        </div>
-      </div>
     </div>
   );
 }

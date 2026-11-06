@@ -4,7 +4,11 @@ const BackToTop = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const updateVisibility = () => setIsVisible(window.scrollY > 300);
+    const updateVisibility = () => {
+      const footer = document.querySelector('footer');
+      const footerVisible = footer && footer.getBoundingClientRect().top < window.innerHeight;
+      setIsVisible(window.scrollY > 300 && !footerVisible);
+    };
 
     updateVisibility();
     window.addEventListener('scroll', updateVisibility, { passive: true });

@@ -11,6 +11,10 @@ jest.mock('@/store/api/authApi', () => ({
   useLogoutMutation: () => [mockLogout, { isLoading: false }],
 }));
 jest.mock('@/store', () => ({ logout: () => ({ type: 'auth/logout' }) }));
+jest.mock('@/store/api/stakesApi', () => ({
+  useGetStakeSetQuery: () => ({ data: undefined }),
+  useUpdateStakeSetMutation: () => [jest.fn(), { isLoading: false }],
+}));
 jest.mock('react-hot-toast', () => ({
   __esModule: true,
   default: { loading: jest.fn(), success: jest.fn(), error: jest.fn() },
@@ -45,11 +49,10 @@ it('renders the mobile account screen in order with real destinations', () => {
   setup();
   const links = screen.getAllByRole('link');
   expect(links.map((link) => link.getAttribute('href'))).toEqual([
-    '/bonus-statement',
+    '/apply-coupon',
     '/my-account/profile',
     '/account-statement',
     '/my-account/my-bets',
-    '/stake-settings',
     '/change-password',
     '/user/rules',
   ]);
@@ -62,14 +65,24 @@ it.each([
   ['My Profile', '/my-account/profile'],
   ['Account Statement', '/account-statement'],
   ['Unsettled Bets', '/my-account/my-bets'],
-  ['Stake Setting', '/stake-settings'],
   ['Change Password', '/change-password'],
   ['Rules', '/user/rules'],
-  ['BONUS COUPON', '/bonus-statement'],
+  ['BONUS COUPON', '/apply-coupon'],
 ])('navigates %s to the existing page', (label, path) => {
   setup();
   fireEvent.click(screen.getByRole('link', { name: label }));
   expect(screen.getByTestId('location')).toHaveTextContent(path);
+});
+
+it('opens stake settings above the profile menu without navigating', () => {
+  setup();
+  fireEvent.click(screen.getByRole('button', { name: 'Stake Setting' }));
+  expect(screen.getByRole('dialog', { name: 'Setting' })).toBeInTheDocument();
+  expect(screen.getAllByRole('textbox')).toHaveLength(8);
+  expect(screen.getByTestId('location')).toHaveTextContent('/');
+  fireEvent.click(screen.getByRole('button', { name: 'Close stake settings' }));
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  expect(screen.getByRole('navigation', { name: 'Account pages' })).toBeInTheDocument();
 });
 
 it('calls the existing logout mutation and clears authentication after success', async () => {

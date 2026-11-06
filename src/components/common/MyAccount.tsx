@@ -9,6 +9,7 @@ import { useLogoutMutation } from '@/store/api/authApi';
 import { logout as clearAuth } from '@/store';
 import { useNavigate } from 'react-router-dom';
 import * as Dropdown from '@radix-ui/react-dropdown-menu';
+import StakeModal from './StakeModal';
 
 const items = [
   { title: 'My Profile', path: '/my-account/profile' },
@@ -39,6 +40,7 @@ export default function MyAccount({
   onOpenChange,
 }: Props) {
   const [internalOpen, setInternalOpen] = useState(false);
+  const [stakeSettingsOpen, setStakeSettingsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 1023px)').matches);
   const open = controlledOpen ?? internalOpen;
   const setOpen = (value: boolean) => {
@@ -56,6 +58,7 @@ export default function MyAccount({
   useEffect(() => {
     if (previousLocation.current !== location) {
       setInternalOpen(false);
+      setStakeSettingsOpen(false);
       onOpenChange?.(false);
       previousLocation.current = location;
     }
@@ -109,9 +112,9 @@ export default function MyAccount({
   );
   const bonus = (
     <Link
-      to="/bonus-statement"
+      to="/apply-coupon"
       onClick={() => setOpen(false)}
-      className="mx-auto flex min-h-[25px] w-[70%] items-center justify-center rounded-full bg-[#243a48] px-4 py-1.5 text-center text-xs text-white hover:bg-[#32617f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500 lg:h-[46px] lg:min-h-[46px] lg:w-[120px] lg:flex-col lg:gap-0 lg:px-3 lg:py-0 lg:text-[11px] lg:leading-[17px]"
+      className="mx-auto flex h-[28px] w-[70%] items-center justify-center rounded-full bg-[#243a48] px-4 text-center text-xs text-white hover:bg-[#32617f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500 lg:h-[46px] lg:min-h-[46px] lg:w-[120px] lg:flex-col lg:gap-0 lg:px-3 lg:py-0 lg:text-[11px] lg:leading-[17px]"
     >
       <span>BONUS</span> <span>COUPON</span>
     </Link>
@@ -121,7 +124,7 @@ export default function MyAccount({
       type="button"
       disabled={isLoading}
       onClick={handleLogout}
-      className="flex h-[48px] w-full items-center justify-center gap-1 bg-[#243a48] text-sm font-bold text-white hover:brightness-110 disabled:opacity-60 max-lg:mt-[14px] max-lg:bg-[linear-gradient(#ed301d,#bf1c0c)] lg:h-10 lg:text-[14px] lg:font-extrabold"
+      className="flex h-[50px] w-full items-center justify-center gap-1 bg-[#243a48] text-[16px] font-bold text-white hover:brightness-110 disabled:opacity-60 max-lg:mt-[16px] max-lg:bg-[linear-gradient(#ed301d,#bf1c0c)] lg:h-10 lg:text-[14px] lg:font-extrabold"
     >
       {isLoading ? 'LOGGING OUT' : 'LOGOUT'}
       {isMobile && <RiLogoutBoxRLine aria-hidden="true" />}
@@ -186,11 +189,12 @@ export default function MyAccount({
           </Dropdown.Root>
         )}
       </div>
+      {isMobile && open && stakeSettingsOpen && <StakeModal mobileProfile onClose={() => setStakeSettingsOpen(false)} />}
       {isMobile && open && (
         <section
           id="account-menu"
           aria-label="Account"
-          className="fixed inset-x-0 bottom-[50px] top-[70px] z-[1050] overflow-y-auto overscroll-contain bg-[#eee] text-black"
+          className="fixed inset-x-0 bottom-[50px] top-[50px] z-[1050] overflow-y-auto overscroll-contain bg-[#eee] font-helvetica text-black"
           onKeyDown={(event) => {
             if (event.key === 'Escape') {
               setOpen(false);
@@ -198,32 +202,34 @@ export default function MyAccount({
             }
           }}
         >
-          <div className="flex h-[38px] items-center justify-between bg-[#222] px-2 text-xs text-white">
+          <div className="flex h-[42px] items-center justify-between bg-[#222] px-[10px] text-[14px] text-white">
             <h2
               ref={heading}
               tabIndex={-1}
               className="flex min-w-0 items-center gap-1 outline-none"
             >
-              <FaUserCircle className="h-[18px] w-[18px] shrink-0" />
+              <FaUserCircle className="h-[22px] w-[22px] shrink-0" />
               <span className="truncate">{name}</span>
             </h2>
-            <span className="shrink-0 border-l border-white/10 pl-2">GMT+5:30</span>
+            <span className="flex h-full shrink-0 items-center border-l border-white/10 pl-2">GMT+5:30</span>
           </div>
-          <div className="border-b border-[#c4ccd0] py-2">{bonus}</div>
-          <nav aria-label="Account pages">
+          <div className="flex h-[44px] items-center border-b border-[#c4ccd0]">{bonus}</div>
+          <nav aria-label="Account pages" className="border-b border-[#7e97a7]">
             {items.map((item) => {
               const style =
-                'flex min-h-[38px] w-full items-center justify-between gap-2 border-b border-[#e5e5e5] bg-white px-[10px] py-2 text-left text-[15px] font-bold text-[#278fce] hover:bg-[#f5f7f8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500';
+                'flex min-h-[43px] w-full items-center justify-between gap-2 border-b border-[#e5e5e5] bg-white px-[10px] py-2 text-left text-[17px] font-extrabold text-[#278fce] hover:bg-[#f5f7f8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500';
               const content = (
                 <>
                   <span>{item.title}</span>
                   <MdKeyboardArrowRight
                     aria-hidden="true"
-                    className="h-[22px] w-[22px] shrink-0 rounded border border-[#eee] text-[#333]"
+                    className="h-[24px] w-[24px] shrink-0 rounded border border-[#eee] text-[#333]"
                   />
                 </>
               );
-              return item.path ? (
+              return item.title === 'Stake Setting' ? (
+                <button key={item.title} type="button" className={style} onClick={() => setStakeSettingsOpen(true)}>{content}</button>
+              ) : item.path ? (
                 <Link
                   key={item.title}
                   to={item.path}

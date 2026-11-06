@@ -40,7 +40,7 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isInplay = pathname === '/inplay';
-  const isCompactSportsList = pathname === '/dashboard' || isInplay;
+  const isCompactSportsList = pathname === '/dashboard' || isInplay || pathname.startsWith('/sports');
   const isAuthenticated = useIsAuthenticated();
   const {
     eventName,
@@ -150,8 +150,8 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
             />
             <span
               className={cn(
-                'truncate text-[#168bd2]',
-                isCompactSportsList && 'max-lg:text-[14px] max-lg:font-semibold'
+                'min-w-0 flex-1 truncate text-[#168bd2]',
+                isCompactSportsList && 'max-lg:text-[14px] max-lg:font-bold'
               )}
             >
               {eventName}
@@ -185,8 +185,8 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
         }
       >
         {/* Match Info */}
-        <div className="col-span-10 md:col-span-7 flex justify-between gap-x-1">
-          <div className={cn('flex gap-x-2', isCompactSportsList && 'lg:gap-0')}>
+        <div className="col-span-10 md:col-span-7 flex min-w-0 justify-between gap-x-1">
+          <div className={cn('flex min-w-0 flex-1 gap-x-2', isCompactSportsList && 'lg:gap-0')}>
             {showLiveIndicator ? (
               <div className="mt-1 self-start rounded-full inline-flex items-start p-1 md:p-0.5">
                 <span className="p-[3.5px] rounded-full bg-[#508d0e] border border-gray-400" />
@@ -197,11 +197,11 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
               </div>
             )}
 
-            <div>
+            <div className="min-w-0 flex-1">
               <div
                 className={cn(
-                  'text-xs text-primary-blue line-clamp-1',
-                  isCompactSportsList && 'text-[13px] text-[#168bd2] font-semibold'
+                  'w-full truncate text-xs text-primary-blue',
+                  isCompactSportsList && 'text-[13px] text-[#168bd2] font-bold'
                 )}
               >
                 {eventName}

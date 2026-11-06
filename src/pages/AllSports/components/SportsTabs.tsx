@@ -156,6 +156,33 @@ export const tabs = [
   },
 ];
 
+const dashboardIcons: Record<string, string> = {
+  "Cricket": "/icons/dashboard-sports/4.svg",
+  "Football": "/icons/dashboard-sports/1.svg",
+  "Tennis": "/icons/dashboard-sports/2.svg",
+  "Fantasy 11": "/icons/dashboard-sports/979797.svg",
+  "Cock Fight": "/icons/dashboard-sports/969696.svg",
+  "Casino": "/icons/dashboard-sports/99998.svg",
+  "Sports book": "/icons/dashboard-sports/99991.svg",
+  "Horse Racing": "/icons/dashboard-sports/7.svg",
+  "Greyhound Racing": "/icons/dashboard-sports/4339.svg",
+  "Other": "/icons/dashboard-sports/100000.svg",
+  "Binary": "/icons/dashboard-sports/99990.svg",
+  "Kabaddi": "/icons/dashboard-sports/99994.svg",
+  "Politics": "/icons/dashboard-sports/2378961.svg",
+  "Basketball": "/icons/dashboard-sports/7522.svg",
+  "Baseball": "/icons/dashboard-sports/7511.svg",
+  "Table Tennis": "/icons/dashboard-sports/20.svg",
+  "Volleyball": "/icons/dashboard-sports/998917.svg",
+  "Ice Hockey": "/icons/dashboard-sports/7524.svg",
+  "Rugby": "/icons/dashboard-sports/5.svg",
+  "Mixed Martial Arts": "/icons/dashboard-sports/26420387.svg",
+  "Darts": "/icons/dashboard-sports/3503.svg",
+  "Futsal": "/icons/dashboard-sports/29.svg",
+  "Genius": "/icons/dashboard-sports/99989.svg",
+  "Predix": "/icons/dashboard-sports/989898.svg"
+};
+
 export default function SportsTabs() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -230,9 +257,9 @@ export default function SportsTabs() {
               }`, isDashboard && 'h-[26px] px-[14px] text-[13px] max-lg:mt-0 max-lg:h-[34px] max-lg:text-[13px]')}
           >
             <img
-              src={tab.name === 'Cricket' ? '/icons/cricket.svg' : tab.name === 'Football' ? '/icons/soccer.svg' : tab.name === 'Tennis' ? '/icons/tennis.svg' : tab.icon.startsWith('/icons/') ? tab.icon : `https://www.lasercric.com${tab.icon}`}
+              src={dashboardIcons[tab.name] ?? '/icons/trophy.webp'}
               alt={tab.name}
-              className="hidden size-5 shrink-0 object-contain invert max-lg:block"
+              className="hidden size-5 shrink-0 object-contain brightness-0 invert max-lg:block"
             />
 
             <span>{tab.name}</span>

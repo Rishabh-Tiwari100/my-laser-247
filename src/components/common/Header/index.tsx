@@ -27,6 +27,8 @@ interface HeaderProps {
   setShowOneClickBar: React.Dispatch<React.SetStateAction<boolean>>;
   isProfileMenuOpen: boolean;
   setIsProfileMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  stakeSettingsOpen?: boolean;
+  onToggleStakeSettings?: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -34,12 +36,14 @@ const Header: React.FC<HeaderProps> = ({
   setShowOneClickBar,
   isProfileMenuOpen,
   setIsProfileMenuOpen,
+  stakeSettingsOpen,
+  onToggleStakeSettings,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isDashboard = location.pathname === '/dashboard';
   const isEventDetails = location.pathname.includes('/market-details/');
-  const isCompactHeader = isEventDetails || ['/account-statement', '/my-bets', '/change-password', '/inplay', '/casino', '/casino/evolution'].includes(location.pathname);
+  const isCompactHeader = isProfileMenuOpen || location.pathname === '/' || isEventDetails || location.pathname.startsWith('/sports') || ['/account-statement', '/my-bets', '/change-password', '/inplay', '/casino', '/casino/evolution'].includes(location.pathname);
   const isMfaPage = location.pathname.includes('2fa');
 
   const isAuthenticated = useIsAuthenticated();
@@ -313,40 +317,9 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {isAuthenticated && !isMfaPage && !isCompactHeader && (
-          <div
-            className={cn(
-              'lg:hidden w-full justify-around gap-[3px] border-y border-[#a6a6a6a3] p-[3px]',
-              isDashboard ? 'hidden' : 'flex'
-            )}
-          >
-            <Link
-              to="/deposit"
-              className="flex h-8 w-1/2 items-center justify-center border border-white bg-gradient-to-b from-[#007b15] to-[#138e00] p-1.5 text-center text-xs font-black uppercase text-white"
-            >
-              <img
-                src="/icons/deposit.png"
-                alt=""
-                className="w-4 max-w-full h-auto mr-[5px] relative top-[-2.5px]"
-              />
-              Deposit
-            </Link>
-            <Link
-              to="/withdraw"
-              className="flex h-8 w-1/2 items-center justify-center border border-white bg-gradient-to-b from-[#7b0000] to-[#d10000] p-1.5 text-center text-xs font-black uppercase text-white"
-            >
-              <img
-                src="/icons/withdraw.png"
-                alt=""
-                className="w-4 max-w-full h-auto mr-[5px] relative top-[-2.5px]"
-              />
-              Withdrawal
-            </Link>
-          </div>
-        )}
         {/* Bottom Section: Navigation */}
         <div className="hidden lg:block">
-          <TopNavigation />
+          <TopNavigation stakeSettingsOpen={stakeSettingsOpen} onToggleStakeSettings={onToggleStakeSettings} />
         </div>
       </header>
       <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />

@@ -5,6 +5,7 @@ import { useGetBetHistoryQuery } from '@/store/api/betReportApi';
 import dayjs from 'dayjs';
 import { Loader2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import StakeSettingsPanel from './StakeSettingsPanel';
 
 type BetTab = 'matched' | 'unmatched' | 'fancy';
 
@@ -14,7 +15,7 @@ const tabs: { id: BetTab; label: string }[] = [
   { id: 'fancy', label: 'Fancy' },
 ];
 
-export default function OpenBetsSidebar({ gridLayout = false }: { gridLayout?: boolean }) {
+export default function OpenBetsSidebar({ gridLayout = false, stakeSettingsOpen = false }: { gridLayout?: boolean; stakeSettingsOpen?: boolean }) {
   const isDashboard = useLocation().pathname === '/dashboard';
   const [activeTab, setActiveTab] = useState<BetTab>('matched');
   const isAuthenticated = useIsAuthenticated();
@@ -52,6 +53,7 @@ export default function OpenBetsSidebar({ gridLayout = false }: { gridLayout?: b
       )}
     >
       <div className="flex h-full min-h-0 flex-col">
+        {stakeSettingsOpen && isAuthenticated && <StakeSettingsPanel />}
         <h2
           className={cn(
             'm-0 shrink-0 rounded-none bg-[#263f50] p-[5px] text-[12px] font-normal leading-normal capitalize text-white',

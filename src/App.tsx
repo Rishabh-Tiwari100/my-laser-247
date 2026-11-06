@@ -30,6 +30,7 @@ const ForgotPassword = loadable(() => import('@/pages/Auth/ForgotPassword'), {
 const ChangePassword = loadable(() => import('@/pages/Auth/ChangePassword'), {
   fallback: <NotOutLoader />,
 });
+const ApplyCoupon = loadable(() => import('@/pages/ApplyCoupon'), { fallback: <NotOutLoader /> });
 const HomePage = loadable(() => import('@/pages/Home'), {
   fallback: <NotOutLoader />,
 });
@@ -281,6 +282,7 @@ export function App() {
           <Route path="/account-statement" element={<Account />} />
           <Route path="/statements" element={<Account />} />
           <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/apply-coupon" element={<ApplyCoupon />} />
           <Route path="/user/rules" element={<Rules />} />
           <Route path="/my-profile" element={<MyProfile />} />
           <Route path="/bonus-statement" element={<BonusStatement />} />

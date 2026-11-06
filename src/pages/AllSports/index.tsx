@@ -19,6 +19,7 @@ import ExchangeSportsbookHeader from '@/components/common/ExchangeSportsbookHead
 import Banner from '@/components/common/Banner';
 import SportNoDataFallback from './components/sports/SportNoDataFallback';
 import EventSearchModal from '@/components/common/EventSearchModal';
+import Footer from '@/components/common/Footer';
 
 const AllSports: React.FC = () => {
   const { sportName = '', competitionId } = useParams();
@@ -36,6 +37,7 @@ const AllSports: React.FC = () => {
         : 'Cricket';
   const { pathname } = useLocation();
   const isDashboard = pathname === '/dashboard';
+  const isSportsPage = pathname.startsWith('/sports');
   const { isAuthenticated } = useHomePage();
   const pageMatchFilter = isVirtualSelected && !isLiveSelected ? 'virtual' : isLiveSelected ? 'live' : 'all';
 
@@ -53,11 +55,11 @@ const AllSports: React.FC = () => {
     filterResultTab,
   } = useAllSports(sport, viewBy, pageMatchFilter);
 
-  const cricketEvents = isDashboard && isPremiumSelected
+  const cricketEvents = (isDashboard || isSportsPage) && isPremiumSelected
     ? allCricketEvents.filter((event) => event.tags.includes('premium')) : allCricketEvents;
-  const footballEvents = isDashboard && isPremiumSelected
+  const footballEvents = (isDashboard || isSportsPage) && isPremiumSelected
     ? allFootballEvents.filter((event) => event.tags.includes('premium')) : allFootballEvents;
-  const tennisEvents = isDashboard && isPremiumSelected
+  const tennisEvents = (isDashboard || isSportsPage) && isPremiumSelected
     ? allTennisEvents.filter((event) => event.tags.includes('premium')) : allTennisEvents;
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const visibleEventCount = isInplay
@@ -133,23 +135,26 @@ const AllSports: React.FC = () => {
           )}
 
           {!isInplay && !isDashboard && (
-            <Banner />
+            <>
+              {isSportsPage && <Marquee tagName="News" className="mb-px h-[26px] leading-[26px]" />}
+              <Banner className={isSportsPage ? 'm-0' : undefined} />
+            </>
           )}
 
-          {!isInplay && <SportsTabs />}
+          {isDashboard && <SportsTabs />}
 
           {!isInplay && (
             <div className={isDashboard ? 'order-4 p-0 lg:order-3' : isAuthenticated ? 'pt-[0.125rem]' : ''}>
 
               {/* Always visible */}
-              <div className={cn('bg-[#212121] py-[5px] mt-[7px] text-xs font-semibold text-white font-tahoma border-b border-[#c8ced3] flex items-center justify-between px-2', isDashboard && 'm-0 min-h-[29px] px-[3px] py-[2px] lg:min-h-[25px] lg:bg-[#213b49] lg:px-[5px] lg:py-px')}>
+              <div className={cn('bg-[#212121] py-[5px] mt-[7px] text-xs font-semibold text-white font-tahoma border-b border-[#c8ced3] flex items-center justify-between px-2', isDashboard && 'm-0 min-h-[29px] px-[3px] py-[2px] lg:min-h-[25px] lg:bg-[#213b49] lg:px-[5px] lg:py-px', isSportsPage && 'mt-0 h-[31px] gap-1 px-[5px] py-0 lg:h-[25px] lg:bg-[#243a48]')}>
                 {isDashboard ? (
                   'Highlights'
                 ) : (
                   <div className="flex gap-2 items-center">
                     <img
                       src={
-                        normalizedSportName === 'cricket'
+                        sport === 'Cricket'
                           ? '/icons/cricket.svg'
                           : normalizedSportName === 'soccer' || normalizedSportName === 'football'
                             ? '/icons/soccer.svg'
@@ -161,7 +166,7 @@ const AllSports: React.FC = () => {
                     {sport}
                   </div>
                 )}
-                <div className={cn("flex gap-2 items-center", isDashboard && "max-lg:gap-[5px]")}>
+                <div className={cn("flex gap-2 items-center", (isDashboard || isSportsPage) && "max-lg:gap-[5px]", isSportsPage && '[&_button]:min-h-[22px] [&_button]:px-[5px] [&_button]:py-0 [&_button]:text-[10px] [&_button]:font-normal')}>
                   <div className="flex items-center gap-[2px]">
                     <button
                       type="button"
@@ -193,10 +198,10 @@ const AllSports: React.FC = () => {
                       )}
                       VIRTUAL
                     </button>
-                    {isDashboard && (
+                    {(isDashboard || isSportsPage) && (
                       <button type="button" aria-pressed={isPremiumSelected}
                         onClick={() => setIsPremiumSelected((selected) => !selected)}
-                        className={`hidden lg:flex min-h-[22px] gap-[3px] font-normal items-center justify-center rounded-[25px] border px-2.5 text-[12px] whitespace-nowrap ${isPremiumSelected ? 'border-[#00ad78] bg-[#00ad78] text-white' : 'border-white text-white'}`}>
+                        className={`${isSportsPage ? 'flex' : 'hidden lg:flex'} min-h-[22px] gap-[3px] font-normal items-center justify-center rounded-[25px] border px-2.5 text-[12px] whitespace-nowrap ${isPremiumSelected ? 'border-[#00ad78] bg-[#00ad78] text-white' : 'border-white text-white'}`}>
                         {isPremiumSelected ? <FaCheck aria-hidden="true" /> : <FaPlus aria-hidden="true" />} PREMIUM
                       </button>
                     )}
@@ -243,9 +248,9 @@ const AllSports: React.FC = () => {
                 <SportNoDataFallback />
               )}
 
-              {/* {!isInplay && !competitionId && <Footer />} */}
             </div>
           )}
+          {isSportsPage && <div className="[&>div]:border-[#ccc] [&_span]:text-[#333] [&_a]:text-[#333] [&_span]:text-[11px] [&_a]:text-[11px]"><Footer /></div>}
           <EventSearchModal
             open={isMobileSearchOpen}
             onClose={() => setIsMobileSearchOpen(false)}
