@@ -10,7 +10,6 @@ import NewLaunch from './components/NewLaunch';
 import MyFavourites from './components/MyFavourites';
 import CasinoTabs, { CasinoTab } from './components/CasinoTabs';
 import CasinoGames from './components/CasinoGames';
-import LandingContent from './components/LandingContent';
 import TermsPolicy from '../TermsPolicy/index';
 import { casinoTabs, homeNavigations } from '@/utils/constants/home';
 import { useGetFixtureCountsQuery } from '@/store/api/eventsApi';
@@ -344,7 +343,6 @@ function Home() {
 
       {/* <CasinoGames tab={activeTab} /> */}
       <Providers />
-      <LandingContent />
       <HomeFooter />
 
       <div className="pb-[30px] lg:hidden">

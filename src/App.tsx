@@ -83,6 +83,7 @@ const ReferralPage = loadable(() => import('@/pages/ReferralPage'), {
 const MyBetsPage = loadable(() => import('@/pages/MyBetsPage'), {
   fallback: <NotOutLoader />,
 });
+const Inplay = loadable(() => import('@/pages/Inplay'), { fallback: <NotOutLoader /> });
 const Affiliate = loadable(() => import('@/pages/Affiliate'), {
   fallback: <NotOutLoader />,
 });
@@ -218,7 +219,7 @@ export function App() {
 
       {/* home layout mini footer */}
       <Route element={<MainLayout />}>
-        <Route path="/inplay" element={<AllSports />} />
+        <Route path="/inplay" element={<Inplay />} />
         <Route path="/casino/evolution" element={<CasinoGames />} />
         <Route path="/casino" element={<CasinoGames />} />
         <Route path="/promotions" element={<Promotions />} />

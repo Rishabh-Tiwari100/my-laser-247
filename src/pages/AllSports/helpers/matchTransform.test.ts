@@ -24,6 +24,12 @@ const makeEvent = (id: number, sport: string): EventItem =>
   }) as EventItem;
 
 describe('groupEvents', () => {
+  it('retains additional sports returned by the fixture API', () => {
+    const grouped = groupEvents([makeEvent(1, 'Basketball'), makeEvent(2, 'Table Tennis')]);
+    expect(grouped.basketball?.[0]?.eventName).toBe('Basketball Event');
+    expect(grouped['table tennis']?.[0]?.eventName).toBe('Table Tennis Event');
+    expect(grouped.cricket).toEqual([]);
+  });
   it('groups cricket, soccer, football, and tennis events', () => {
     const grouped = groupEvents([
       makeEvent(1, 'Cricket'),

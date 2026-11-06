@@ -39,7 +39,7 @@ const Header: React.FC<HeaderProps> = ({
   const location = useLocation();
   const isDashboard = location.pathname === '/dashboard';
   const isEventDetails = location.pathname.includes('/market-details/');
-  const isCompactHeader = isEventDetails || ['/account-statement', '/my-bets', '/change-password'].includes(location.pathname);
+  const isCompactHeader = isEventDetails || ['/account-statement', '/my-bets', '/change-password', '/inplay', '/casino', '/casino/evolution'].includes(location.pathname);
   const isMfaPage = location.pathname.includes('2fa');
 
   const isAuthenticated = useIsAuthenticated();

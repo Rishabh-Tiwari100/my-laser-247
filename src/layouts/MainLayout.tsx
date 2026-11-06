@@ -3,7 +3,6 @@ import { Outlet, useLocation } from 'react-router-dom';
 import BottomNav from '@/components/common/BottomNav';
 import { useState } from 'react';
 import Sidebar from '@/components/common/Sidebar';
-import LandingContent from '@/pages/Home/components/LandingContent';
 import { useAppSelector } from '@/hooks';
 import OpenBetsSidebar from '@/components/common/OpenBetsSidebar';
 
@@ -16,6 +15,7 @@ function MainLayout() {
   const isEventDetails = pathname.includes('/market-details/');
   const isReferenceAccountPage = ['/account-statement', '/my-bets', '/change-password'].includes(pathname);
   const isInplayPage = pathname === '/inplay';
+  const isCasinoPage = pathname === '/casino' || pathname === '/casino/evolution';
   const isDepositPage = pathname === '/deposit';
   const isWithdrawPage = pathname === '/withdraw' || pathname === '/wallet-withdraw';
   const isPaymentPage = isDepositPage || isWithdrawPage;
@@ -24,8 +24,6 @@ function MainLayout() {
     pathname === '/my-account/2fa' ||
     pathname.startsWith('/2fa/');
   const isReferralPage = pathname === '/referral' || pathname === '/refer-earn';
-  const isMyAccountPage =
-    pathname.startsWith('/my-account') && pathname !== '/my-account/2fa';
   const isProfilePage = pathname === '/my-account/profile' || pathname === '/my-profile';
   const isOtherAccountPage = [
     '/change-password', '/user/rules', '/stake-settings', '/bonus-statement',
@@ -40,7 +38,7 @@ function MainLayout() {
     !isOtherAccountPage && !isPaymentPage && !isTwoFaPage && !isReferralPage);
 
   return (
-    <div className={`flex min-h-screen flex-col ${isDashboard || isEventDetails || isReferenceAccountPage ? 'bg-[#eee] text-[#111] [font-family:Arial,Helvetica,sans-serif]' : 'font-inter'}`}>
+    <div className={`flex min-h-screen flex-col ${isDashboard || isEventDetails || isReferenceAccountPage || isInplayPage || isCasinoPage ? 'bg-[#eee] text-[#111] [font-family:Arial,Helvetica,sans-serif]' : 'font-inter'}`}>
       <Header
         showOneClickBar={showOneClickBar}
         setShowOneClickBar={setShowOneClickBar}
@@ -52,13 +50,12 @@ function MainLayout() {
           <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
         )}
 
-        <div className={`min-w-0 flex-1 ${isDashboard ? 'grid grid-cols-1 lg:pl-[12px] lg:pr-[2px] min-[1200px]:grid-cols-3' : isInplayPage ? 'grid grid-cols-1 xl:grid-cols-12' : 'flex'} ${showOpenBetsSidebar ? 'lg:pr-0' : ''}`}>
+        <div className={`min-w-0 flex-1 ${isDashboard ? 'grid grid-cols-1 lg:pl-[12px] lg:pr-[2px] min-[1200px]:grid-cols-3' : isInplayPage ? 'grid grid-cols-1 lg:grid-cols-4' : 'flex'} ${showOpenBetsSidebar ? 'lg:pr-0' : ''}`}>
         <main
-          className={`min-w-0 flex-1 overflow-x-hidden lg:max-w-full ${isDashboard ? 'px-0 lg:px-[6px] min-[1200px]:col-span-2' : isInplayPage ? 'xl:col-span-8' : isPaymentPage || isTwoFaPage ? 'lg:px-0' : isReferenceAccountPage ? 'lg:pl-[36px] lg:pr-[26px]' : isEventDetails ? 'lg:pl-[12px] lg:pr-[22px]' : showOpenBetsSidebar ? 'lg:pl-[23px] lg:pr-[34px]' : 'lg:px-4'}`}
+          className={`min-w-0 flex-1 overflow-x-hidden lg:max-w-full ${isDashboard ? 'px-0 lg:px-[6px] min-[1200px]:col-span-2' : isInplayPage ? 'lg:col-span-3 lg:px-[8px]' : isPaymentPage || isTwoFaPage ? 'lg:px-0' : isReferenceAccountPage ? 'lg:pl-[36px] lg:pr-[26px]' : isCasinoPage ? 'lg:pl-[18px] lg:pr-[28px]' : isEventDetails ? 'lg:pl-[12px] lg:pr-[22px]' : showOpenBetsSidebar ? 'lg:pl-[23px] lg:pr-[34px]' : 'lg:px-4'}`}
         >
           <div className="min-h-0 pb-24 lg:pb-0">
             <Outlet />
-            {!isMyAccountPage && <LandingContent page={pathname} className="mx-2 lg:mx-0" />}
           </div>
         </main>
         {showOpenBetsSidebar && <OpenBetsSidebar gridLayout={isInplayPage} />}

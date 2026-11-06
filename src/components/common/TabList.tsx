@@ -1,5 +1,4 @@
 import React from 'react';
-import 'swiper/css';
 
 interface Match {
   id: number | string;
@@ -23,6 +22,7 @@ const TabList: React.FC<TabListProps> = ({ list, selected, onSelect, className }
 
   return (
     <ul
+      aria-label="Casino providers"
       onMouseDown={(event) => {
         dragState.current = {
           isDragging: false,
@@ -56,27 +56,19 @@ const TabList: React.FC<TabListProps> = ({ list, selected, onSelect, className }
         event.stopPropagation();
         event.currentTarget.scrollLeft += event.deltaY;
       }}
-      className={`scrollbar-hidden flex w-full min-w-0 max-w-full cursor-grab select-none flex-nowrap overflow-x-auto overflow-y-hidden whitespace-nowrap rounded-sm border-b border-[#dee2e6] overscroll-x-contain active:cursor-grabbing ${className ?? ''}`}
+      className={`flex w-full min-w-0 max-w-full cursor-grab select-none flex-nowrap overflow-x-scroll overflow-y-hidden overscroll-x-contain whitespace-nowrap border-b border-[#aaa] bg-white [scrollbar-width:auto] [&::-webkit-scrollbar]:h-[14px] [&::-webkit-scrollbar-track]:bg-[#f5f5f5] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-[3px] [&::-webkit-scrollbar-thumb]:border-[#f5f5f5] [&::-webkit-scrollbar-thumb]:bg-[#8c8c8c] active:cursor-grabbing ${className ?? ''}`}
     >
       {list.map((item) => (
         <li
           key={item?.id}
           onClick={() => handleSelect(item.id, item.name)}
-          className="mb-px shrink-0 bg-primary-theme border border-primary-theme cursor-pointer"
+          className="shrink-0 cursor-pointer border border-[#aaa] bg-[#243a48]"
         >
           <button
             type="button"
-            className={`flex items-center gap-1 text-[13px] pl-4 pr-8 py-2 border border-primary-theme ${item?.id == selected || item?.name == selected ? 'text-[#495057] bg-white' : 'bg-primary-theme text-white'}`}
+            aria-pressed={item?.id == selected || item?.name == selected}
+            className={`flex h-[36px] items-center gap-[4px] px-[17px] py-[6px] text-[13px] font-normal leading-[20px] ${item?.id == selected || item?.name == selected ? 'bg-white text-[#243a48]' : 'bg-[#243a48] text-white'}`}
           >
-            {item?.name !== 'ALL' && (
-              <span className="shrink-0">
-                <img
-                  src="/icons/provider.svg"
-                  className={`w-auto max-w-full ${(item?.id == selected || item?.name == selected) && 'invert'}`}
-                  alt=""
-                />
-              </span>
-            )}
             <span className="shrink-0">{item.name}</span>
           </button>
         </li>

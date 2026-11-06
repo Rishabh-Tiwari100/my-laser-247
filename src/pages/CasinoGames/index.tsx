@@ -9,7 +9,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import Skeleton from '@/components/common/Skeleton';
 import { clearCasinoGameDetail } from '@/store/slices/casinoGameDetailSlice';
 import { useCasinoGames } from './hooks/useCasinoGames';
-import CasinoBannerSlider from './components/CasinoBannerSlider';
+import Banner from '@/components/common/Banner';
+import Marquee from '@/components/common/Marquee';
 const TabListMemoize = TabList;
 
 const CasinoGames: React.FC = () => {
@@ -54,7 +55,7 @@ const CasinoGames: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white pt-0 p-4">
+      <div className="min-h-screen bg-[#eee] px-[8px] pt-[3px] font-helvetica text-black">
         <div className="mb-1 px-2 py-1 text-white bg-primary w-full flex items-center gap-x-8 border border-b-[3px] border-r-[3px] border-black rounded-md">
           <button onClick={() => navigate(-1)} className="flex items-center gap-x-1">
             <Icons.angularLeftArrow />
@@ -140,50 +141,54 @@ const CasinoGames: React.FC = () => {
   }
 
   return (
-    <div className="h-full flex flex-col p-1.5 md:p-2 text-white overflow-hidden">
-      <CasinoBannerSlider />
+    <div className="flex min-w-0 flex-col overflow-hidden bg-white pt-[3px] font-helvetica text-white">
+      <Marquee tagName="News" className="mb-px h-[26px] leading-[26px]" />
+      <Banner className="m-0" />
       {/* Header */}
-      <div className="flex justify-between w-full items-center bg-[#212121] border border-[#c8ced3]">
+      <div className="flex min-h-[26px] w-full items-center justify-between border border-[#c8ced3] bg-[#243a48]">
         <div className="flex items-center gap-[2px] pl-[10px]">
           <img src="/icons/casino.png" alt="" className="max-w-5 mr-[3px] invert w-auto" />
           <span className="font-bold text-xs capitalize leading-[25px]">Casino</span>
         </div>
-        <div className="w-[60%] h-auto flex items-center relative">
+        <div className="relative flex h-[25.2px] w-[60%] items-center lg:w-1/4">
           <input
             type="text"
             placeholder="Search Games..."
             aria-label="Search casino games"
             onChange={(event) => debouncedSearch(event.target.value.trim())}
-            className="text-black bg-white w-full border border-[#F44336] h-[25.2px] px-[10px] py-[5px] text-xs focus:outline-none"
+            className="text-black bg-white w-full border border-[#F44336] h-[25.2px] pl-[10px] pr-[32px] py-[5px] text-[12px] focus:outline-none"
           />
-          <span className="absolute right-px top-0 flex items-center justify-center h-[25px] w-6 p-[7px] bg-[red] text-white ">
+          <span className="absolute right-px top-0 flex items-center justify-center h-[25px] w-[28px] p-[7px] bg-[red] text-white ">
             <img src="/icons/casino-search.svg" alt="" className="brightness-0 invert" />
           </span>
         </div>
       </div>
       {/* Provider Tabs */}
-      <div className="z-50 min-w-0 max-w-full">
+      <div className="min-w-0 max-w-full">
         <TabListMemoize
           list={providerList}
           selected={selectedProvider}
           onSelect={handleProviderSelect}
-          className="my-1"
+          className="m-0"
         />
         <CategoryTabs
           categories={categoryList || []}
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
-          className="mt-1"
+          className="mt-[5px]"
         />
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hidden mt-1">
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-1">
+      <div className="mt-[10px] min-w-0 flex-1">
+        <div className="grid grid-cols-3 gap-[4px] px-px lg:grid-cols-4">
           {allGames.map((item) => {
             const isFavorite = Boolean(item.isFavorite ?? item.isFavourite);
 
             return (
-              <div key={item.id} className="group relative overflow-hidden text-left">
+              <div
+                key={item.id}
+                className="group relative min-w-0 overflow-hidden bg-[#243a48] text-left"
+              >
                 <button
                   type="button"
                   onClick={() => handleGameClick(item.id)}
@@ -192,16 +197,19 @@ const CasinoGames: React.FC = () => {
                 >
                   <img
                     loading="lazy"
-                    className="h-[135px] min-h-[135px] max-w-full w-full object-unset transition-transform group-hover:scale-105"
+                    className="block aspect-video w-full max-w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
                     src={item.gameImage}
                     alt={item.name}
                     onError={(e) => (e.currentTarget.src = '/images/casino/casino-fallback.webp')}
                   />
+                  <span className="flex h-[21px] items-center justify-center overflow-hidden bg-[#243a48] px-[3px] text-center text-[10px] font-bold uppercase leading-[12px] text-white">
+                    <span className="truncate">{item.name}</span>
+                  </span>
                 </button>
 
                 <button
                   type="button"
-                  className={`absolute left-[3px] top-[3px] flex size-[21px] items-center justify-center rounded-[0px_0px_8px] border border-white/25 bg-black/45 text-white shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition-colors hover:bg-black/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                  className={`absolute left-[3px] top-[3px] flex size-[21px] items-center justify-center rounded-[0px_0px_8px] border border-white/25 bg-black/45 text-white shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition-opacity hover:bg-black/70 focus:outline-none lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary ${
                     isFavorite ? 'text-[#ffc400]' : 'text-white'
                   }`}
                   aria-label={`${isFavorite ? 'Remove' : 'Add'} ${item.name} ${
@@ -226,11 +234,13 @@ const CasinoGames: React.FC = () => {
         {hasMore && <div ref={observerTarget} className="h-10 mt-4" />}
 
         {!hasMore && allGames.length > 0 && (
-          <div className="text-center py-8 text-gray-400">No more games available.</div>
+          <div className="py-[20px] text-center text-[12px] text-[#6c757d]">
+            No more games available.
+          </div>
         )}
 
         {!isLoading && allGames.length === 0 && (
-          <div className="text-center py-16 text-gray-400">
+          <div className="py-[40px] text-center text-[#6c757d]">
             <p className="text-lg">No games found</p>
           </div>
         )}

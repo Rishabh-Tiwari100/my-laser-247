@@ -16,7 +16,9 @@ interface Props {
 }
 
 const OddsRow = ({ allOdds, blockedStatus, length, isLeague }: Props) => {
-  const isDashboard = useLocation().pathname === '/dashboard';
+  const { pathname } = useLocation();
+  const isInplay = pathname === '/inplay';
+  const isCompactSportsList = pathname === '/dashboard' || isInplay;
   const groupedOdds: OddType[][] = [];
 
   for (let i = 0; i < allOdds.length; i += 2) {
@@ -40,7 +42,13 @@ const OddsRow = ({ allOdds, blockedStatus, length, isLeague }: Props) => {
                 price={isDisabled ? null : odd.price}
                 position={hasPrice ? 1 : 2}
                 // className={clsx(isDisabled ? 'opacity-50' : 'opacity-100')}
-                className={isDashboard ? odd.type === 'back' ? 'lg:h-[34px] lg:bg-[#72bbef]' : 'lg:h-[34px] lg:bg-[#faa9bd]' : undefined}
+                className={
+                  isCompactSportsList
+                    ? odd.type === 'back'
+                      ? 'lg:h-[34px] lg:bg-[#72bbef]'
+                      : 'lg:h-[34px] lg:bg-[#faa9bd]'
+                    : undefined
+                }
                 isLeague={isLeague}
               />
             );

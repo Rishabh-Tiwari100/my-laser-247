@@ -4,7 +4,6 @@ import OneClickBetBar from '@/components/common/OneClickBetBar';
 import BackToTop from '@/components/common/BackToTop';
 import React, { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import LandingContent from '@/pages/Home/components/LandingContent';
 
 function HomeLayout() {
   const { pathname } = useLocation();
@@ -25,7 +24,6 @@ function HomeLayout() {
             setIsProfileMenuOpen={setIsProfileMenuOpen}
           />
           <Outlet />
-          {pathname !== '/' && <LandingContent page={pathname} className="mx-4" />}
           {showOneClickBar && (
             <OneClickBetBar
               width="max-w-8xl"

@@ -1,5 +1,4 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import LandingContent from '@/pages/Home/components/LandingContent';
 
 function AuthLayout() {
   const { pathname } = useLocation();
@@ -14,7 +13,7 @@ function AuthLayout() {
         }
       >
         <Outlet />
-        {pathname !== '/login' && <LandingContent page={pathname} className="w-full max-w-6xl" />}
+
       </div>
     </div>
   );

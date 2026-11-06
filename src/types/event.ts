@@ -72,6 +72,7 @@ export interface ApiResponse {
 }
 
 export type GroupedMatches = {
+  [sport: string]: Match[];
   cricket: Match[];
   football: Match[];
   tennis: Match[];

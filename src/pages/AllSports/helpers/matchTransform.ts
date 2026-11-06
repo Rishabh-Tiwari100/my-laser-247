@@ -70,8 +70,10 @@ export function groupEvents(fixtures: EventItem[]): GroupedMatches {
   const grouped: GroupedMatches = { cricket: [], football: [], tennis: [] };
 
   fixtures.forEach((event) => {
-    const group = SPORT_MAP[event.sport?.toLowerCase()];
-    if (group) grouped[group].push(transformEvent(event));
+    const sport = event.sport?.trim().toLowerCase();
+    if (!sport) return;
+    const group = SPORT_MAP[sport] ?? sport;
+    (grouped[group] ??= []).push(transformEvent(event));
   });
 
   return grouped;

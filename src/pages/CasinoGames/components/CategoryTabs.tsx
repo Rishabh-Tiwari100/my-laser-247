@@ -19,7 +19,7 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
   const dragState = React.useRef({ isDragging: false, startX: 0, scrollLeft: 0 });
 
   return (
-    <div className={`min-w-0 max-w-full pt-[5px] ${className ?? ''}`}>
+    <div className={`min-w-0 max-w-full ${className ?? ''}`}>
       <div
         onMouseDown={(event) => {
           dragState.current = {
@@ -54,27 +54,39 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
           event.stopPropagation();
           event.currentTarget.scrollLeft += event.deltaY;
         }}
-        className="scrollbar-hidden min-w-0 max-w-full cursor-grab select-none overflow-x-auto overflow-y-hidden overscroll-x-contain active:cursor-grabbing"
+        className="min-w-0 max-w-full cursor-grab select-none overflow-x-scroll overflow-y-hidden overscroll-x-contain border border-[#aaa] bg-white [scrollbar-width:auto] [&::-webkit-scrollbar]:h-[14px] [&::-webkit-scrollbar-track]:bg-[#f5f5f5] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-[3px] [&::-webkit-scrollbar-thumb]:border-[#f5f5f5] [&::-webkit-scrollbar-thumb]:bg-[#8c8c8c] active:cursor-grabbing"
       >
-        <ul className="flex w-max min-w-full flex-nowrap rounded-sm border border-primary-theme">
+        <ul aria-label="Casino categories" className="flex w-max min-w-full flex-nowrap">
           {categories.map((label, index) => (
             <li
               key={index}
+              role="button"
+              tabIndex={0}
+              aria-pressed={selectedCategory === label}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  setSelectedCategory(label);
+                }
+              }}
               onClick={() => {
                 if (dragState.current.isDragging) return;
                 setSelectedCategory(label);
               }}
               className={cn(
-                'shadow min-w-[70px] md:min-w-[90px] flex-shrink-0 flex flex-col items-center md:gap-1 px-2 py-1.5 border border-primary-theme text-sm transition font-medium cursor-pointer',
-                selectedCategory === label ? 'bg-primary-theme text-white' : ''
+                'flex h-[61px] min-w-[65px] shrink-0 cursor-pointer flex-col items-center justify-center gap-[3px] border-r border-[#aaa] px-[6px] py-[5px] text-[13px] font-normal uppercase leading-[20px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300',
+                selectedCategory === label ? 'bg-[#243a48] text-white' : 'bg-white text-black'
               )}
             >
               <img
                 src={categoryIconMap[label] || '/images/casino/category/three-cards.svg'}
                 alt=""
-                className={cn('w-5 h-5 md:w-6 md:h-6 transition')}
+                className={cn(
+                  'h-[28px] w-[28px] object-contain brightness-0',
+                  selectedCategory === label && 'invert'
+                )}
               />
-              <span className="text-9 md:text-xs whitespace-nowrap">{formatLabel(label)}</span>
+              <span className="whitespace-nowrap">{formatLabel(label)}</span>
             </li>
           ))}
         </ul>
