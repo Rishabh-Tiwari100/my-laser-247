@@ -29,8 +29,6 @@ export const sidebarSports = [
   { label: 'Table Tennis' },
   { label: 'Volleyball' },
   { label: 'Ice Hockey' },
-  { label: 'Rugby' },
-  { label: 'Mixed Martial Arts' },
   { label: 'Darts' },
   { label: 'Futsal' },
 ];

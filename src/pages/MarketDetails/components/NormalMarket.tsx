@@ -22,14 +22,14 @@ const NormalMarket = ({
   const { eventId } = useParams();
   const [addToMultiMarket] = useAddToMultiMarketMutation();
 
-  const onTogglePin = (isPinned: boolean) => {
+  const onTogglePin = async (isPinned: boolean) => {
     try {
       if (!eventId) {
         toast.error('Event ID is missing');
         return;
       }
       const status = isPinned ? 'UNFAVORITE' : 'FAVORITE';
-      addToMultiMarket({ eventId: Number(eventId), status }).unwrap();
+      await addToMultiMarket({ eventId: Number(eventId), status }).unwrap();
       toast.success(isPinned ? 'Market unpinned successfully' : 'Market pinned successfully');
     } catch (error: any) {
       console.log('error: ', error);

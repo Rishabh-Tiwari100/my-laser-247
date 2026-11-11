@@ -212,6 +212,7 @@ export const eventsApi = apiSlice.injectEndpoints({
         );
         return groupEvents(flattenedFixtures);
       },
+      providesTags: ['Sports'],
     }),
 
     getRaces: builder.query<

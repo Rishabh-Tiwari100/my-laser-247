@@ -76,5 +76,9 @@ export function groupEvents(fixtures: EventItem[]): GroupedMatches {
     (grouped[group] ??= []).push(transformEvent(event));
   });
 
+  Object.values(grouped).forEach((matches) => {
+    matches.sort((a, b) => Number(b.isFavourite) - Number(a.isFavourite));
+  });
+
   return grouped;
 }

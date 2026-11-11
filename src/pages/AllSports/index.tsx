@@ -178,7 +178,7 @@ const AllSports: React.FC = () => {
                 className={cn(
                   'bg-[#212121] py-[5px] mt-[7px] text-xs font-semibold text-white font-helvetica border-b border-[#c8ced3] flex items-center justify-between px-2',
                   isDashboard &&
-                    'm-0 min-h-[29px] px-[3px] py-[2px] lg:min-h-[25px] lg:bg-[#213b49] lg:px-[5px] lg:py-px',
+                    'm-0 min-h-[29px] px-0 py-[2px] lg:min-h-[25px] lg:bg-[#213b49] lg:px-[5px] lg:py-px',
                   isSportsPage && 'mt-0 h-[31px] gap-1 px-[5px] py-0 lg:h-[25px] lg:bg-[#243a48]'
                 )}
               >
@@ -204,6 +204,7 @@ const AllSports: React.FC = () => {
                   className={cn(
                     'flex gap-2 items-center',
                     (isDashboard || isSportsPage) && 'max-lg:gap-[5px]',
+                    isDashboard && 'max-lg:[&_button]:min-h-[22px] max-lg:[&_button]:text-[10px]',
                     isSportsPage &&
                       '[&_button]:min-h-[22px] [&_button]:px-[5px] [&_button]:py-0 [&_button]:text-[10px] [&_button]:font-normal'
                   )}

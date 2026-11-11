@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useIsAuthenticated } from '@/hooks';
 import { useFantasyGameLauncher } from '@/hooks/useFantasyGameLauncher';
 import CasinoGameLauncher from '@/components/casino/CasinoGameLauncher';
+import './SportsTabs.css';
 
 export const tabs = [
   {
@@ -275,7 +276,7 @@ export default function SportsTabs({
         className={cn(
           'relative w-full border-b border-[#c8ced3] bg-white max-lg:border-0 max-lg:bg-[#243a48]',
           isDashboard &&
-            'order-3 border-b-[3px] border-b-white max-lg:border-b-[3px] max-lg:border-t-[8px] max-lg:border-t-[#213b49] lg:order-4 lg:border-b-[#213b49] lg:bg-[#7e97a7]'
+            'order-3 border-b-[3px] border-b-white max-lg:border-b-[3px] max-lg:border-t-[8px] max-lg:border-t-[#213b49] lg:order-4 lg:border-b-[#213b49] lg:bg-white'
         )}
         aria-label="Sports"
       >
@@ -283,7 +284,7 @@ export default function SportsTabs({
           className={cn(
             'flex min-h-[38px] overflow-x-auto whitespace-nowrap px-1.5 max-lg:min-h-[42px] max-lg:items-end max-lg:gap-px max-lg:pr-11',
             isDashboard &&
-              'min-h-[26px] px-0 max-lg:min-h-[37px] max-lg:pl-0 max-lg:[scrollbar-width:none]'
+              'min-h-[26px] px-0 max-lg:mr-[48px] max-lg:min-h-[37px] max-lg:gap-0 max-lg:pl-0 max-lg:pr-0 max-lg:[scrollbar-width:none] max-lg:[&::-webkit-scrollbar]:hidden'
           )}
         >
           {visibleTabs.map((tab) => (
@@ -318,7 +319,15 @@ export default function SportsTabs({
                     : 'border-transparent text-[#d8e0e5] hover:bg-[#212121] hover:text-white max-lg:text-white/90 max-lg:hover:rounded-t-[9px] hover:max-lg:border hover:max-lg:border-white max-lg:border-b-0'
                 }`,
                 isDashboard &&
-                  'h-[26px] px-[14px] text-[13px] max-lg:mt-0 max-lg:h-[34px] max-lg:text-[13px]'
+                  'h-[26px] px-[14px] text-[13px] max-lg:mt-0 max-lg:h-[34px] max-lg:gap-[5px] max-lg:px-[15px] max-lg:text-[13px] max-lg:rounded-t-[9px]',
+                isDashboard &&
+                  active !== tab.id &&
+                  'lg:bg-white lg:text-[#3b5160] lg:hover:bg-[#212121] lg:hover:text-white',
+                isDashboard && tab.name === 'Casino' && 'dashboard-sport-casino',
+                isDashboard &&
+                  ['Sports book', 'Genius'].includes(tab.name) &&
+                  'dashboard-sport-featured',
+                isDashboard && tab.name === 'Binary' && 'dashboard-sport-binary'
               )}
             >
               <img
@@ -329,6 +338,7 @@ export default function SportsTabs({
               />
 
               <span>{tab.name}</span>
+              {isDashboard && tab.name === 'Binary' && <em className="dashboard-sport-new">New</em>}
             </button>
           ))}
         </div>
@@ -336,9 +346,12 @@ export default function SportsTabs({
           type="button"
           aria-label="Search sports"
           onClick={() => setIsSearchOpen(true)}
-          className="absolute bottom-0 right-0 hidden h-[42px] w-11 items-center justify-center border-l border-white/20 bg-[#243a48] text-white max-lg:flex"
+          className={cn(
+            'absolute bottom-0 right-0 hidden h-[42px] w-11 items-center justify-center border-l border-white/20 bg-[#243a48] text-white max-lg:flex',
+            isDashboard && 'h-[45px] w-[48px]'
+          )}
         >
-          <Search className="h-5 w-5" strokeWidth={2.5} />
+          <Search className={isDashboard ? 'h-6 w-6' : 'h-5 w-5'} strokeWidth={2.5} />
         </button>
       </nav>
       <CasinoGameLauncher

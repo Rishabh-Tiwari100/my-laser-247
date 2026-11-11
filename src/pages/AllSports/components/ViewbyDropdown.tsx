@@ -1,7 +1,7 @@
 import { useLocation } from 'react-router-dom';
 import { cn } from '@/utils';
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Filter } from 'lucide-react';
 
 export type ViewByOption = 'Competition' | 'Time';
 
@@ -34,11 +34,15 @@ export default function ViewByDropdown({ selected, onChange }: ViewByDropdownPro
     <div className="relative inline-block" ref={dropdownRef}>
       {/* Button */}
       <button
+        type="button"
+        aria-expanded={open}
+        aria-label="View events by"
         onClick={() => setOpen(!open)}
-        className={cn("flex items-center gap-1 rounded-t-sm bg-[linear-gradient(-180deg,#f72424,#bb1c00)] py-[3px] px-1 rounded-[2px] text-xs font-semibold uppercase text-white", isDashboard && "min-h-[23px] gap-[3px] px-[6px] py-0 text-[11px] font-normal lg:min-h-[22px] lg:px-1 lg:py-[3px] lg:text-xs")}
+        className={cn("flex items-center gap-1 rounded-t-sm bg-[linear-gradient(-180deg,#f72424,#bb1c00)] py-[3px] px-1 rounded-[2px] text-xs font-semibold uppercase text-white", isDashboard && "min-h-[23px] justify-center gap-[3px] px-[6px] py-0 text-[11px] font-normal max-lg:min-w-[76px] lg:min-h-[22px] lg:px-1 lg:py-[3px] lg:text-xs")}
       >
+        {isDashboard && <Filter size={12} className="lg:hidden" aria-hidden="true" />}
         View By
-        <ChevronDown size={14} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown size={14} className={cn('transition-transform', open && 'rotate-180', isDashboard && 'max-lg:hidden')} />
       </button>
 
       {/* Dropdown */}

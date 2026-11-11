@@ -40,6 +40,7 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isInplay = pathname === '/inplay';
+  const isDashboard = pathname === '/dashboard';
   const isCompactSportsList =
     pathname === '/dashboard' || isInplay || pathname.startsWith('/sports');
   const isAuthenticated = useIsAuthenticated();
@@ -114,14 +115,16 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
           <div
             className={cn(
               'flex h-[18px] items-center gap-1',
-              isCompactSportsList && 'max-lg:pl-[10px] max-lg:gap-[3px]'
+              isCompactSportsList && 'max-lg:pl-[10px] max-lg:gap-[3px]',
+              isDashboard && 'max-lg:h-[20px] max-lg:gap-[4px]'
             )}
           >
             {showLiveIndicator && !isInplay && (
               <span
                 className={cn(
                   'hidden font-bold text-[#508d0e]',
-                  isCompactSportsList && 'max-lg:inline max-lg:text-[13px]'
+                  isCompactSportsList && 'max-lg:inline max-lg:text-[13px]',
+                  isDashboard && 'max-lg:text-[13.65px]'
                 )}
               >
                 In-Play
@@ -138,7 +141,8 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
             <span
               className={cn(
                 'truncate text-[10px] font-normal text-[#8a969e]',
-                isCompactSportsList && 'max-lg:text-[9px] max-lg:text-[#f00]'
+                isCompactSportsList && 'max-lg:text-[9px] max-lg:text-[#f00]',
+                isDashboard && 'max-lg:text-[10px]'
               )}
             >
               {dayjs(time).format('DD/MM/YYYY HH:mm')}

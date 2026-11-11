@@ -97,6 +97,7 @@ export const catalogueApi = apiSlice.injectEndpoints({
           method: 'GET',
         };
       },
+      providesTags: ['Sports'],
     }),
   }),
 });

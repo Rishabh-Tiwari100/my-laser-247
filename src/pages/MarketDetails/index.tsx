@@ -113,7 +113,7 @@ function MarketDetails() {
       <div className="p-4">
         {/* <BackButton backButtonClassName="hidden sm:flex" /> */}
         <div className="text-center py-8">
-          <div className="inline-flex items-center gap-x-1 text-white">
+          <div className="inline-flex items-center gap-x-1 text-[#213b49]">
             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
             Loading market details...
           </div>

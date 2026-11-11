@@ -258,7 +258,6 @@ const NormalMarketRow = ({ data, market, min, max }: NormalMarketRowProps) => {
                     onClick={() => handleSelectOdds(priceKey, sizeKey, betOn, position)}
                     style={{
                       background: bg,
-                      boxShadow: selectedOdd ? 'inset 0 0 0 2px #111827' : undefined,
                     }}
                     className={`${hideOnMobile ? 'max-lg:hidden' : ''} col-span-6 lg:col-span-2 border-r border-white/50 text-[13px] lg:text-[12px] font-semibold py-1 text-black h-full min-h-[42.5px] lg:min-h-[43px] disabled:opacity-50`}
                   >

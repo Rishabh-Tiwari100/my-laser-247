@@ -100,9 +100,7 @@ export default function OpenBetsSidebar({
           </>
         )}
         <div className="min-h-0 flex-1 overflow-y-scroll p-0 text-[11px] leading-normal">
-          {!isAuthenticated ? (
-            <div className="p-3 text-center text-gray-500">Login to view bets</div>
-          ) : loading ? (
+          {!isAuthenticated ? null : loading ? (
             <div className="flex h-32 items-center justify-center">
               <Loader2 className="h-5 w-5 animate-spin text-[#263f50]" />
             </div>
@@ -112,7 +110,11 @@ export default function OpenBetsSidebar({
             bets.map((bet, index) => (
               <div
                 key={bet.id ?? index}
-                className="grid grid-cols-4 items-center border-b border-gray-100 text-left capitalize [&>span]:p-1"
+                className={cn(
+                  'grid grid-cols-4 items-center border-b border-gray-100 text-left capitalize [&>span]:p-1',
+                  bet.betOn?.toUpperCase() === 'BACK' && 'bg-[#beddf4]',
+                  bet.betOn?.toUpperCase() === 'LAY' && 'bg-[#f3dce2]'
+                )}
               >
                 <span className="truncate px-1" title={bet.selection ?? bet.selectionName ?? ''}>
                   {bet.selection ?? bet.selectionName ?? bet.runnerName ?? '-'}

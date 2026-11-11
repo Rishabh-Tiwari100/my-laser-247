@@ -33,10 +33,14 @@ export default function CompetitionEventGroups({
   matches,
   sportName,
 }: CompetitionEventGroupsProps) {
-  const groups = groupMatchesByCompetition(matches);
+  const pinnedMatches = matches.filter((match) => match.isFavourite);
+  const groups = groupMatchesByCompetition(matches.filter((match) => !match.isFavourite));
 
   return (
     <>
+      {pinnedMatches.map((match) => (
+        <OuterMarketRow key={match.eventId} match={match} sportName={sportName} />
+      ))}
       {groups.map((group) => (
         <div key={group.key}>
           <div className="bg-[#203946] px-[13px] py-[9px] text-[13px] font-bold leading-none text-white">

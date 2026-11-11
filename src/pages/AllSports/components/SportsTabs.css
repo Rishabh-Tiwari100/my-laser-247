@@ -1,0 +1,64 @@
+.dashboard-sport-new {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .dashboard-sport-casino {
+    animation: dashboard-casino-pulse 1s ease-out infinite;
+  }
+
+  .dashboard-sport-featured img {
+    filter: brightness(0) saturate(100%) invert(8%) sepia(100%) saturate(7494%) hue-rotate(248deg) brightness(102%) contrast(143%);
+  }
+
+  .dashboard-sport-binary {
+    position: relative;
+  }
+
+  .dashboard-sport-new {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    display: block;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 7px;
+    font-style: normal;
+    font-weight: 900;
+    line-height: normal;
+    text-transform: uppercase;
+    animation: dashboard-new-badge 2s ease-out infinite;
+  }
+}
+
+@keyframes dashboard-casino-pulse {
+  0% {
+    transform: scale(1);
+    background: yellow;
+  }
+  50% {
+    transform: scale(1.1);
+    background: darkred;
+    color: white;
+    box-shadow: inset 0 2px 4px #1b00ff;
+  }
+  100% {
+    transform: scale(1);
+    background: blue;
+  }
+}
+
+@keyframes dashboard-new-badge {
+  0% {
+    background: red;
+    color: white;
+  }
+  50% {
+    background: white;
+    color: red;
+  }
+  100% {
+    background: yellow;
+    color: black;
+  }
+}

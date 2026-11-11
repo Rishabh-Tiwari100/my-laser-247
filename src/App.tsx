@@ -65,6 +65,9 @@ const BetProfitLossDetail = loadable(() => import('@/pages/Reports/BetProfitLoss
 const Turnover = loadable(() => import('@/pages/Reports/Turnover'), {
   fallback: <NotOutLoader />,
 });
+const StatementBetDetails = loadable(() => import('@/pages/Reports/StatementBetDetails'), {
+  fallback: <NotOutLoader />,
+});
 const Account = loadable(() => import('@/pages/Reports/Account'), {
   fallback: <NotOutLoader />,
 });
@@ -280,6 +283,7 @@ export function App() {
           <Route path="/profit-loss-detail" element={<BetProfitLossDetail />} />
           <Route path="/turnover-history" element={<Turnover />} />
           <Route path="/account-statement" element={<Account />} />
+          <Route path="/reports/my-bets/:sportId/:referenceId" element={<StatementBetDetails />} />
           <Route path="/statements" element={<Account />} />
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/apply-coupon" element={<ApplyCoupon />} />

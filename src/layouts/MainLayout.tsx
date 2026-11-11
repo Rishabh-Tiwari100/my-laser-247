@@ -13,13 +13,11 @@ function MainLayout() {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const { pathname } = useLocation();
   const isDashboard = pathname === '/dashboard';
+  const isMultiMarketPage = pathname === '/multi-market';
   const isEventDetails = pathname.includes('/market-details/');
-  const isReferenceAccountPage = [
-    '/account-statement',
-    '/my-bets',
-    '/change-password',
-    '/apply-coupon',
-  ].includes(pathname);
+  const isReferenceAccountPage =
+    ['/account-statement', '/my-bets', '/change-password', '/apply-coupon'].includes(pathname) ||
+    pathname.startsWith('/reports/my-bets/');
   const isInplayPage = pathname === '/inplay';
   const isCasinoPage = pathname === '/casino' || pathname === '/casino/evolution';
   const isDepositPage = pathname === '/deposit';
@@ -50,10 +48,13 @@ function MainLayout() {
       '/turnover-history',
       '/account-statement',
       '/statements',
-    ].includes(pathname) || pathname.startsWith('/my-account/');
+    ].includes(pathname) ||
+    pathname.startsWith('/my-account/') ||
+    pathname.startsWith('/reports/my-bets/');
   const showOpenBetsSidebar =
     isProfilePage ||
     (pathname !== '/' &&
+      !isMultiMarketPage &&
       !isReportsPage &&
       !isOtherAccountPage &&
       !isPaymentPage &&
@@ -81,7 +82,7 @@ function MainLayout() {
           className={`min-w-0 flex-1 ${isDashboard ? 'grid grid-cols-1 lg:pl-[12px] lg:pr-[2px] min-[1200px]:grid-cols-3' : isInplayPage ? 'grid grid-cols-1 lg:grid-cols-4' : 'flex'} ${showOpenBetsSidebar ? 'lg:pr-0' : ''}`}
         >
           <main
-            className={`min-w-0 flex-1 overflow-x-hidden lg:max-w-full ${isDashboard ? 'px-0 lg:px-[6px] min-[1200px]:col-span-2' : isInplayPage ? 'lg:col-span-3 lg:px-[8px]' : isPaymentPage || isTwoFaPage ? 'lg:px-0' : pathname === '/apply-coupon' ? 'lg:pl-[24px] lg:pr-[14px]' : isReferenceAccountPage ? 'lg:pl-[36px] lg:pr-[26px]' : isCasinoPage ? 'lg:pl-[18px] lg:pr-[28px]' : isProfilePage ? 'lg:pl-[24px] lg:pr-[34px]' : isEventDetails ? 'lg:pl-[12px] lg:pr-[22px]' : showOpenBetsSidebar ? 'lg:pl-[23px] lg:pr-[34px]' : 'lg:px-4'}`}
+            className={`min-w-0 flex-1 overflow-x-hidden lg:max-w-full ${isDashboard ? 'px-0 lg:px-[6px] min-[1200px]:col-span-2' : isInplayPage ? 'lg:col-span-3 lg:px-[8px]' : isMultiMarketPage ? 'lg:pl-[12px] lg:pr-[2px]' : isPaymentPage || isTwoFaPage ? 'lg:px-0' : pathname === '/apply-coupon' ? 'lg:pl-[24px] lg:pr-[14px]' : isReferenceAccountPage ? 'lg:pl-[36px] lg:pr-[26px]' : isCasinoPage ? 'lg:pl-[18px] lg:pr-[28px]' : isProfilePage ? 'lg:pl-[24px] lg:pr-[34px]' : isEventDetails ? 'lg:pl-[12px] lg:pr-[22px]' : showOpenBetsSidebar ? 'lg:pl-[23px] lg:pr-[34px]' : 'lg:px-4'}`}
           >
             <div className="min-h-0 pb-[46px] lg:pb-0">
               <Outlet />

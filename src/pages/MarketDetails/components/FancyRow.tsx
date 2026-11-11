@@ -196,7 +196,6 @@ const FancyRow = ({
               disabled={isSuspended || isPlacingBet || !runner?.layPrice1}
               onClick={() => handleSelectOdds(runner?.layPrice1, runner?.laySize1, 'LAY')}
               className="bg-[#f3a1b5] disabled:bg-[#bd8492] py-1 text-[13px] font-semibold disabled:cursor-not-allowed"
-              style={{ boxShadow: isLaySelected ? 'inset 0 0 0 2px #111827' : undefined }}
             >
               {runner?.layPrice1 ?? '-'}
               <span className="block text-[10px] font-medium">{runner?.laySize1 ?? '-'}</span>
@@ -207,7 +206,6 @@ const FancyRow = ({
               disabled={isSuspended || isPlacingBet || !runner?.backPrice1}
               onClick={() => handleSelectOdds(runner?.backPrice1, runner?.backSize1, 'BACK')}
               className="bg-[#72b9e8] disabled:bg-[#5893ba] py-1 text-[13px] font-semibold disabled:cursor-not-allowed"
-              style={{ boxShadow: isBackSelected ? 'inset 0 0 0 2px #111827' : undefined }}
             >
               {runner?.backPrice1 ?? '-'}
               <span className="block text-[10px] font-medium">{runner?.backSize1 ?? '-'}</span>

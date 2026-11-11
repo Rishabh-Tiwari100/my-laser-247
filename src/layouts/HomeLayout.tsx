@@ -1,12 +1,10 @@
 import BottomNav from '@/components/common/BottomNav';
 import Header from '@/components/common/Header';
 import OneClickBetBar from '@/components/common/OneClickBetBar';
-import BackToTop from '@/components/common/BackToTop';
 import React, { useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 function HomeLayout() {
-  const { pathname } = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showOneClickBar, setShowOneClickBar] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -33,11 +31,6 @@ function HomeLayout() {
           )}
         </div>
         {/* <Footer /> */}
-        {pathname === '/' && (
-          <>
-            <BackToTop />
-          </>
-        )}
         <BottomNav
           isProfileMenuOpen={isProfileMenuOpen}
           onProfileClick={() => setIsProfileMenuOpen((open) => !open)}

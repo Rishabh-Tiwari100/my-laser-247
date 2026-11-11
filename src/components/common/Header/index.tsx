@@ -18,7 +18,7 @@ import { IoMdSettings } from 'react-icons/io';
 import LiveIcon from '../LiveIcon';
 import MyAccount from '../MyAccount';
 import { useGetEventsQuery } from '@/store/api/eventsApi';
-import dayjs from 'dayjs';
+import type { Match } from '@/types/event';
 import TopNavigation from '@/components/TopNavigation';
 import GuestHeaderAuth from './GuestHeaderAuth';
 
@@ -61,11 +61,15 @@ const Header: React.FC<HeaderProps> = ({
   const [showSettings, setShowSettings] = useState(false);
   const [search, setSearch] = useState('');
   const [searchText, setSearchText] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [activeSearchIndex, setActiveSearchIndex] = useState(0);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [loadingDots, setLoadingDots] = useState('.');
 
   const debouncedSearch = useRef(
     debounce((value: string) => {
-      setSearch(value);
+      setSearch(value.trim());
     }, 500)
   ).current;
 
@@ -79,14 +83,44 @@ const Header: React.FC<HeaderProps> = ({
     }
   );
 
-  const searchEvents = [
-    ...(searchData?.cricket ?? []),
-    ...(searchData?.football ?? []),
-    ...(searchData?.tennis ?? []),
-  ];
+  const searchEvents = Object.values(searchData ?? {}).flat();
+  const showDropdown =
+    searchOpen &&
+    searchText.trim().length >= 2 &&
+    search === searchText.trim() &&
+    !isSearching &&
+    searchEvents.length > 0;
 
-  const showDropdown = search.trim().length >= 2 && !isSearching;
-  const currentDay = dayjs();
+  const selectSearchEvent = (event: Match) => {
+    setSearch('');
+    setSearchText('');
+    setSearchOpen(false);
+    const sport = event.sport.toLowerCase() === 'soccer' ? 'football' : event.sport.toLowerCase();
+    navigate(`/sports/${sport}/${event.competitionId}/market-details/${event.eventId}`, {
+      state: { isPremiumFancy: event.externalId?.startsWith('sr') ?? false },
+    });
+  };
+
+  useEffect(() => {
+    const closeSearch = (event: MouseEvent) => {
+      if (!searchContainerRef.current?.contains(event.target as Node)) setSearchOpen(false);
+    };
+    document.addEventListener('mousedown', closeSearch);
+    return () => document.removeEventListener('mousedown', closeSearch);
+  }, []);
+
+  useEffect(() => {
+    setSearchOpen(false);
+    setSearchText('');
+    setSearch('');
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (showDropdown)
+      document
+        .getElementById(`header-event-option-${activeSearchIndex}`)
+        ?.scrollIntoView({ block: 'nearest' });
+  }, [activeSearchIndex, showDropdown]);
 
   const user = useSelector((s: RootState) => s.user.profile);
   const balanceInfo = useSelector((s: RootState) => s.wallet);
@@ -176,10 +210,14 @@ const Header: React.FC<HeaderProps> = ({
               </Link>
             </div>
             {isAuthenticated && (
-              <div className="hidden xl:flex relative group bg-white rounded w-[278px]">
+              <div
+                ref={searchContainerRef}
+                className="hidden xl:flex relative group bg-white rounded w-[278px]"
+              >
                 <button
                   type="button"
                   aria-label="Search events"
+                  onClick={() => searchInputRef.current?.focus()}
                   className="flex h-[25px] w-[28px] shrink-0 items-center justify-center"
                 >
                   <svg viewBox="0 0 24 24" className="w-[15px] h-[15px] lg:h-[13px] lg:w-[13px]">
@@ -191,13 +229,43 @@ const Header: React.FC<HeaderProps> = ({
                 </button>
 
                 <input
+                  ref={searchInputRef}
                   type="text"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-expanded={showDropdown}
+                  aria-controls={showDropdown ? 'header-event-search-options' : undefined}
+                  aria-activedescendant={
+                    showDropdown ? `header-event-option-${activeSearchIndex}` : undefined
+                  }
+                  autoComplete="off"
                   value={searchText}
+                  onFocus={() => setSearchOpen(true)}
                   onChange={(e) => {
                     const value = e.target.value;
 
                     setSearchText(value);
+                    setSearchOpen(true);
+                    setActiveSearchIndex(0);
                     debouncedSearch(value);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape') setSearchOpen(false);
+                    else if (
+                      showDropdown &&
+                      (event.key === 'ArrowDown' || event.key === 'ArrowUp')
+                    ) {
+                      event.preventDefault();
+                      setActiveSearchIndex(
+                        (index) =>
+                          (index + (event.key === 'ArrowDown' ? 1 : -1) + searchEvents.length) %
+                          searchEvents.length
+                      );
+                    } else if (showDropdown && event.key === 'Enter') {
+                      event.preventDefault();
+                      const selectedEvent = searchEvents[activeSearchIndex] ?? searchEvents[0];
+                      if (selectedEvent) selectSearchEvent(selectedEvent);
+                    }
                   }}
                   aria-label="Search events"
                   className="relative -ml-px h-[25px] min-w-0 w-full rounded px-[7px] text-[14px] leading-[21px] text-black focus:outline-none"
@@ -205,63 +273,28 @@ const Header: React.FC<HeaderProps> = ({
 
                 {showDropdown && (
                   <div
-                    className={`absolute top-[28px] -left-[14px] z-50 max-h-64 overflow-y-auto border border-gray-300 bg-white ${
-                      searchEvents.length > 0 ? 'w-[22.25rem]' : 'w-[17.5rem] rounded shadow-lg'
-                    }`}
+                    id="header-event-search-options"
+                    role="listbox"
+                    aria-label="Event search results"
+                    className="absolute left-0 top-full z-50 max-h-[165px] w-max min-w-[160px] max-w-[calc(100vw_-_193px)] overflow-auto border border-[#e3e8eb] bg-white p-0 font-helvetica text-[14px] font-normal leading-[21px] shadow-[0_0_35px_0_rgba(154,161,171,0.15)]"
                   >
-                    {searchEvents.length > 0 ? (
-                      searchEvents.map((event) => {
-                        const eventTime = dayjs(event.time);
-                        let dateLabel: string | null = null;
-
-                        if (eventTime.isSame(currentDay.add(1, 'day'), 'day')) {
-                          dateLabel = 'Tomorrow';
-                        } else if (!eventTime.isSame(currentDay, 'day')) {
-                          dateLabel = eventTime.format('DD/MM/YYYY');
-                        }
-
-                        return (
-                          <button
-                            key={event.eventId}
-                            type="button"
-                            onClick={() => {
-                              setSearch('');
-                              setSearchText('');
-
-                              const sport =
-                                event.sport.toLowerCase() === 'soccer'
-                                  ? 'football'
-                                  : event.sport.toLowerCase();
-
-                              navigate(
-                                `/sports/${sport}/${event.competitionId}/market-details/${event.eventId}`,
-                                {
-                                  state: {
-                                    isPremiumFancy: event.externalId.startsWith('sr'),
-                                  },
-                                }
-                              );
-                            }}
-                            className="flex min-h-[33px] w-full items-stretch border-b border-[#ddd] bg-[#f5f5f5] text-left last:border-b-0 hover:bg-[#eee]"
-                          >
-                            <span className="flex w-[73px] shrink-0 flex-col justify-center border-r border-[#d7d7d7] px-1 py-[3px] leading-[14px]">
-                              {dateLabel && <span className="text-[#168bd2]">{dateLabel}</span>}
-                              <span>{eventTime.format('HH:mm')}</span>
-                            </span>
-                            <span className="flex min-w-0 flex-1 items-center px-2">
-                              <span className="truncate">{event.eventName}</span>
-                            </span>
-                          </button>
-                        );
-                      })
-                    ) : (
-                      <div
-                        className="m-1 flex h-[30px] items-center justify-center rounded border border-[#aaa] bg-[#ccc] px-3 font-semibold text-[#1f1f1f]"
-                        role="status"
+                    {searchEvents.map((event, index) => (
+                      <button
+                        key={`${event.sport}-${event.eventId}`}
+                        id={`header-event-option-${index}`}
+                        role="option"
+                        aria-selected={index === activeSearchIndex}
+                        type="button"
+                        onMouseEnter={() => setActiveSearchIndex(index)}
+                        onClick={() => selectSearchEvent(event)}
+                        className={cn(
+                          'block h-[33px] w-full whitespace-nowrap border-0 py-[6px] pl-[4px] pr-[19.2px] text-left text-[14px] font-normal leading-[21px] text-[#333] hover:bg-[#f5faff] focus-visible:bg-[#f5faff] focus-visible:outline-none',
+                          index === activeSearchIndex && 'bg-[#f7f8f9]'
+                        )}
                       >
-                        No Data Found.
-                      </div>
-                    )}
+                        {event.eventName}
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>

@@ -40,7 +40,7 @@ const NormalMarketRow = ({ data, market, eventId, min, max }: NormalMarketRowPro
   const oneClickBetEnabled = useSelector((state: RootState) => state.betPlace.oneClickBetEnabled);
   const [placeBet, { isLoading: isPlacingBet }] = usePlaceBetMutation({
     fixedCacheKey: 'placeBet',
-  }); 
+  });
   const blockedStatus = getBlockedStatus(data?.status, market?.marketStatus ?? market?.status);
   const { data: booksetCalculation } = useGetBooksetCalcQuery({
     eventId: resolvedEventId ? Number(resolvedEventId) : 0,
@@ -130,7 +130,7 @@ const NormalMarketRow = ({ data, market, eventId, min, max }: NormalMarketRowPro
   const isBookmaker = [market?.marketType, market?.marketName].some((value) =>
     value?.toLowerCase().includes('bookmaker')
   );
-  const visibleOdds = isBookmaker ? odds.filter(({ position }) => position === 0) : odds;
+  const visibleOdds = odds;
 
   const handleSelectOdds = useCallback(
     async (priceKey: keyof Runner, sizeKey: keyof Runner, betOn: BetOn, position: number) => {
@@ -197,10 +197,15 @@ const NormalMarketRow = ({ data, market, eventId, min, max }: NormalMarketRowPro
 
   return (
     <>
-      <div className={cn("bg-white border border-[#7e97a7] grid items-center")}>
+      <div
+        className={cn(
+          'grid items-center border-x border-b border-[#7e97a7] text-black',
+          isBookmaker ? 'bg-[#faf8d8]' : 'bg-white lg:[&:nth-of-type(even)]:bg-[#ececec]'
+        )}
+      >
         <div className="grid grid-cols-12">
-          <div className={cn("col-span-7 md:col-span-5 flex items-center pr-2", market?.marketName?.toLowerCase() == "bookmaker" && "bg-[#faf8d8]")}>
-            <p className="min-w-0 overflow-auto flex-1 font-bold flex items-center text-xs pl-[5px]">
+          <div className="col-span-7 lg:col-span-5 flex min-w-0 items-center pr-2">
+            <p className="min-w-0 flex-1 break-words py-[2px] pl-[5px] text-[12px] font-bold leading-[18px]">
               {data?.runnerName}
             </p>
             {totalExposure ? (
@@ -214,23 +219,34 @@ const NormalMarketRow = ({ data, market, eventId, min, max }: NormalMarketRowPro
               </span>
             ) : null}
           </div>
-          <div className="col-span-5 md:col-span-7">
-            <div className="w-full relative rounded-[6px] grid grid-cols-12">
-              {visibleOdds.map(({ priceKey, sizeKey, bg, hideOnMobile, betOn, position }) => (
-                <button
-                  key={priceKey}
-                  type="button"
-                  disabled={Boolean(blockedStatus) || !data?.[priceKey] || isPlacingBet}
-                  onClick={() => handleSelectOdds(priceKey, sizeKey, betOn, position)}
-                  style={{ background: bg }}
-                  className={`${hideOnMobile ? 'max-md:hidden' : ''} col-span-6 ${isBookmaker ? '' : 'md:col-span-2'} text-[13px] font-semibold py-1 text-black h-[42.2px] disabled:opacity-50`}
-                >
-                  {data?.[priceKey] ?? '-'}
-                  <span className="block font-medium text-[10px] text-black">
-                    {data?.[sizeKey] ?? '-'}
-                  </span>
-                </button>
-              ))}
+          <div className="col-span-5 lg:col-span-7">
+            <div className="w-full h-full relative grid grid-cols-12">
+              {visibleOdds.map(({ priceKey, sizeKey, bg, hideOnMobile, betOn, position }) =>
+                isBookmaker && position !== 0 ? (
+                  <div
+                    key={priceKey}
+                    className="hidden min-h-[43px] flex-col items-center justify-center text-[12px] lg:col-span-2 lg:flex"
+                    style={{ background: bg }}
+                  >
+                    <span>-</span>
+                    <span className="text-[10px]">-</span>
+                  </div>
+                ) : (
+                  <button
+                    key={priceKey}
+                    type="button"
+                    disabled={Boolean(blockedStatus) || !data?.[priceKey] || isPlacingBet}
+                    onClick={() => handleSelectOdds(priceKey, sizeKey, betOn, position)}
+                    style={{ background: bg }}
+                    className={`${hideOnMobile ? 'max-lg:hidden' : ''} col-span-6 lg:col-span-2 border-r border-white/50 text-[13px] lg:text-[12px] font-semibold py-1 text-black h-full min-h-[43px]`}
+                  >
+                    {data?.[priceKey] ?? '-'}
+                    <span className="block font-medium text-[10px] text-black">
+                      {data?.[sizeKey] ?? '-'}
+                    </span>
+                  </button>
+                )
+              )}
               {blockedStatus && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/30 text-xs font-semibold capitalize text-white">
                   {blockedStatus}
