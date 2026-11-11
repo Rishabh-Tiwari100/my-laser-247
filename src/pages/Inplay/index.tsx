@@ -35,7 +35,7 @@ function SportSection({
 
   return (
     <section aria-label={`${title} events`} className="border-b-[3px] border-[#7e97a7] bg-white">
-      <div className="flex h-[31px] items-center justify-between gap-[5px] bg-[#213b49] px-[8px] text-[13px] font-bold text-white">
+      <div className="flex h-[31px] items-center justify-between gap-[5px] bg-[#213b49] px-[8px] text-[13px] font-bold text-white lg:h-[25px] lg:px-[10px] lg:text-[12px]">
         <h2 className="m-0 truncate">{title}</h2>
         <div className="flex shrink-0 gap-[2px]">
           {(['live', 'virtual', 'premium'] as const).map((filter) => {
@@ -157,7 +157,7 @@ export default function Inplay() {
         groups.map(([sport, matches]) => (
           <SportSection
             key={`${activeTab}-${sport}`}
-                title={sport === 'football' ? 'Football' : matches[0]?.sport || sport}
+            title={sport === 'football' ? 'Football' : matches[0]?.sport || sport}
             sport={sport}
             matches={matches}
           />

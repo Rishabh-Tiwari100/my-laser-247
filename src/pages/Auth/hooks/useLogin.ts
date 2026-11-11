@@ -32,7 +32,8 @@ export const useLoginPage = (onSuccess?: () => void, loginMethod: LoginMethod = 
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginMethod === 'phone' ? phoneLoginSchema : loginSchema),
-    mode: 'onChange',
+    mode: loginMethod === 'phone' ? 'onChange' : 'onSubmit',
+    reValidateMode: loginMethod === 'phone' ? 'onChange' : 'onSubmit',
     defaultValues: {
       username: '',
       password: '',

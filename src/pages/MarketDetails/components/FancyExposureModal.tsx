@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { mdiClose } from '@mdi/js';
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useGetFancyProfitLossQuery } from '@/store/api/booksetApi';
@@ -65,18 +65,14 @@ export default function FancyExposureModal({
       }}
     >
       <section
-        className="w-[470px] max-w-[calc(100vw-16px)] overflow-hidden rounded-[5px] bg-white text-[#050505] shadow-[0_1px_2px_rgba(0,0,0,0.25)]"
+        className="w-[500px] max-w-[calc(100vw-16px)] overflow-hidden rounded-[5px] border border-black/20 bg-white p-[1px] text-[#050505] shadow-[0_1px_2px_rgba(0,0,0,0.25)]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="fancy-exposure-title"
       >
-        <header className="flex h-[38px] items-center justify-between bg-[#243a48] pl-[10px] pr-[7px] text-white">
-          <h2
-            id="fancy-exposure-title"
-            className="m-0 min-w-0 truncate text-[14px] font-bold leading-none"
-            title={title}
-          >
-            {title || 'Fancy Exposure'}
+        <header className="flex items-center justify-between bg-[#243a48] px-[15px] py-[4px] text-white">
+          <h2 id="fancy-exposure-title" className="m-0 text-[14px] font-bold leading-[21px]">
+            Book
           </h2>
           <button
             ref={closeButtonRef}
@@ -85,19 +81,24 @@ export default function FancyExposureModal({
             aria-label="Close fancy exposure"
             onClick={onClose}
           >
-            <X className="h-[18px] w-[18px]" aria-hidden="true" />
+            <svg viewBox="0 0 24 24" className="h-[20px] w-[20px] fill-current" aria-hidden="true">
+              <path d={mdiClose} />
+            </svg>
           </button>
         </header>
 
-        <div className="max-h-[calc(100vh-120px)] overflow-y-auto px-[9px] pb-[9px] pt-[9px]">
-          <table className="w-full table-fixed border-collapse text-[13px]">
+        <div className="max-h-[calc(100dvh-80px)] overflow-y-auto p-[16px]">
+          <table
+            aria-label={title}
+            className="w-full table-fixed border-collapse border-2 border-[#333] text-[13px] font-bold"
+          >
             <thead>
               <tr>
-                <th className="h-[28px] border border-[#4c4c4c] bg-[#c9ced2] text-center font-bold">
-                  Position
+                <th className="h-[28px] border border-[#333] bg-[#c8ced3] text-center font-bold">
+                  Run
                 </th>
-                <th className="h-[28px] border border-[#4c4c4c] bg-[#c9ced2] text-center font-bold">
-                  Profit / Loss
+                <th className="h-[28px] border border-[#333] bg-[#c8ced3] text-center font-bold">
+                  Amount
                 </th>
               </tr>
             </thead>
@@ -122,15 +123,13 @@ export default function FancyExposureModal({
                   const profitLoss = Number(item.profit_or_loss ?? 0);
                   return (
                     <tr key={`${item.position}-${index}`}>
-                      <td className="h-[26px] border border-[#4c4c4c] text-center">
-                        {item.position}
-                      </td>
+                      <td className="h-[26px] border border-[#333] text-center">{item.position}</td>
                       <td
-                        className={`h-[26px] border border-[#4c4c4c] text-center ${
-                          profitLoss < 0 ? 'text-red-600' : 'text-green-700'
+                        className={`h-[26px] border border-[#333] text-center ${
+                          profitLoss < 0 ? 'text-[#ef4e46]' : 'text-[#28a745]'
                         }`}
                       >
-                        {Math.abs(profitLoss)}
+                        {Number(profitLoss.toFixed(2))}
                       </td>
                     </tr>
                   );

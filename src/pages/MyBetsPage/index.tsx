@@ -25,6 +25,7 @@ const timestamp = (value: unknown) => {
 function BetRow({ bet }: { bet: ProfitLossItem }) {
   const eventName =
     bet.eventName || (typeof bet.event === 'object' ? bet.event?.name : bet.event) || '-';
+  const placeTime = timestamp(bet.placedAt || bet.createdAt);
   const values = [
     bet.id ?? bet.betId ?? '-',
     eventName,
@@ -33,8 +34,8 @@ function BetRow({ bet }: { bet: ProfitLossItem }) {
     bet.betOn || '-',
     bet.requestedOdds ?? bet.odds ?? bet.rate ?? '-',
     bet.amount ?? bet.stake ?? '-',
-    timestamp(bet.placedAt || bet.createdAt),
-    timestamp(bet.matchedAt || bet.matchedTime),
+    placeTime,
+    placeTime,
   ];
   return (
     <tr
@@ -115,7 +116,11 @@ function MyBetsPage() {
                 <tr>
                   <td
                     colSpan={9}
-                    className="h-[10px] border border-[#d9dfe4] text-center text-[#666]"
+                    className={
+                      isError
+                        ? 'border border-[#d9dfe4] p-2 text-center text-[#666]'
+                        : 'h-0 border-0 p-0 leading-none'
+                    }
                   >
                     {isError ? (
                       'Unable to load unsettled bets. Please try again.'

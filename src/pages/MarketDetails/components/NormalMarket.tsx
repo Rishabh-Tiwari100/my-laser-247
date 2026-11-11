@@ -1,5 +1,4 @@
 import MarketOddsHeader from './MarketOddsHeader';
-import { mdiInformation } from '@mdi/js';
 import React from 'react';
 import NormalMarketRow from './NormalMarketRow';
 import { Market } from '@/store/api/catalogueApi';
@@ -7,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAddToMultiMarketMutation } from '@/store/api/eventsApi';
 import { type StakeLimitValue } from './stakeLimit';
+import MarketInfoButton from './MarketInfoButton';
 
 const NormalMarket = ({
   isFavorite = false,
@@ -60,13 +60,7 @@ const NormalMarket = ({
                 </button>
               )}
               <span className="max-w-[160px] leading-[normal]">{data?.marketName}</span>
-              <svg
-                viewBox="0 0 24 24"
-                className="ml-[5px] h-[14px] w-[14px] shrink-0 fill-current"
-                aria-hidden="true"
-              >
-                <path d={mdiInformation} />
-              </svg>
+              <MarketInfoButton marketName={data.marketName} marketType={data.marketType} />
             </p>
           </div>
         </div>

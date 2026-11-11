@@ -1,6 +1,7 @@
 import { LucideIcon } from 'lucide-react';
 import React from 'react';
 import { categoryIconMap } from '../constant';
+import { referenceCategoryIcons } from '../referenceCategoryIcons';
 import { cn, formatLabel } from '@/utils';
 
 interface CategoryTabsProps {
@@ -8,6 +9,24 @@ interface CategoryTabsProps {
   selectedCategory: string;
   setSelectedCategory: (label: string) => void;
   className?: string;
+}
+
+function categoryIcon(label: string) {
+  const key = label.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const aliases: Record<string, string> = {
+    ALL: 'OTHERS',
+    SLOTGAMES: 'SLOTS',
+    SLOTGAME: 'SLOTS',
+    GAMESHOWS: 'LIVEGAMESHOW',
+    LIVEGAMESHOWS: 'LIVEGAMESHOW',
+    VIRTUALS: 'VIRTUAL',
+    CARDGAMES: 'CARD',
+    CRASHGAME: 'CRASH',
+  };
+  const reference =
+    referenceCategoryIcons[aliases[key] ?? key] ??
+    (key.startsWith('LIVE') ? referenceCategoryIcons[key.slice(4)] : undefined);
+  return reference ?? categoryIconMap[label] ?? '/images/casino/category/three-cards.svg';
 }
 
 const CategoryTabs: React.FC<CategoryTabsProps> = ({
@@ -79,10 +98,10 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
               )}
             >
               <img
-                src={categoryIconMap[label] || '/images/casino/category/three-cards.svg'}
+                src={categoryIcon(label)}
                 alt=""
                 className={cn(
-                  'h-[28px] w-[28px] object-contain brightness-0',
+                  'h-[30px] w-[30px] object-contain brightness-0',
                   selectedCategory === label && 'invert'
                 )}
               />

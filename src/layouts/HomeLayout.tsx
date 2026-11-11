@@ -16,7 +16,7 @@ function HomeLayout() {
       {/* <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} /> */}
 
       <div className="flex-1 w-full flex flex-col relative">
-        <div className="flex-1 overflow-x-clip pb-24 lg:pb-0">
+        <div className="flex-1 overflow-x-clip pb-[46px] lg:pb-0">
           <Header
             showOneClickBar={showOneClickBar}
             setShowOneClickBar={setShowOneClickBar}

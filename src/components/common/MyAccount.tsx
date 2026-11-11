@@ -41,7 +41,7 @@ export default function MyAccount({
 }: Props) {
   const [internalOpen, setInternalOpen] = useState(false);
   const [stakeSettingsOpen, setStakeSettingsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 1023px)').matches);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 991px)').matches);
   const open = controlledOpen ?? internalOpen;
   const setOpen = (value: boolean) => {
     setInternalOpen(value);
@@ -65,7 +65,7 @@ export default function MyAccount({
   }, [location, onOpenChange]);
 
   useEffect(() => {
-    const media = window.matchMedia('(max-width: 1023px)');
+    const media = window.matchMedia('(max-width: 991px)');
     const change = () => {
       setIsMobile(media.matches);
       setInternalOpen(false);
@@ -107,7 +107,7 @@ export default function MyAccount({
         event.currentTarget.src = '/icons/default-user-icon.svg';
       }}
       alt=""
-      className="h-[18px] w-[18px] shrink-0 rounded-full object-cover lg:h-[15px] lg:w-[15px]"
+      className="h-[18px] w-[18px] shrink-0 rounded-full object-cover lg:h-[18px] lg:w-[18px]"
     />
   );
   const bonus = (
@@ -134,7 +134,7 @@ export default function MyAccount({
   return (
     <div className="relative h-full">
       <div className="flex h-full items-center gap-2 lg:gap-[18px]">
-        <span className="flex min-w-0 max-w-[28vw] items-center gap-1 rounded bg-[#243a48] px-2 py-2 text-xs font-bold text-white lg:h-[27px] lg:min-w-[94px] lg:max-w-[200px] lg:rounded-[5px] lg:px-[9px] lg:py-0 lg:text-[11px]">
+        <span className="flex min-w-0 max-w-[28vw] items-center gap-1 rounded bg-[#243a48] h-full px-[10px] py-[4px] text-[11px] font-black leading-[28px] text-white lg:h-[27px] lg:min-w-0 lg:max-w-[200px] lg:rounded-[5px] lg:px-[10px] lg:py-0 lg:text-[12px] lg:font-bold lg:leading-[18px]">
           {avatar}
           <span className="truncate">{name}</span>
         </span>
@@ -142,7 +142,7 @@ export default function MyAccount({
           <Dropdown.Root open={open} onOpenChange={setOpen} modal={false}>
             <Dropdown.Trigger
               data-account-desktop-trigger
-              className="flex h-[34px] items-center gap-1 rounded-md bg-[#243a48] px-2 text-xs text-white hover:bg-[#32617f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white lg:h-[27px] lg:min-w-[94px] lg:gap-[3px] lg:px-[7px] lg:text-[11px]"
+              className="flex h-[34px] items-center gap-1 rounded-md bg-[#243a48] px-2 text-xs text-white hover:bg-[#32617f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white lg:h-[26px] lg:gap-[6px] lg:px-[5px] lg:text-[12px]"
             >
               {avatar} My Account
             </Dropdown.Trigger>
@@ -189,12 +189,14 @@ export default function MyAccount({
           </Dropdown.Root>
         )}
       </div>
-      {isMobile && open && stakeSettingsOpen && <StakeModal mobileProfile onClose={() => setStakeSettingsOpen(false)} />}
+      {isMobile && open && stakeSettingsOpen && (
+        <StakeModal mobileProfile onClose={() => setStakeSettingsOpen(false)} />
+      )}
       {isMobile && open && (
         <section
           id="account-menu"
           aria-label="Account"
-          className="fixed inset-x-0 bottom-[50px] top-[50px] z-[1050] overflow-y-auto overscroll-contain bg-[#eee] font-helvetica text-black"
+          className="fixed inset-x-0 bottom-[46px] top-[50px] z-[1050] overflow-y-auto overscroll-contain bg-[#eee] font-helvetica text-black"
           onKeyDown={(event) => {
             if (event.key === 'Escape') {
               setOpen(false);
@@ -211,7 +213,9 @@ export default function MyAccount({
               <FaUserCircle className="h-[22px] w-[22px] shrink-0" />
               <span className="truncate">{name}</span>
             </h2>
-            <span className="flex h-full shrink-0 items-center border-l border-white/10 pl-2">GMT+5:30</span>
+            <span className="flex h-full shrink-0 items-center border-l border-white/10 pl-2">
+              GMT+5:30
+            </span>
           </div>
           <div className="flex h-[44px] items-center border-b border-[#c4ccd0]">{bonus}</div>
           <nav aria-label="Account pages" className="border-b border-[#7e97a7]">
@@ -228,7 +232,14 @@ export default function MyAccount({
                 </>
               );
               return item.title === 'Stake Setting' ? (
-                <button key={item.title} type="button" className={style} onClick={() => setStakeSettingsOpen(true)}>{content}</button>
+                <button
+                  key={item.title}
+                  type="button"
+                  className={style}
+                  onClick={() => setStakeSettingsOpen(true)}
+                >
+                  {content}
+                </button>
               ) : item.path ? (
                 <Link
                   key={item.title}

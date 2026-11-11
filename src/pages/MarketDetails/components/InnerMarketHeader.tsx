@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { useLocation } from 'react-router-dom';
 import { Icons } from '@/utils/icons';
 import { formatStakeLimit, formatStakeLimitRange } from './stakeLimit';
+import MarketInfoButton from './MarketInfoButton';
 
 type Variation = 'primary' | 'secondary';
 
@@ -53,6 +54,7 @@ const InnerMarketHeader: React.FC<MatchInnerMarketHeaderProps> = ({
         <div className="col-span-12">
           <p className="uppercase h-[30px] text-white font-semibold pr-[30px] pl-[10px] relative text-xs bg-primary-theme flex items-center">
             <span className="max-w-[160px] leading-[normal]">{marketName}</span>
+            <MarketInfoButton marketName={marketName} marketType={marketCategory} />
             <span className="text-[10px] leading-[normal]"></span>
           </p>
         </div>
@@ -63,9 +65,7 @@ const InnerMarketHeader: React.FC<MatchInnerMarketHeaderProps> = ({
             <div className="p-[2px] block lg:hidden text-center text-black">
               <dl className="p-[5px] bg-[#bed5d8] leading-[11px] rounded-[1px] text-left">
                 <dt className="text-[9px] text-[#315195] inline-block mr-2 font-bold">Min/Max</dt>
-                <dd className="text-[9px] inline-block">
-                  {formatStakeLimitRange(min, max)}
-                </dd>
+                <dd className="text-[9px] inline-block">{formatStakeLimitRange(min, max)}</dd>
               </dl>
             </div>
           </div>
@@ -82,9 +82,7 @@ const InnerMarketHeader: React.FC<MatchInnerMarketHeaderProps> = ({
               <button className="text-[13px] capitalize col-span-4 font-semibold h-[42.2px] py-1 border-none px-[3px] max-lg:hidden">
                 <dl className="text-center p-[5px] bg-[#bed5d8] leading-[11px] rounded-[1px]">
                   <dt className="text-[9px] text-[#315195] inline-block mr-2 font-bold">Min/Max</dt>
-                  <dd className="inline-block text-[9px]">
-                    {formatStakeLimitRange(min, max)}
-                  </dd>
+                  <dd className="inline-block text-[9px]">{formatStakeLimitRange(min, max)}</dd>
                 </dl>
               </button>
             </div>

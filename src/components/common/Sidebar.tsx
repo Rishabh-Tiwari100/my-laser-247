@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Loader2 } from 'lucide-react';
-import { mdiChevronDownBoxOutline, mdiChevronRightBoxOutline } from '@mdi/js';
-import { NavLink, useLocation } from 'react-router-dom';
+import React, { useId, useState } from 'react';
+import { mdiChevronRightBoxOutline } from '@mdi/js';
+import { NavLink } from 'react-router-dom';
 import { cn } from '@/utils';
-import { useSidebar } from '@/hooks/useSidebar';
+import { sidebarSports } from '@/hooks/useSidebar';
+import { useGetCompetitionByIdQuery } from '@/store/api/sidebarApi';
+import { useGetEventsQuery } from '@/store/api/eventsApi';
 
 interface SidebarProps {
   isSidebarOpen: boolean;
@@ -11,124 +12,201 @@ interface SidebarProps {
   reserveDesktopSpace?: boolean;
 }
 
+const normalizeSport = (sport: string) =>
+  sport.toLowerCase() === 'football' ? 'soccer' : sport.toLowerCase();
+
+const sportPath = (sport: string) =>
+  normalizeSport(sport) === 'soccer' ? 'football' : sport.toLowerCase();
+
+function MenuArrow({ expanded }: { expanded: boolean }) {
+  return (
+    <span
+      className={cn(
+        'absolute right-[10px] inline-block h-[24px] w-[17.6px] text-[17.6px] leading-[24px] text-[#243a48] transition-transform duration-150 motion-reduce:transition-none',
+        expanded && 'rotate-90'
+      )}
+      aria-hidden="true"
+    >
+      <svg viewBox="0 0 24 24" className="block h-full w-full fill-current">
+        <path d={mdiChevronRightBoxOutline} />
+      </svg>
+    </span>
+  );
+}
+
+function MenuChildren({
+  id,
+  expanded,
+  children,
+}: {
+  id: string;
+  expanded: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      id={id}
+      aria-hidden={!expanded}
+      className={cn(
+        'grid transition-[grid-template-rows,visibility] [transition-duration:350ms] [transition-timing-function:ease] motion-reduce:transition-none',
+        expanded ? 'visible grid-rows-[1fr]' : 'invisible grid-rows-[0fr]'
+      )}
+    >
+      <div className="min-h-0 overflow-hidden">{children}</div>
+    </div>
+  );
+}
+
+function CompetitionBranch({
+  competition,
+  sport,
+  sportExpanded,
+  onSelectEvent,
+}: {
+  competition: { id: number; name: string; sport: string };
+  sport: string;
+  sportExpanded: boolean;
+  onSelectEvent: () => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const contentId = useId();
+  const { data, isFetching, isError, refetch } = useGetEventsQuery(
+    { sportName: sport, competitionId: competition.id, status: 'ACTIVE' },
+    { skip: !expanded || !sportExpanded }
+  );
+  const events = Object.values(data ?? {}).flat();
+
+  return (
+    <li>
+      <button
+        type="button"
+        aria-expanded={expanded}
+        aria-controls={contentId}
+        onClick={() => setExpanded((open) => !open)}
+        className="relative block w-full overflow-visible whitespace-normal border-b border-white py-[4.8px] pl-[15px] pr-[1.6px] text-left text-[12px] font-normal capitalize leading-[18px] text-black focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#243a48]"
+      >
+        <span className="whitespace-normal break-normal pr-[36px] [overflow-wrap:normal] [text-overflow:clip]">
+          {competition.name}
+        </span>
+        <MenuArrow expanded={expanded} />
+      </button>
+      <MenuChildren id={contentId} expanded={expanded && sportExpanded}>
+        <ul className="m-0 list-none bg-[#ddd] p-0">
+          {isFetching && !data ? (
+            <li role="status" className="py-[4.8px] pl-[20px] text-[12px] leading-[18px]">
+              Loading events...
+            </li>
+          ) : isError ? (
+            <li className="py-[4.8px] pl-[20px] text-[12px] leading-[18px]">
+              Unable to load events.{' '}
+              <button type="button" onClick={() => refetch()} className="underline">
+                Retry
+              </button>
+            </li>
+          ) : events.length === 0 ? (
+            <li className="py-[4.8px] pl-[20px] text-[12px] leading-[18px]">No events available</li>
+          ) : (
+            events.map((event) => (
+              <li key={event.eventId}>
+                <NavLink
+                  to={`/sports/${sportPath(sport)}/${competition.id}/market-details/${event.eventId}`}
+                  state={{ isPremiumFancy: event.externalId?.startsWith('sr') ?? false }}
+                  onClick={onSelectEvent}
+                  className="relative block whitespace-normal break-normal border-b border-white py-[4.8px] pl-[20px] pr-[1.6px] text-[12px] font-normal capitalize leading-[18px] text-black [overflow-wrap:normal] [text-overflow:clip] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#243a48]"
+                >
+                  {event.eventName}
+                </NavLink>
+              </li>
+            ))
+          )}
+        </ul>
+      </MenuChildren>
+    </li>
+  );
+}
+
+function SportBranch({ label, onSelectEvent }: { label: string; onSelectEvent: () => void }) {
+  const [expanded, setExpanded] = useState(false);
+  const contentId = useId();
+  const sport = label === 'Football' ? 'Soccer' : label;
+  const { data, isFetching, isError, refetch } = useGetCompetitionByIdQuery(sport, {
+    skip: !expanded,
+  });
+  const competitions = (data?.competitions ?? []).filter(
+    (competition) =>
+      !competition.sport || normalizeSport(competition.sport) === normalizeSport(sport)
+  );
+
+  return (
+    <li>
+      <button
+        type="button"
+        aria-expanded={expanded}
+        aria-controls={contentId}
+        onClick={() => setExpanded((open) => !open)}
+        className="relative block w-full overflow-visible whitespace-normal border-b border-[#ededed] py-[4.8px] pl-[9.6px] pr-[1.6px] text-left text-[13px] font-medium capitalize leading-[19.5px] text-black hover:bg-[#ededed] hover:text-[#1b2d52] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#243a48]"
+      >
+        <span className="whitespace-normal break-normal pr-[36px] align-middle [overflow-wrap:normal] [text-overflow:clip]">
+          {label}
+        </span>
+        <MenuArrow expanded={expanded} />
+      </button>
+      <MenuChildren id={contentId} expanded={expanded}>
+        <ul className="m-0 list-none bg-[#ededed] p-0">
+          {isFetching && !data ? (
+            <li role="status" className="py-[4.8px] pl-[15px] text-[12px] leading-[18px]">
+              Loading competitions...
+            </li>
+          ) : isError ? (
+            <li className="py-[4.8px] pl-[15px] text-[12px] leading-[18px]">
+              Unable to load competitions.{' '}
+              <button type="button" onClick={() => refetch()} className="underline">
+                Retry
+              </button>
+            </li>
+          ) : competitions.length === 0 ? (
+            <li className="py-[4.8px] pl-[15px] text-[12px] leading-[18px]">
+              No competitions available
+            </li>
+          ) : (
+            competitions.map((competition) => (
+              <CompetitionBranch
+                key={competition.id}
+                competition={competition}
+                sport={sport}
+                sportExpanded={expanded}
+                onSelectEvent={onSelectEvent}
+              />
+            ))
+          )}
+        </ul>
+      </MenuChildren>
+    </li>
+  );
+}
+
 const Sidebar: React.FC<SidebarProps> = ({
   isSidebarOpen,
   setIsSidebarOpen,
   reserveDesktopSpace = true,
-}) => {
-  const { competitions, competitionsLoading, menuItems, handleSelectSport } = useSidebar({
-    setIsSidebarOpen,
-  });
-
-  const { pathname } = useLocation();
-  const isDashboard = pathname === '/dashboard';
-  const visibleMenuItems =
-    pathname === '/dashboard'
-      ? [
-          ...menuItems.slice(0, -1),
-          { label: 'Rugby' },
-          menuItems[menuItems.length - 1]!,
-          { label: 'Futsal' },
-        ]
-      : menuItems;
-  const [expandedSport, setExpandedSport] = useState<string | null>(null);
-
-  const toggleSport = (sport: string) => {
-    setExpandedSport((prev) => (prev === sport ? null : sport));
-  };
-
-  const normalizeSportName = (sport: string) =>
-    sport.toLowerCase() === 'football' ? 'soccer' : sport.toLowerCase();
-
-  return (
-    <div
-      className={reserveDesktopSpace ? 'contents lg:block lg:w-[240px] lg:shrink-0' : 'contents'}
+}) => (
+  <div className={reserveDesktopSpace ? 'contents lg:block lg:w-[240px] lg:shrink-0' : 'contents'}>
+    <nav
+      aria-label="Sports sidebar"
+      className={cn(
+        'fixed left-0 top-[50px] z-[100] h-[calc(100dvh-50px)] w-[240px] bg-white p-0 font-helvetica shadow-lg lg:top-[98px] lg:z-50 lg:block lg:h-[calc(100vh-98px)] lg:shadow-none',
+        isSidebarOpen ? 'block' : 'hidden'
+      )}
     >
-      <div
-        className={cn(
-          'fixed top-0 left-0 z-[100] h-screen w-[240px] p-[100px_0_70px] bg-white border-r border-gray-300 font-tahoma shadow-lg transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:left-0 lg:shadow-none',
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
-          isDashboard
-            ? 'lg:top-[98px] lg:h-[calc(100vh-98px)] lg:p-0 lg:z-50'
-            : 'lg:top-0 lg:h-screen'
-        )}
-      >
-        <div
-          className={cn(
-            'h-full overflow-hidden scrollbar-hidden',
-            isDashboard && 'lg:overflow-y-auto'
-          )}
-        >
-          {visibleMenuItems.map((sport) => {
-            const sportName = sport.label === 'Football' ? 'Soccer' : sport.label;
-
-            const sportCompetitions = competitions.filter(
-              (competition) =>
-                normalizeSportName(competition.sport) === normalizeSportName(sportName)
-            );
-
-            const isOpen = expandedSport === sport.label;
-
-            return (
-              <div key={sport.label}>
-                {/* Sport */}
-                <button
-                  onClick={() => {
-                    toggleSport(sport.label);
-                    handleSelectSport(sport.label);
-                  }}
-                  className={cn(
-                    'flex items-center justify-between w-full px-[14px] py-2 text-[13px] border-b border-[#ededed] hover:bg-[#ededed] transition-colors',
-                    isDashboard && 'lg:min-h-[31px] lg:px-[10px] lg:py-[5px]'
-                  )}
-                >
-                  <span>{sport.label}</span>
-
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-[16px] w-[16px] shrink-0 fill-current text-[#304d5d]"
-                    aria-hidden="true"
-                  >
-                    <path d={isOpen ? mdiChevronDownBoxOutline : mdiChevronRightBoxOutline} />
-                  </svg>
-                </button>
-
-                {/* Competitions */}
-                {isOpen && (
-                  <div className="bg-white">
-                    {competitionsLoading ? (
-                      <div className="flex justify-center items-center py-6">
-                        <Loader2 size={18} className="animate-spin text-gray-400" />
-                      </div>
-                    ) : sportCompetitions.length === 0 ? (
-                      <div className="px-4 py-3 text-xs text-gray-500">
-                        No competitions available
-                      </div>
-                    ) : (
-                      sportCompetitions.map((competition) => (
-                        <NavLink
-                          key={competition.id}
-                          to={`/sports/${
-                            normalizeSportName(competition.sport) === 'soccer'
-                              ? 'football'
-                              : competition.sport.toLowerCase()
-                          }/${competition.id}`}
-                          onClick={() => setIsSidebarOpen(false)}
-                          className="block font-normal text-xs p-[10px_2px_6px_17px] border-b border-white bg-[#ededed]"
-                        >
-                          <span className="truncate">{competition.name}</span>
-                        </NavLink>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+      <div className="h-full overflow-y-auto scrollbar-hidden">
+        <ul className="m-0 list-none p-0">
+          {sidebarSports.map(({ label }) => (
+            <SportBranch key={label} label={label} onSelectEvent={() => setIsSidebarOpen(false)} />
+          ))}
+        </ul>
       </div>
-    </div>
-  );
-};
+    </nav>
+  </div>
+);
 
 export default Sidebar;

@@ -113,7 +113,7 @@ const Banner = ({ className }: { className?: string }) => {
           'flex touch-pan-y will-change-transform',
           positions[position],
           animated && !reducedMotion
-            ? 'transition-transform duration-[600ms] ease-in-out'
+            ? 'transition-transform [transition-duration:600ms] ease-in-out'
             : 'transition-none'
         )}
         onTransitionEnd={(event) => {
@@ -137,7 +137,7 @@ const Banner = ({ className }: { className?: string }) => {
               height={300}
             />
             <img
-              className="block aspect-[18/5] w-full object-cover sm:aspect-[32/5]"
+              className="block aspect-[18/5] w-full object-cover min-[576px]:aspect-[32/5]"
               src={`/images/banners/m_bnr${slide}.png`}
               width={720}
               height={200}
@@ -148,14 +148,11 @@ const Banner = ({ className }: { className?: string }) => {
           </picture>
         ))}
       </div>
-      <div className="sr-only focus-within:not-sr-only focus-within:absolute focus-within:inset-x-0 focus-within:bottom-[4px] focus-within:flex focus-within:justify-center focus-within:gap-[8px]">
-        <button
-          type="button"
-          onClick={() => move(-1)}
-          className="rounded bg-black/70 px-[8px] py-[3px] text-white"
-        >
-          Previous banner
-        </button>
+      <div
+        role="group"
+        aria-label="Banner slides"
+        className="absolute inset-x-0 bottom-[16px] z-10 hidden justify-center lg:flex"
+      >
         {slides.map((slide, index) => (
           <button
             key={slide}
@@ -163,19 +160,27 @@ const Banner = ({ className }: { className?: string }) => {
             aria-label={`Go to banner ${slide}`}
             aria-current={activeSlide === index ? 'true' : undefined}
             onClick={() => setPosition(slide)}
-            className="rounded bg-black/70 px-[8px] py-[3px] text-white"
-          >
-            {slide}
-          </button>
+            className={cn(
+              'mx-[3px] size-[10px] shrink-0 cursor-pointer rounded-full border-0 bg-white p-0 transition-opacity [transition-duration:600ms] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none',
+              activeSlide === index ? 'opacity-100' : 'opacity-50'
+            )}
+          />
         ))}
-        <button
-          type="button"
-          onClick={() => move(1)}
-          className="rounded bg-black/70 px-[8px] py-[3px] text-white"
-        >
-          Next banner
-        </button>
       </div>
+      <button
+        type="button"
+        onClick={() => move(-1)}
+        className="sr-only focus:not-sr-only focus:absolute focus:bottom-[12px] focus:left-[8px] focus:z-20 focus:rounded focus:bg-black/70 focus:px-[8px] focus:py-[3px] focus:text-white"
+      >
+        Previous banner
+      </button>
+      <button
+        type="button"
+        onClick={() => move(1)}
+        className="sr-only focus:not-sr-only focus:absolute focus:bottom-[12px] focus:right-[8px] focus:z-20 focus:rounded focus:bg-black/70 focus:px-[8px] focus:py-[3px] focus:text-white"
+      >
+        Next banner
+      </button>
     </section>
   );
 };

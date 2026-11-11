@@ -5,10 +5,7 @@ import { RootState } from '@/store';
 import { useDeviceWidth } from '@/hooks/useDeviceWidth';
 import { useIsAuthenticated } from '@/hooks';
 import { useGetCasinoStaticGamesQuery } from '@/store/api/casinoHomePageApi';
-import {
-  CASINO_IMAGES,
-  WebHomeBannerFallback,
-} from '@/utils/constants/home';
+import { CASINO_IMAGES, WebHomeBannerFallback } from '@/utils/constants/home';
 import { useGetBannersQuery } from '@/store/api/bannerApi';
 
 const pickBanners = (src: any, key: string) =>
@@ -77,15 +74,14 @@ export function useHomePage() {
   const displayWelcomeBanner = useMemo(() => {
     if (isBannersLoading) return [];
     if (width <= 768) {
-      return appWelcomeBannerImages;
+      return appWelcomeBannerImages.length ? appWelcomeBannerImages : webWelcomeBannerImages;
     }
-    return webWelcomeBannerImages;
+    return webWelcomeBannerImages.length ? webWelcomeBannerImages : appWelcomeBannerImages;
   }, [width, appWelcomeBannerImages, webWelcomeBannerImages, isBannersLoading]);
 
   // API Calls
   // const { data: staticCasinoGames, isLoading: staticCasinoLoading } =
   //   useGetCasinoStaticGamesQuery();
-
 
   // const finalCasinoData = useMemo(() => {
   //   return staticCasinoGames?.games?.map((category) => ({

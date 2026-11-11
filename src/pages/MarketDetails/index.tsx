@@ -18,6 +18,7 @@ import MarketFilterModal, {
   defaultMarketFilterSettings,
   type MarketFilterSettings,
 } from './components/MarketFilterModal';
+import MarketInfoButton from './components/MarketInfoButton';
 
 const getFancyMarketPinKey = (market: any) => {
   const runner = Array.isArray(market?.runners) ? market.runners[0] : market?.runners;
@@ -281,21 +282,37 @@ function MarketDetails() {
 
           {(fancyTabs.length > 1 || premiumTabs.length > 1) && (
             <>
-              <div className="flex flex-col border-x border-[#7e97a7] text-[13px] font-bold text-white">
+              <div
+                className={cn(
+                  'grid border-x border-[#7e97a7] font-[family-name:system-ui] text-[12px] font-bold tracking-[1px] text-white',
+                  fancyTabs.length > 1 && premiumTabs.length > 1
+                    ? 'grid-cols-2 lg:grid-cols-1'
+                    : 'grid-cols-1'
+                )}
+              >
                 {fancyTabs.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => setActiveCatTab('Fancy')}
-                    aria-pressed={activeCatTab === 'Fancy'}
+                  <div
                     className={cn(
-                      'h-[31px] px-[10px] text-left',
+                      'flex h-[30px] items-center',
                       activeCatTab === 'Fancy'
-                        ? 'bg-gradient-to-b from-[#0a92a5] to-[#076875]'
-                        : 'bg-[#213b49]'
+                        ? 'bg-gradient-to-b from-[#0a92a5] from-[15%] to-[#076875]'
+                        : 'bg-[#243a48]'
                     )}
                   >
-                    Fancy Bet
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveCatTab('Fancy')}
+                      aria-pressed={activeCatTab === 'Fancy'}
+                      className="h-full min-w-0 flex-1 px-[10px] text-left"
+                    >
+                      Fancy Bet
+                    </button>
+                    <MarketInfoButton
+                      marketName="Fancy"
+                      marketType="FANCY"
+                      className="ml-0 h-[30px] w-[35px] bg-white/5"
+                    />
+                  </div>
                 )}
                 {premiumTabs.length > 1 && (
                   <button
@@ -303,10 +320,10 @@ function MarketDetails() {
                     onClick={() => setActiveCatTab('Premium')}
                     aria-pressed={activeCatTab === 'Premium'}
                     className={cn(
-                      'flex h-[31px] items-center gap-[8px] px-[10px] text-left',
+                      'flex h-[30px] items-center gap-[8px] px-[10px] text-left',
                       activeCatTab === 'Premium'
-                        ? 'bg-gradient-to-b from-[#0a92a5] to-[#076875]'
-                        : 'bg-[#213b49]'
+                        ? 'bg-gradient-to-b from-[#0a92a5] from-[15%] to-[#076875]'
+                        : 'bg-[#243a48]'
                     )}
                   >
                     Premium <span className="bg-[#126778] px-[4px] text-[9px]">NEW</span>

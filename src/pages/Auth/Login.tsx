@@ -90,16 +90,11 @@ function Login() {
               id="login-username"
               autoComplete="username"
               placeholder="Enter Username"
+              required
               aria-invalid={Boolean(errors.username)}
-              aria-describedby={errors.username ? 'login-username-error' : undefined}
               className="h-[40px] w-full rounded-[4px] border border-[#ced4da] bg-white px-[14.4px] text-[14px] leading-[21px] text-black outline-none placeholder:italic placeholder:text-black focus:ring-2 focus:ring-cyan-300 md:h-[36.375px]"
               {...register('username')}
             />
-            {errors.username && (
-              <p id="login-username-error" role="alert" className="mt-1 text-xs text-[#ffb7b7]">
-                {errors.username.message}
-              </p>
-            )}
           </div>
           <div className="relative">
             <label className="sr-only" htmlFor="login-password">
@@ -110,17 +105,11 @@ function Login() {
               type="password"
               autoComplete="current-password"
               placeholder="Enter Password"
+              required
               aria-invalid={Boolean(errors.password)}
-              aria-describedby={errors.password ? 'login-password-error' : undefined}
               className="h-[40px] w-full rounded-[4px] border border-[#ced4da] bg-white px-[14.4px] text-[14px] leading-[21px] text-black outline-none placeholder:italic placeholder:text-black focus:ring-2 focus:ring-cyan-300 md:h-[36.375px]"
               {...register('password')}
             />
-
-            {errors.password && (
-              <p id="login-password-error" role="alert" className="mt-1 text-xs text-[#ffb7b7]">
-                {errors.password.message}
-              </p>
-            )}
           </div>
           <div>
             <div className="flex items-center justify-between gap-3">
@@ -145,14 +134,8 @@ function Login() {
             </div>
             <p className="min-h-[42px] text-[12px] leading-[21px]">
               This site is protected by reCAPTCHA and the Google{' '}
-              <Link to="/terms-policy" className="underline">
-                Privacy Policy
-              </Link>{' '}
-              and{' '}
-              <Link to="/terms-policy" className="underline">
-                Terms of Service apply
-              </Link>
-              .
+              <span className="underline">Privacy Policy</span> and{' '}
+              <span className="underline">Terms of Service apply</span>.
             </p>
           </div>
           <div className="flex flex-col gap-[5px] md:items-end md:gap-[15px]">

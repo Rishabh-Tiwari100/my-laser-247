@@ -2,7 +2,7 @@ import { Icons } from '@/utils/icons';
 import { useHomePage } from './hooks/useHomePage';
 import Marquee from '@/components/common/Marquee';
 import { FiMic } from 'react-icons/fi';
-import { createPortal } from 'react-dom';
+import * as Dialog from '@radix-ui/react-dialog';
 import CasinoGameLauncher from '@/components/casino/CasinoGameLauncher';
 import { useFantasyGameLauncher } from '@/hooks/useFantasyGameLauncher';
 import { Link, useLocation } from 'react-router-dom';
@@ -16,8 +16,15 @@ import { useGetFixtureCountsQuery } from '@/store/api/eventsApi';
 import { useEffect, useState } from 'react';
 import Providers from './components/Providers';
 import HomeFooter from './components/HomeFooter';
+import type { BannerItem } from '@/types/banner';
 
 const WELCOME_BANNER_PENDING_KEY = 'welcomeBannerPending';
+const DEFAULT_WELCOME_BANNER = {
+  image: '/images/banners/welcome-apk.webp',
+  link: 'https://speedcdn.io/apk8/mylaser247com-v8.apk',
+  width: 1076,
+  height: 1556,
+};
 
 const getBannerLink = (link?: string) => {
   if (!link) return '';
@@ -26,8 +33,6 @@ const getBannerLink = (link?: string) => {
   return markdownLinkMatch?.[1] || link;
 };
 
-const getDownloadName = (name?: string) => name?.trim().replace(/\s+/g, '-') || 'welcome-banner';
-
 function Home() {
   const { displayWelcomeBanner, isAuthenticated, isBannersLoading, homeImages } = useHomePage();
   const location = useLocation();
@@ -35,7 +40,8 @@ function Home() {
     useFantasyGameLauncher();
   const { data: fixtureCountsData } = useGetFixtureCountsQuery();
   const [showWelcomeBanner, setShowWelcomeBanner] = useState(false);
-  const welcomeBanner = displayWelcomeBanner[0];
+  const welcomeBanner =
+    displayWelcomeBanner.find((banner: BannerItem) => banner.image) ?? DEFAULT_WELCOME_BANNER;
   const welcomeBannerLink = getBannerLink(welcomeBanner?.link);
 
   const inplayCounts = fixtureCountsData?.counts.inplay;
@@ -111,71 +117,71 @@ function Home() {
   };
 
   useEffect(() => {
-    if (!isAuthenticated || isBannersLoading || displayWelcomeBanner.length === 0) return;
+    if (!isAuthenticated || isBannersLoading) return;
 
     const shouldShowWelcomeBanner =
       window.sessionStorage.getItem(WELCOME_BANNER_PENDING_KEY) === 'true';
 
     if (shouldShowWelcomeBanner) {
+      window.sessionStorage.removeItem(WELCOME_BANNER_PENDING_KEY);
       setShowWelcomeBanner(true);
     }
-  }, [displayWelcomeBanner.length, isAuthenticated, isBannersLoading]);
+  }, [isAuthenticated, isBannersLoading]);
 
   const handleCloseWelcomeBanner = () => {
     window.sessionStorage.removeItem(WELCOME_BANNER_PENDING_KEY);
     setShowWelcomeBanner(false);
   };
 
-  const welcomeBannerOverlay =
-    showWelcomeBanner && typeof document !== 'undefined'
-      ? createPortal(
-          <div
-            className="fixed inset-0 z-[2147483647] flex items-center justify-center bg-black/70 px-4"
-            role="presentation"
-            onClick={handleCloseWelcomeBanner}
-          >
-            <div
-              role="dialog"
-              aria-modal="true"
-              aria-label="Welcome"
-              className="relative max-h-[80vh] w-full max-w-[calc(100vw-2rem)] lg:max-w-[1120px]"
-              onClick={(event) => event.stopPropagation()}
+  const welcomeBannerOverlay = (
+    <Dialog.Root
+      open={isAuthenticated && showWelcomeBanner}
+      onOpenChange={(open) => {
+        if (!open) handleCloseWelcomeBanner();
+      }}
+    >
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-[5000000000000002] bg-[#323a46]/50" />
+        <Dialog.Content
+          aria-describedby={undefined}
+          className="fixed inset-0 z-[5000000000000003] flex overflow-y-auto p-[8px] font-helvetica outline-none sm:px-0 sm:py-[28px]"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) handleCloseWelcomeBanner();
+          }}
+        >
+          <Dialog.Title className="sr-only">Welcome</Dialog.Title>
+          <div className="relative m-auto w-full shrink-0 sm:max-w-[500px]">
+            <Dialog.Close
+              type="button"
+              aria-label="Close welcome banner"
+              className="absolute right-[15px] top-[5px] z-10 border-0 bg-transparent p-0 text-[25px] font-black leading-[36px] text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-white"
             >
-              <button
-                type="button"
-                onClick={handleCloseWelcomeBanner}
-                aria-label="Close welcome banner"
-                className="absolute -right-[10px] -top-[10px] z-10 rounded-full bg-[#1f2937] p-2 shadow-lg transition hover:bg-[#111827]"
-              >
-                <Icons.close className="size-4 text-white" />
-              </button>
-
-              {welcomeBannerLink ? (
-                <a
-                  href={welcomeBannerLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  download={getDownloadName(welcomeBanner?.name)}
-                  className="block"
-                >
-                  <img
-                    className="block max-h-[80vh] w-full object-contain"
-                    src={welcomeBanner?.image}
-                    alt="Welcome"
-                  />
-                </a>
-              ) : (
+              <span aria-hidden="true">&times;</span>
+            </Dialog.Close>
+            {welcomeBannerLink ? (
+              <a href={welcomeBannerLink} className="block" aria-label="Download the Android app">
                 <img
-                  className="block max-h-[80vh] w-full object-contain"
-                  src={welcomeBanner?.image}
+                  className="block h-auto w-full"
+                  src={welcomeBanner.image}
+                  width={welcomeBanner.width}
+                  height={welcomeBanner.height}
                   alt="Welcome"
                 />
-              )}
-            </div>
-          </div>,
-          document.body
-        )
-      : null;
+              </a>
+            ) : (
+              <img
+                className="block h-auto w-full"
+                src={welcomeBanner.image}
+                width={welcomeBanner.width}
+                height={welcomeBanner.height}
+                alt="Welcome"
+              />
+            )}
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
 
   return (
     <div className="relative mx-auto w-full px-px font-helvetica min-[576px]:max-w-[540px] md:max-w-[720px] min-[992px]:max-w-[960px] lg:px-[2px] min-[1200px]:max-w-[1140px] min-[1400px]:max-w-[1344px]">
@@ -185,14 +191,17 @@ function Home() {
         <Marquee icon={FiMic} tagName="News" />
       </div>
 
-      <div aria-label="Homepage sports" className="flex h-[35px] w-full overflow-x-auto overflow-y-hidden whitespace-nowrap bg-black text-center font-helvetica text-[13px] lg:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div
+        aria-label="Homepage sports"
+        className="flex h-[35px] w-full overflow-x-auto overflow-y-hidden whitespace-nowrap bg-black text-center font-helvetica text-[13px] lg:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
         {homeNavigations.map((nav, index) =>
           nav.label === 'Fantasy 11' ? (
             <button
               key={index}
               type="button"
               disabled={isLaunchingFantasy || activeGameId !== null}
-              className="animate-menuHighlight shrink-0 px-[10px] py-[8px] text-[13px] text-white border-r border-[#333] hover:bg-[#1a1a1a] disabled:cursor-wait disabled:opacity-70"
+              className="animate-[zoom-in-out_1s_ease-out_infinite] shrink-0 px-[10px] py-[8px] text-[13px] text-white border-r border-[#333] hover:bg-[#1a1a1a] disabled:cursor-wait disabled:opacity-70"
               aria-disabled={isLaunchingFantasy || activeGameId !== null}
               aria-busy={isLaunchingFantasy}
               onClick={() => void launchFantasyGame()}
@@ -221,7 +230,9 @@ function Home() {
 
       <Link to="/popular-events" className="mb-[6px] block w-full">
         <img
-          className="block h-auto max-w-full w-full"
+          className="block aspect-[800/149] h-auto max-w-full w-full"
+          width={1600}
+          height={298}
           src="/images/home-images/main-banner.gif"
           alt=""
         />
@@ -230,7 +241,10 @@ function Home() {
       {welcomeBannerOverlay}
 
       <div>
-        <div aria-label="Sports highlights" className="grid grid-cols-1 gap-[2px] md:grid-cols-2 lg:gap-[4px]">
+        <div
+          aria-label="Sports highlights"
+          className="grid grid-cols-1 gap-[2px] md:grid-cols-2 lg:gap-[4px]"
+        >
           <div className="relative min-w-0 overflow-hidden bg-black">
             <Link to="/inplay" className="block" aria-label="Sports">
               <img
@@ -242,30 +256,33 @@ function Home() {
                 Sports
               </p>
             </Link>
-              <div aria-label="Live sports" className="absolute right-0 top-0 h-full w-[105px] overflow-x-hidden overflow-y-auto bg-[linear-gradient(180deg,#000_0%,rgba(0,0,0,0.7)_82%,transparent_100%)] px-[2px] py-[8px] text-left lg:w-[150px] lg:px-[5px] lg:py-[10px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <p className="mt-[2px] mb-px inline-flex h-[18px] w-[69px] items-center rounded-[3px] bg-gradient-to-b from-[#fb3434] to-[#e80505] pr-[10px] text-[12px] font-bold leading-[18px] text-white lg:mt-px lg:h-[20px] lg:w-[59px] lg:pr-[5px] lg:leading-5">
-                  <span className="mr-[5px] flex h-full items-center justify-center rounded-l-[3px] bg-gradient-to-b from-white to-[#e8e8e8] px-[3px]">
-                    <span className="live-icon animate-twinkling" />
-                  </span>
-                  LIVE
-                </p>
-                <div className="pb-2">
-                  {sports.map((sport) => (
-                    <Link
-                      key={sport.name}
-                      to={sport.path}
-                      className="flex items-center justify-between gap-1 text-[10px] lg:text-xs"
-                    >
-                      <h3 className="whitespace-nowrap text-white font-normal capitalize leading-[20px] ">
-                        {sport.name}
-                      </h3>
-                      <span className="h-[14px] min-w-[14px] shrink-0 rounded-[3px] bg-white px-[2px] text-center leading-[14px] text-[#333] lg:h-4 lg:leading-4">
-                        {sport.count}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
+            <div
+              aria-label="Live sports"
+              className="absolute right-0 top-0 h-full w-[105px] overflow-x-hidden overflow-y-auto bg-[linear-gradient(180deg,#000_0%,rgba(0,0,0,0.7)_82%,transparent_100%)] px-[2px] py-[8px] text-left lg:w-[150px] lg:px-[5px] lg:py-[10px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              <p className="mt-[2px] mb-px inline-flex h-[18px] w-[69px] items-center rounded-[3px] bg-gradient-to-b from-[#fb3434] to-[#e80505] pr-[10px] text-[12px] font-bold leading-[18px] text-white lg:mt-px lg:h-[20px] lg:w-[59px] lg:pr-[5px] lg:leading-5">
+                <span className="mr-[5px] flex h-full items-center justify-center rounded-l-[3px] bg-gradient-to-b from-white to-[#e8e8e8] px-[3px]">
+                  <span className="live-icon animate-twinkling" />
+                </span>
+                LIVE
+              </p>
+              <div className="pb-2">
+                {sports.map((sport) => (
+                  <Link
+                    key={sport.name}
+                    to={sport.path}
+                    className="flex items-center justify-between gap-1 text-[10px] lg:text-xs"
+                  >
+                    <h3 className="whitespace-nowrap text-white font-normal capitalize leading-[20px] ">
+                      {sport.name}
+                    </h3>
+                    <span className="h-[14px] min-w-[14px] shrink-0 rounded-[3px] bg-white px-[2px] text-center leading-[14px] text-[#333] lg:h-4 lg:leading-4">
+                      {sport.count}
+                    </span>
+                  </Link>
+                ))}
               </div>
+            </div>
           </div>
           <div className="relative min-w-0 overflow-hidden bg-black">
             <Link to="#" className="block" aria-label="Sports Book">
@@ -303,7 +320,6 @@ function Home() {
       {/* <CasinoGames tab={activeTab} /> */}
       <Providers />
       <HomeFooter />
-
     </div>
   );
 }

@@ -4,13 +4,11 @@ import { RootState } from '@/store';
 import { useGetBooksetCalcQuery } from '@/store/api/booksetApi';
 import { usePlaceBetMutation } from '@/store/api/betPlaceApi';
 import { setBetDetails } from '@/store/slices/betSlice';
-import { calculateProfitLoss } from '@/utils/helpers/booksetCalculation';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import BetSlip from './BetSlip';
 import FancyExposureModal from './FancyExposureModal';
-import { Icons } from '@/utils/icons';
 import toast from 'react-hot-toast';
 import { formatStakeLimitRange, type StakeLimitValue } from './stakeLimit';
 
@@ -40,7 +38,6 @@ const FancyRow = ({
   const marketId = String(data?.marketId ?? data?.id ?? '');
   const marketName = data?.marketName ?? data?.name ?? runner?.runnerName ?? '';
   const marketCategory = data?.marketType ?? data?.marketCategory ?? 'FANCY';
-  const gameType = data?.gameType ?? data?.marketCategory;
   const isFancyOneMarket = [data?.marketType, data?.marketCategory].some(
     (value) => String(value ?? '').toLowerCase() === 'fancy1'
   );
@@ -63,23 +60,6 @@ const FancyRow = ({
 
     return Number(selection?.exposure ?? 0);
   }, [booksetCalculation, marketId, runner?.selectionId]);
-
-  const calculatedPL = useMemo(() => {
-    if (!isFancyOneMarket || !betDetails?.stake) return 0;
-
-    return (
-      calculateProfitLoss(
-        'FANCY',
-        betDetails,
-        eventId,
-        runner?.selectionId,
-        marketId,
-        isFancyOneMarket ? 'fancy1' : gameType
-      ) ?? 0
-    );
-  }, [betDetails, eventId, gameType, isFancyOneMarket, marketId, runner?.selectionId]);
-
-  const totalExposure = exposureFromBookset + calculatedPL;
 
   const handleSelectOdds = useCallback(
     async (
@@ -167,31 +147,30 @@ const FancyRow = ({
               className="w-[18px] min-w-[18px] h-auto"
             />
           </button>
-          <p className="min-w-0 flex-1 text-[12px] font-bold leading-[18px]">
+          <p className="min-w-0 flex-1 break-words py-[2px] text-[12px] font-bold leading-[18px]">
             {runner?.runnerName}
+            {isFancyOneMarket &&
+            Number.isFinite(exposureFromBookset) &&
+            exposureFromBookset !== 0 ? (
+              <span
+                aria-label="Current profit or loss"
+                className={`ml-[5px] inline-block text-[11px] font-bold leading-[16.5px] ${exposureFromBookset < 0 ? 'text-[#d0021b]' : 'text-[#228b22]'}`}
+              >
+                ({Number(exposureFromBookset.toFixed(2))})
+              </span>
+            ) : null}
             <span className="mt-0.5 block text-[9px] not-italic leading-none text-[#315195] lg:hidden">
               Min/Max {formatStakeLimitRange(min, max)}
             </span>
           </p>
-          {isFancyOneMarket && totalExposure ? (
-            <span
-              className={`ml-[5px] flex shrink-0 items-center gap-[2px] text-[11px] font-bold ${
-                totalExposure < 0 ? 'text-red-500' : 'text-green-500'
-              }`}
-            >
-              <Icons.arrowRight className="h-[12px] w-[12px]" aria-hidden="true" />
-              {Math.abs(totalExposure).toFixed(2)}
-            </span>
-          ) : exposureFromBookset ? (
+          {!isFancyOneMarket && exposureFromBookset ? (
             <span className="ml-auto flex shrink-0 items-center gap-[6px] pl-[6px]">
               <button
                 type="button"
-                className={`flex p-[3px_6px] items-center justify-center border-0 text-xs font-semibold leading-[1.2] text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#243a48] ${
-                  exposureFromBookset < 0 ? 'bg-red-600' : 'bg-green-600'
-                }`}
+                className="flex items-center justify-center rounded-[4px] border border-[#333] bg-[#243a48] px-[10px] py-[4px] text-[12px] font-bold leading-[18px] text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#243a48]"
                 onClick={() => setIsExposureModalOpen(true)}
               >
-                {Math.abs(exposureFromBookset).toFixed(2)}
+                {Number(exposureFromBookset.toFixed(2))}
               </button>
               <button
                 type="button"
@@ -210,7 +189,7 @@ const FancyRow = ({
         </div>
 
         <div className="col-span-5 grid min-w-0 grid-cols-1 lg:col-span-1 lg:grid-cols-4">
-          <div className="relative grid h-[44px] grid-cols-2 lg:col-span-2">
+          <div className="relative grid h-full min-h-[44px] grid-cols-2 lg:col-span-2">
             <button
               type="button"
               aria-pressed={isLaySelected}

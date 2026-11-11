@@ -115,14 +115,8 @@ export type ProfileFormData = z.infer<typeof profileValidationSchema>;
 
 // Login Validation Schema
 export const loginSchema = z.object({
-  username: z
-    .string()
-    .min(1, 'Please Enter Username')
-    .min(3, 'Username must be at least 3 characters long'),
-  password: z
-    .string()
-    .min(1, 'Please enter a password')
-    .regex(/^[a-zA-Z0-9]+$/, 'Password can contain only letters and numbers'),
+  username: z.string().min(1, 'Please Enter Username'),
+  password: z.string().min(1, 'Please enter a password'),
 });
 
 export const phoneLoginSchema = z.object({

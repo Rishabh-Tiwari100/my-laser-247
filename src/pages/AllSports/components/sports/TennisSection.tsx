@@ -38,8 +38,13 @@ const TennisSection: React.FC<TennisSectionProps> = ({
           onFilterChange={setMatchFilter}
         />
       )}
-      <div className={cn("max-md:hidden", isDashboard && "max-lg:hidden")}>
-        <div className={cn("grid grid-cols-12 h-6 bg-[#ededed]", isDashboard && "lg:h-[21px] lg:bg-[#cfd6da]")}>
+      <div className={'max-lg:hidden'}>
+        <div
+          className={cn(
+            'grid grid-cols-12 h-6 bg-[#ced5da]',
+            isDashboard && 'lg:h-[21px] lg:bg-[#cfd6da]'
+          )}
+        >
           <div className="col-span-7"></div>
           <div className="col-span-4 flex gap-2 justify-center items-center text-xs font-medium text-[#000]">
             <div className="text-center w-[141px]">1</div>

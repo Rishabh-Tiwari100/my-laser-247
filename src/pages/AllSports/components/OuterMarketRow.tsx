@@ -40,7 +40,8 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const isInplay = pathname === '/inplay';
-  const isCompactSportsList = pathname === '/dashboard' || isInplay || pathname.startsWith('/sports');
+  const isCompactSportsList =
+    pathname === '/dashboard' || isInplay || pathname.startsWith('/sports');
   const isAuthenticated = useIsAuthenticated();
   const {
     eventName,
@@ -151,7 +152,7 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
             <span
               className={cn(
                 'min-w-0 flex-1 truncate text-[#168bd2]',
-                isCompactSportsList && 'max-lg:text-[14px] max-lg:font-bold'
+                isCompactSportsList && 'max-lg:text-[13.65px] max-lg:font-bold'
               )}
             >
               {eventName}
@@ -201,7 +202,7 @@ const OuterMarketRow: React.FC<OuterMarketRowProps> = ({ match, sportName = '' }
               <div
                 className={cn(
                   'w-full truncate text-xs text-primary-blue',
-                  isCompactSportsList && 'text-[13px] text-[#168bd2] font-bold'
+                  isCompactSportsList && 'text-[12px] text-[#168bd2] font-bold'
                 )}
               >
                 {eventName}

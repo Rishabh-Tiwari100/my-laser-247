@@ -2,6 +2,7 @@
 module.exports = {
   darkMode: ['class'],
   content: [
+    './index.html',
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
@@ -28,6 +29,10 @@ module.exports = {
         '8xl': '1410px',
       },
       screens: {
+        sm: '576px',
+        lg: '992px',
+        xl: '1200px',
+        '2xl': '1400px',
         xs: '480px',
         md2: '950px',
         lg2: '1100px',
@@ -81,8 +86,7 @@ module.exports = {
         'log-button': 'linear-gradient(-180deg, #F72424 0%, #BB1C00 100%)',
         'auth-gradient': 'linear-gradient(90deg,#020024,#090979 35%,#00d4ff)',
         'custom-overlay': 'linear-gradient(180deg, #00000005 27%, #1c282de0 83%)',
-        'footer-gradient':
-          'linear-gradient(-180deg, #243a48 20%, #172732 91%)',
+        'footer-gradient': 'linear-gradient(-180deg, #243a48 20%, #172732 91%)',
       },
       colors: {
         mint: 'hsl(var(--mint))',

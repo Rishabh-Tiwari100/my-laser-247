@@ -17,7 +17,7 @@ import {
   useUserProfile,
 } from '@/hooks/redux';
 
-const menuItems = [
+export const sidebarSports = [
   { label: 'Cricket' },
   { label: 'Football' },
   { label: 'Tennis' },
@@ -29,7 +29,10 @@ const menuItems = [
   { label: 'Table Tennis' },
   { label: 'Volleyball' },
   { label: 'Ice Hockey' },
+  { label: 'Rugby' },
+  { label: 'Mixed Martial Arts' },
   { label: 'Darts' },
+  { label: 'Futsal' },
 ];
 
 export type IconName = keyof typeof Icons;
@@ -239,7 +242,7 @@ export const useSidebar = ({
     userProfile,
     isAuthenticated,
     logoutLoading,
-    menuItems,
+    menuItems: sidebarSports,
     menuToRender,
 
     // handlers

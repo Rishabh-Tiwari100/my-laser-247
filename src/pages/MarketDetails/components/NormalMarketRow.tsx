@@ -12,7 +12,6 @@ import { usePlaceBetMutation } from '@/store/api/betPlaceApi';
 import { calculateProfitLoss } from '@/utils/helpers/booksetCalculation';
 import { cn } from '@/lib/utils';
 import { getBlockedStatus } from '@/utils';
-import { Icons } from '@/utils/icons';
 import toast from 'react-hot-toast';
 
 interface NormalMarketRowProps {
@@ -58,21 +57,21 @@ const NormalMarketRow = ({ data, market, min, max }: NormalMarketRowProps) => {
   }, [booksetCalculation, data?.selectionId, market?.marketId]);
 
   const calculatedPL = useMemo(() => {
-    if (!betDetails?.stake) return 0;
+    if (!betDetails?.stake) return null;
 
-    return (
-      calculateProfitLoss(
-        'NORMAL',
-        betDetails,
-        eventId,
-        data?.selectionId,
-        market?.marketId,
-        market?.gameType
-      ) ?? 0
+    return calculateProfitLoss(
+      'NORMAL',
+      betDetails,
+      eventId,
+      data?.selectionId,
+      market?.marketId,
+      market?.gameType
     );
   }, [betDetails, data?.selectionId, eventId, market?.gameType, market?.marketId]);
 
-  const totalExposure = exposureFromBookset + calculatedPL;
+  const projectedExposure = calculatedPL === null ? null : exposureFromBookset + calculatedPL;
+  const hasProjectedExposure = projectedExposure !== null && Number.isFinite(projectedExposure);
+  const booksetValue = hasProjectedExposure ? projectedExposure : exposureFromBookset;
 
   const odds = [
     {
@@ -211,22 +210,29 @@ const NormalMarketRow = ({ data, market, min, max }: NormalMarketRowProps) => {
               market?.marketName?.toLowerCase() == 'bookmaker' && 'bg-[#faf8d8]'
             )}
           >
-            <p className="min-w-0 overflow-auto flex-1 font-bold flex items-center text-xs pl-[5px]">
+            <p className="min-w-0 flex-1 break-words py-[2px] pl-[5px] text-[12px] font-bold leading-[18px]">
               {data?.runnerName}
+              {Number.isFinite(booksetValue) && (hasProjectedExposure || booksetValue !== 0) ? (
+                <span
+                  aria-label={
+                    hasProjectedExposure ? 'Projected profit or loss' : 'Current profit or loss'
+                  }
+                  className={cn(
+                    'ml-[5px] inline-block text-[11px] font-bold leading-[16.5px]',
+                    booksetValue < 0
+                      ? 'text-[#d0021b]'
+                      : booksetValue > 0
+                        ? 'text-[#228b22]'
+                        : 'text-black'
+                  )}
+                >
+                  ({Number(booksetValue.toFixed(2))})
+                </span>
+              ) : null}
             </p>
-            {totalExposure ? (
-              <span
-                className={`ml-[5px] flex shrink-0 items-center gap-[2px] text-[11px] font-bold ${
-                  totalExposure < 0 ? 'text-red-500' : 'text-green-500'
-                }`}
-              >
-                <Icons.arrowRight className="h-[12px] w-[12px]" aria-hidden="true" />
-                {Math.abs(totalExposure).toFixed(2)}
-              </span>
-            ) : null}
           </div>
           <div className="col-span-5 lg:col-span-7">
-            <div className="relative grid w-full grid-cols-12">
+            <div className="relative grid h-full w-full grid-cols-12">
               {visibleOdds.map(({ priceKey, sizeKey, bg, hideOnMobile, betOn, position }) => {
                 const selectedOdd = isSelectedOdd(betOn, position);
 
@@ -234,7 +240,7 @@ const NormalMarketRow = ({ data, market, min, max }: NormalMarketRowProps) => {
                   return (
                     <div
                       key={priceKey}
-                      className="hidden h-[43px] flex-col items-center justify-center text-[12px] lg:col-span-2 lg:flex"
+                      className="hidden h-full min-h-[43px] flex-col items-center justify-center text-[12px] lg:col-span-2 lg:flex"
                       style={{ background: bg }}
                     >
                       <span>-</span>
@@ -254,7 +260,7 @@ const NormalMarketRow = ({ data, market, min, max }: NormalMarketRowProps) => {
                       background: bg,
                       boxShadow: selectedOdd ? 'inset 0 0 0 2px #111827' : undefined,
                     }}
-                    className={`${hideOnMobile ? 'max-lg:hidden' : ''} col-span-6 lg:col-span-2 border-r border-white/50 text-[13px] lg:text-[12px] font-semibold py-1 text-black h-[42.5px] lg:h-[43px] disabled:opacity-50`}
+                    className={`${hideOnMobile ? 'max-lg:hidden' : ''} col-span-6 lg:col-span-2 border-r border-white/50 text-[13px] lg:text-[12px] font-semibold py-1 text-black h-full min-h-[42.5px] lg:min-h-[43px] disabled:opacity-50`}
                   >
                     {data?.[priceKey] ?? '-'}
                     <span className="block font-medium text-[10px] text-black">

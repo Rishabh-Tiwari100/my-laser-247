@@ -41,10 +41,6 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isDashboard = location.pathname === '/dashboard';
-  const isEventDetails = location.pathname.includes('/market-details/');
-  const isCompactHeader = isProfileMenuOpen || location.pathname === '/' || isEventDetails || location.pathname.startsWith('/sports') || ['/account-statement', '/my-bets', '/change-password', '/inplay', '/casino', '/casino/evolution'].includes(location.pathname);
-  const isMfaPage = location.pathname.includes('2fa');
 
   const isAuthenticated = useIsAuthenticated();
   const { refetch: refetchWallet, isFetching: isRefreshingWallet } = useGetUserWalletsQuery(
@@ -155,40 +151,37 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-[1000] w-full bg-theme-navbar font-sans text-xs lg:font-helvetica">
+      <header className="sticky top-0 z-[1000] w-full bg-theme-navbar font-helvetica text-xs">
         {/* Top Section: Logo, Search, and Auth Section */}
         <div
           className={cn(
-            'flex items-center justify-between lg:h-[70px] lg:gap-4 lg:pr-8 lg:[&>div:first-child]:min-w-0 lg:[&>div:first-child]:flex-1 lg:[&>div:last-child]:shrink-0',
-            isCompactHeader
-              ? 'h-[50px] min-h-[50px] lg:min-h-[70px]'
-              : isDashboard
-                ? 'h-[51px] min-h-[51px] lg:min-h-[70px]'
-                : 'min-h-[54px] md:min-h-[70px]'
+            'flex h-[50px] min-h-[50px] items-center justify-between lg:h-[70px] lg:min-h-[70px] lg:gap-4 lg:[&>div:first-child]:min-w-0 lg:[&>div:first-child]:flex-1 lg:[&>div:last-child]:shrink-0',
+            isAuthenticated ? 'lg:pr-8' : 'lg:pr-[7px]'
           )}
         >
           {/* Left: Logo & Search */}
           <div className="flex items-center">
             {/* Mobile Sidebar Toggle */}
-            <div
-              className={`shrink-0 ${isCompactHeader ? 'w-[155px] h-[50px]' : isDashboard ? 'w-[155px] h-[51px]' : isAuthenticated ? 'w-[125px] h-[70px]' : 'w-[125px] h-[54px]'} lg:h-[70px] lg:w-[185px] flex items-center justify-center lg:justify-start lg:pl-3`}
-            >
-              <Link
-                to="/"
-                className="block text-center leading-[70px] w-auto lg:w-[178px] lg:shrink-0"
-              >
+            <div className="flex h-[50px] w-[155px] shrink-0 items-center justify-center lg:h-[70px] lg:w-[185px] lg:justify-start">
+              <Link to="/" className="block shrink-0 text-center leading-[50px] lg:leading-[70px]">
                 <span className="leading-[70px] text-center">
                   <img
                     src="/images/logo.png"
                     alt="My Laser247 Logo"
-                    className="relative object-contain h-[30px] lg:left-0 lg:w-[178px] lg:h-10"
+                    width={185}
+                    height={50}
+                    className="relative left-[2.5px] h-[50px] w-[140px] object-contain lg:left-[10px] lg:top-[1.375px] lg:w-[185px]"
                   />
                 </span>
               </Link>
             </div>
             {isAuthenticated && (
-              <div className="hidden lg:flex relative group bg-white rounded w-[278px]">
-                <button className="h-[25px] block lg:px-1.5">
+              <div className="hidden xl:flex relative group bg-white rounded w-[278px]">
+                <button
+                  type="button"
+                  aria-label="Search events"
+                  className="flex h-[25px] w-[28px] shrink-0 items-center justify-center"
+                >
                   <svg viewBox="0 0 24 24" className="w-[15px] h-[15px] lg:h-[13px] lg:w-[13px]">
                     <path
                       fill="#000000"
@@ -206,7 +199,8 @@ const Header: React.FC<HeaderProps> = ({
                     setSearchText(value);
                     debouncedSearch(value);
                   }}
-                  className="text-xs h-[25px] w-full relative focus:outline-none text-black rounded"
+                  aria-label="Search events"
+                  className="relative -ml-px h-[25px] min-w-0 w-full rounded px-[7px] text-[14px] leading-[21px] text-black focus:outline-none"
                 />
 
                 {showDropdown && (
@@ -275,13 +269,18 @@ const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Right: Auth / Profile Section */}
-          <div className="flex items-center gap-2">
+          <div
+            className={cn(
+              'flex items-center gap-2',
+              isAuthenticated && 'self-end mb-[2px] lg:self-center lg:mb-0'
+            )}
+          >
             {isAuthenticated ? (
               // LOGGED IN VIEW
               <>
-                <div className="flex h-[34px] min-w-0 items-stretch rounded border border-[#071a2a] bg-[#243a48] lg:h-[27px] lg:gap-[7px] lg:border-0 lg:bg-transparent">
+                <div className="flex h-[38px] min-w-0 items-stretch rounded border border-[#071a2a] bg-[#243a48] lg:h-[27px] lg:gap-[7px] lg:border-0 lg:bg-transparent">
                   {/* Balance */}
-                  <div className="order-2 flex h-full shrink-0 items-center border-l border-white/15 px-2.5 py-1 text-[11px] text-white lg:order-1 md:rounded-md md:border-0 md:bg-[#243a48] md:px-2 md:py-0 md:text-xs lg:min-w-[72px] lg:rounded-[5px] lg:px-2 lg:text-[11px]">
+                  <div className="order-2 flex h-full shrink-0 items-center border-l border-white/15 px-2.5 py-1 text-[11px] text-white lg:order-1 lg:rounded-md lg:border-0 lg:bg-[#243a48] lg:px-2 lg:py-0 lg:text-xs lg:min-w-[72px] lg:rounded-[5px] lg:px-2 lg:text-[11px]">
                     <div className="flex flex-col justify-center gap-0.5 leading-tight lg:flex-row lg:items-center lg:gap-[3px]">
                       <span className="flex items-center gap-1 lg:gap-[3px]">
                         Bal <b className="font-medium">{formattedTotalBalance}</b>
@@ -297,7 +296,7 @@ const Header: React.FC<HeaderProps> = ({
                   </div>
 
                   {/* Account */}
-                  <div className="order-1 flex h-full min-w-0 flex-1 items-center lg:order-2 md:h-full md:flex-none">
+                  <div className="order-1 flex h-full min-w-0 flex-1 items-center lg:order-2 lg:h-full lg:flex-none">
                     <MyAccount
                       username={username}
                       mobile={mobile}
@@ -319,7 +318,10 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* Bottom Section: Navigation */}
         <div className="hidden lg:block">
-          <TopNavigation stakeSettingsOpen={stakeSettingsOpen} onToggleStakeSettings={onToggleStakeSettings} />
+          <TopNavigation
+            stakeSettingsOpen={stakeSettingsOpen}
+            onToggleStakeSettings={onToggleStakeSettings}
+          />
         </div>
       </header>
       <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />

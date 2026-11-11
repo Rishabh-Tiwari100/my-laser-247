@@ -6,7 +6,6 @@ import TabList from '@/components/common/TabList';
 import CategoryTabs from './components/CategoryTabs';
 import { Icons } from '@/utils/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import Skeleton from '@/components/common/Skeleton';
 import { clearCasinoGameDetail } from '@/store/slices/casinoGameDetailSlice';
 import { useCasinoGames } from './hooks/useCasinoGames';
 import Banner from '@/components/common/Banner';
@@ -180,7 +179,7 @@ const CasinoGames: React.FC = () => {
       </div>
 
       <div className="mt-[10px] min-w-0 flex-1">
-        <div className="grid grid-cols-3 gap-[4px] px-px lg:grid-cols-4">
+        <div className="grid grid-cols-3 gap-[4px] px-[3px] lg:grid-cols-4">
           {allGames.map((item) => {
             const isFavorite = Boolean(item.isFavorite ?? item.isFavourite);
 
@@ -197,19 +196,19 @@ const CasinoGames: React.FC = () => {
                 >
                   <img
                     loading="lazy"
-                    className="block aspect-video w-full max-w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+                    className="block h-[80px] w-full max-w-full object-fill lg:h-[115px]"
                     src={item.gameImage}
                     alt={item.name}
                     onError={(e) => (e.currentTarget.src = '/images/casino/casino-fallback.webp')}
                   />
-                  <span className="flex h-[21px] items-center justify-center overflow-hidden bg-[#243a48] px-[3px] text-center text-[10px] font-bold uppercase leading-[12px] text-white">
+                  <span className="flex h-[18px] items-center justify-center overflow-hidden bg-[#243a48] px-[5px] text-center text-[8px] font-semibold uppercase leading-[12px] text-white lg:h-[21px] lg:text-[10px] lg:leading-[15px]">
                     <span className="truncate">{item.name}</span>
                   </span>
                 </button>
 
                 <button
                   type="button"
-                  className={`absolute left-[3px] top-[3px] flex size-[21px] items-center justify-center rounded-[0px_0px_8px] border border-white/25 bg-black/45 text-white shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition-opacity hover:bg-black/70 focus:outline-none lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary ${
+                  className={`absolute left-[3px] top-[3px] flex size-[21px] items-center justify-center rounded-[0px_0px_8px] border border-white/25 bg-black/45 text-white shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition-opacity hover:bg-black/70 focus:outline-none opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary ${
                     isFavorite ? 'text-[#ffc400]' : 'text-white'
                   }`}
                   aria-label={`${isFavorite ? 'Remove' : 'Add'} ${item.name} ${
@@ -226,10 +225,18 @@ const CasinoGames: React.FC = () => {
               </div>
             );
           })}
+          {(isLoading || (isFetching && allGames.length === 0)) &&
+            Array.from({ length: 12 }).map((_, index) => (
+              <div
+                key={`loading-${index}`}
+                aria-hidden="true"
+                className="min-w-0 animate-pulse bg-[#243a48] motion-reduce:animate-none"
+              >
+                <div className="h-[80px] bg-[#d8dfe3] lg:h-[115px]" />
+                <div className="h-[18px] lg:h-[21px]" />
+              </div>
+            ))}
         </div>
-
-        {(isLoading || isFetching) &&
-          Array.from({ length: 14 }).map((_, i) => <Skeleton key={i} />)}
 
         {hasMore && <div ref={observerTarget} className="h-10 mt-4" />}
 

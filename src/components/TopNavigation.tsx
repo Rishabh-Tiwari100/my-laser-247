@@ -51,23 +51,40 @@ const menuItems = [
   { label: 'Predix', href: '#', highlight: true },
 ];
 
-export default function TopNavigation({ stakeSettingsOpen = false, onToggleStakeSettings }: { stakeSettingsOpen?: boolean; onToggleStakeSettings?: () => void } = {}) {
+export default function TopNavigation({
+  stakeSettingsOpen = false,
+  onToggleStakeSettings,
+}: { stakeSettingsOpen?: boolean; onToggleStakeSettings?: () => void } = {}) {
   const location = useLocation();
   const isAuthenticated = useIsAuthenticated();
-  const visibleItems = isAuthenticated ? menuItems : menuItems.filter((item) =>
-    !['Multi Market', 'Fantasy 11', 'Cock Fight', 'Other', 'Predix', 'Futsal', 'Genius'].includes(item.label)
-  );
+  const visibleItems = isAuthenticated
+    ? menuItems
+    : menuItems.filter(
+        (item) =>
+          ![
+            'Multi Market',
+            'Fantasy 11',
+            'Cock Fight',
+            'Other',
+            'Predix',
+            'Futsal',
+            'Genius',
+          ].includes(item.label)
+      );
   const { activeGameId, isLaunchingFantasy, launchFantasyGame, closeFantasyGame } =
     useFantasyGameLauncher();
 
   return (
     <>
-      <div className="flex bg-top-navbar shadow-[0_2px_6px_-2px_rgba(0,0,0,0.16),0_2px_6px_rgba(0,0,0,0.12)]">
-        <div className="min-w-0 flex-1 overflow-x-auto overflow-y-hidden lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden">
-          <ul className="flex w-max whitespace-nowrap">
+      <nav
+        aria-label="Main navigation"
+        className="relative flex h-[28px] bg-top-navbar font-helvetica shadow-[0_2px_6px_-2px_rgba(0,0,0,0.16),0_2px_6px_rgba(0,0,0,0.12)]"
+      >
+        <div className="h-[28px] min-w-0 flex-1 overflow-x-auto overflow-y-hidden [scrollbar-width:auto] [&::-webkit-scrollbar]:h-[2px] [&::-webkit-scrollbar-thumb]:bg-[#ccc] [&::-webkit-scrollbar-track]:bg-white">
+          <ul className="flex h-[26px] w-max whitespace-nowrap pl-[8px] pr-[100px]">
             {visibleItems.map((item, index) => {
               const isFantasyItem = item.label === 'Fantasy 11';
-              const classes = `hover:underline relative flex items-center gap-1 px-[9.5px] py-1 text-[12px] font-bold lg:h-[27px] lg:px-[10px] capitalize border-r border-black/10 transition-all ${item.special ? 'bg-log-button text-white' : item.danger ? 'bg-[#d71919] text-black' : 'text-[var(--primary-textcolork)] hover:bg-black/5'} ${item.highlight ? 'highlight-menus' : ''}`;
+              const classes = `relative flex h-[26px] items-center gap-1 border-r border-[rgba(69,32,7,0.2)] px-[10px] py-[4px] text-[12px] font-bold capitalize leading-[18px] hover:underline ${item.special ? 'bg-log-button text-white' : item.danger ? 'bg-log-button text-black' : 'text-black'} ${item.highlight ? 'animate-[zoom-in-out_1s_ease-out_infinite]' : ''}`;
 
               return (
                 <li key={`${item.label}-${item.href}-${index}`}>
@@ -86,13 +103,13 @@ export default function TopNavigation({ stakeSettingsOpen = false, onToggleStake
                     <NavLink
                       to={item.href}
                       className={({ isActive }) =>
-                        `${classes}${isActive && !item.special && !item.danger ? 'text-[var(--theme-color)]' : ''}`
+                        `${classes}${isActive && item.href !== '#' && !item.special && !item.danger ? ' bg-[linear-gradient(180deg,#123696_0%,#13a0dd_61%)]' : ''}`
                       }
                     >
                       {item.label}
 
                       {item.new && (
-                        <em className="absolute right-0 top-0 rounded-[2px] px-1 py-[1px] text-[7px] font-black uppercase text-white animate-tagmenu leading-none">
+                        <em className="absolute right-0 top-0 rounded-[1px] px-1 py-[1px] text-[7px] font-black uppercase not-italic text-white animate-tagmenu [line-height:normal]">
                           New
                         </em>
                       )}
@@ -103,8 +120,22 @@ export default function TopNavigation({ stakeSettingsOpen = false, onToggleStake
             })}
           </ul>
         </div>
-        {isAuthenticated && onToggleStakeSettings && <button type="button" aria-label="Toggle stake settings" aria-expanded={stakeSettingsOpen} aria-controls="sidebar-stake-settings" onClick={onToggleStakeSettings} className="flex h-[27px] shrink-0 items-center gap-[3px] bg-[linear-gradient(#f72424,#bb1c00)] px-[10px] text-[12px] font-bold text-white">Setting<svg viewBox="0 0 24 24" aria-hidden="true" className="h-[14px] w-[14px] fill-current"><path d={mdiCog} /></svg></button>}
-      </div>
+        {isAuthenticated && onToggleStakeSettings && (
+          <button
+            type="button"
+            aria-label="Toggle stake settings"
+            aria-expanded={stakeSettingsOpen}
+            aria-controls="sidebar-stake-settings"
+            onClick={onToggleStakeSettings}
+            className="absolute right-0 top-0 flex h-[26px] w-[80px] items-center justify-center gap-[3px] bg-[linear-gradient(#f72424,#bb1c00)] px-[10px] text-[12px] font-bold text-white"
+          >
+            Setting
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="h-[14px] w-[14px] fill-current">
+              <path d={mdiCog} />
+            </svg>
+          </button>
+        )}
+      </nav>
 
       <CasinoGameLauncher
         open={activeGameId !== null}

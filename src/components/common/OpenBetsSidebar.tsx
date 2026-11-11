@@ -15,8 +15,16 @@ const tabs: { id: BetTab; label: string }[] = [
   { id: 'fancy', label: 'Fancy' },
 ];
 
-export default function OpenBetsSidebar({ gridLayout = false, stakeSettingsOpen = false }: { gridLayout?: boolean; stakeSettingsOpen?: boolean }) {
-  const isDashboard = useLocation().pathname === '/dashboard';
+export default function OpenBetsSidebar({
+  gridLayout = false,
+  stakeSettingsOpen = false,
+}: {
+  gridLayout?: boolean;
+  stakeSettingsOpen?: boolean;
+}) {
+  const { pathname } = useLocation();
+  const isDashboard = pathname === '/dashboard';
+  const isProfile = pathname === '/my-account/profile' || pathname === '/my-profile';
   const [activeTab, setActiveTab] = useState<BetTab>('matched');
   const isAuthenticated = useIsAuthenticated();
   const fromDate = useMemo(() => dayjs().subtract(1, 'day').toISOString(), []);
@@ -46,7 +54,7 @@ export default function OpenBetsSidebar({ gridLayout = false, stakeSettingsOpen 
       className={cn(
         'hidden overflow-x-hidden border-l border-[#c8ced3] bg-white font-helvetica text-black',
         isDashboard
-          ? 'min-[1200px]:ml-[48px] min-[1200px]:block min-[1200px]:sticky min-[1200px]:top-[98px] min-[1200px]:h-[calc(100vh-98px)] min-[1200px]:self-start'
+          ? 'min-[1200px]:ml-[22px] min-[1200px]:block min-[1200px]:sticky min-[1200px]:top-[98px] min-[1200px]:h-[calc(100vh-98px)] min-[1200px]:self-start'
           : gridLayout
             ? 'lg:col-span-1 lg:sticky lg:top-[98px] lg:block lg:h-[calc(100vh-98px)] lg:self-start'
             : 'w-[26.5vw] shrink-0 lg:sticky lg:top-[98px] lg:block lg:h-[calc(100vh-98px)] lg:self-start'
@@ -62,7 +70,7 @@ export default function OpenBetsSidebar({ gridLayout = false, stakeSettingsOpen 
         >
           Open Bets
         </h2>
-        {(!gridLayout || Boolean(data?.bets?.length)) && (
+        {!isProfile && (!gridLayout || Boolean(data?.bets?.length)) && (
           <>
             <input
               aria-label="Filter open bets"
