@@ -274,8 +274,8 @@ const AllSports: React.FC = () => {
           ) : isLoading ? (
             <div
               className={cn(
-                'flex justify-center items-center gap-x-1 py-8 text-white',
-                isDashboard && 'order-5 text-[#213b49]'
+                'flex justify-center items-center gap-x-1 py-8 text-[#213b49]',
+                isDashboard && 'order-5'
               )}
             >
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />

@@ -1,27 +1,46 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { A11y, Autoplay, Keyboard } from 'swiper/modules';
+import type { Swiper as SwiperInstance } from 'swiper';
+import 'swiper/css';
 import { cn } from '@/utils';
 
-const slides = [1, 2, 3];
-const loopSlides = [3, ...slides, 1];
-const positions = [
-  'translate-x-0',
-  '-translate-x-full',
-  '-translate-x-[200%]',
-  '-translate-x-[300%]',
-  '-translate-x-[400%]',
-];
+import { useGetBannersQuery } from '@/store/api/bannerApi';
+import { useDeviceWidth } from '@/hooks/useDeviceWidth';
+
+interface BannerSlide {
+  image: string;
+  title?: string;
+}
 
 const Banner = ({ className }: { className?: string }) => {
-  const [position, setPosition] = useState(1);
-  const [animated, setAnimated] = useState(true);
+  const { data } = useGetBannersQuery(undefined);
+  const isDesktop = useDeviceWidth() >= 576;
+  const group = isDesktop ? data?.data?.WebBanner : data?.data?.AppBanner;
+  const apiSlides = (group?.HomeBanner ?? []).filter(
+    (banner) =>
+      typeof banner.image === 'string' &&
+      banner.image.trim().length > 0 &&
+      banner.isActive !== false &&
+      banner.isPubliced !== false
+  );
+  const slides: BannerSlide[] = apiSlides.length
+    ? apiSlides.map((banner) => ({ image: banner.image!, title: banner.heading || banner.title }))
+    : [1, 2, 3].map((slide) => ({
+        image: `/images/banners/${isDesktop ? '' : 'm_'}bnr${slide}.png`,
+      }));
+
+  return <BannerCarousel key={JSON.stringify(slides)} slides={slides} className={className} />;
+};
+
+const BannerCarousel = ({ slides, className }: { slides: BannerSlide[]; className?: string }) => {
+  const [swiper, setSwiper] = useState<SwiperInstance | null>(null);
+  const [activeSlide, setActiveSlide] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(
     () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
   );
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
-  const frames = useRef<number[]>([]);
-  const activeSlide = (position - 1 + slides.length) % slides.length;
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -31,46 +50,13 @@ const Banner = ({ className }: { className?: string }) => {
   }, []);
 
   useEffect(() => {
-    if (hovered || focused || reducedMotion) return;
-    const interval = window.setInterval(() => {
-      if (document.visibilityState === 'visible')
-        setPosition((current) => Math.min(current + 1, 4));
-    }, 5000);
-    return () => window.clearInterval(interval);
-  }, [hovered, focused, reducedMotion]);
-
-  useEffect(() => () => frames.current.forEach((frame) => window.cancelAnimationFrame(frame)), []);
-
-  useEffect(() => {
-    setAnimated(!reducedMotion);
-    if (reducedMotion)
-      setPosition((current) => ((current - 1 + slides.length) % slides.length) + 1);
-  }, [reducedMotion]);
-
-  const finishTransition = () => {
-    if (position !== 0 && position !== 4) return;
-    setAnimated(false);
-    setPosition(position === 0 ? 3 : 1);
-    frames.current = [
-      window.requestAnimationFrame(() => {
-        frames.current = [
-          window.requestAnimationFrame(() => {
-            setAnimated(true);
-            frames.current = [];
-          }),
-        ];
-      }),
-    ];
-  };
-
-  const move = (direction: number) => {
-    if (reducedMotion) {
-      setAnimated(false);
-      setPosition(((activeSlide + direction + slides.length) % slides.length) + 1);
+    if (!swiper || swiper.destroyed) return;
+    if (hovered || focused || reducedMotion || slides.length < 2) {
+      swiper.autoplay.stop();
     } else {
-      setPosition((current) => Math.max(0, Math.min(4, current + direction)));
+      swiper.autoplay.start();
     }
-  };
+  }, [swiper, hovered, focused, reducedMotion, slides.length]);
 
   return (
     <section
@@ -88,78 +74,45 @@ const Banner = ({ className }: { className?: string }) => {
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false);
       }}
-      onTouchStart={(event) => {
-        const touch = event.touches[0];
-        if (touch) touchStart.current = { x: touch.clientX, y: touch.clientY };
-      }}
-      onTouchEnd={(event) => {
-        const touch = event.changedTouches[0];
-        const start = touchStart.current;
-        touchStart.current = null;
-        if (!touch || !start) return;
-        const delta = touch.clientX - start.x;
-        if (Math.abs(delta) > 40 && Math.abs(delta) > Math.abs(touch.clientY - start.y))
-          move(delta < 0 ? 1 : -1);
-      }}
-      onKeyDown={(event) => {
-        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-          event.preventDefault();
-          move(event.key === 'ArrowRight' ? 1 : -1);
-        }
-      }}
     >
-      <div
-        className={cn(
-          'flex touch-pan-y will-change-transform',
-          positions[position],
-          animated && !reducedMotion
-            ? 'transition-transform [transition-duration:600ms] ease-in-out'
-            : 'transition-none'
-        )}
-        onTransitionEnd={(event) => {
-          if (event.target === event.currentTarget && event.propertyName === 'transform')
-            finishTransition();
-        }}
+      <Swiper
+        modules={[A11y, Autoplay, Keyboard]}
+        onSwiper={setSwiper}
+        onSlideChange={(instance) => setActiveSlide(instance.realIndex)}
+        slidesPerView={1}
+        loop={slides.length > 1}
+        speed={reducedMotion ? 0 : 600}
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
+        keyboard={{ enabled: focused, onlyInViewport: true, pageUpDown: false }}
+        a11y={{ containerRoleDescriptionMessage: 'carousel', itemRoleDescriptionMessage: 'slide' }}
+        className="[&_.swiper-wrapper]:ease-in-out"
       >
-        {loopSlides.map((slide, index) => (
-          <picture
-            key={index}
-            role="group"
-            aria-roledescription="slide"
-            aria-label={`Promotion ${slide} of ${slides.length}`}
-            aria-hidden={index !== position}
-            className="block w-full shrink-0"
-          >
-            <source
-              media="(min-width: 576px)"
-              srcSet={`/images/banners/bnr${slide}.png`}
-              width={1920}
-              height={300}
-            />
+        {slides.map((slide, index) => (
+          <SwiperSlide key={index} aria-hidden={index !== activeSlide}>
             <img
               className="block aspect-[18/5] w-full object-cover min-[576px]:aspect-[32/5]"
-              src={`/images/banners/m_bnr${slide}.png`}
+              src={slide.image}
               width={720}
               height={200}
-              alt={`Sports promotion ${slide}`}
-              loading={index === 1 ? 'eager' : 'lazy'}
+              alt={slide.title || `Sports promotion ${index + 1}`}
+              loading={index === 0 ? 'eager' : 'lazy'}
               draggable={false}
             />
-          </picture>
+          </SwiperSlide>
         ))}
-      </div>
+      </Swiper>
       <div
         role="group"
         aria-label="Banner slides"
         className="absolute inset-x-0 bottom-[16px] z-10 hidden justify-center lg:flex"
       >
-        {slides.map((slide, index) => (
+        {slides.map((_, index) => (
           <button
-            key={slide}
+            key={index}
             type="button"
-            aria-label={`Go to banner ${slide}`}
+            aria-label={`Go to banner ${index + 1}`}
             aria-current={activeSlide === index ? 'true' : undefined}
-            onClick={() => setPosition(slide)}
+            onClick={() => swiper?.slideToLoop(index)}
             className={cn(
               'mx-[3px] size-[10px] shrink-0 cursor-pointer rounded-full border-0 bg-white p-0 transition-opacity [transition-duration:600ms] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-reduce:transition-none',
               activeSlide === index ? 'opacity-100' : 'opacity-50'
@@ -169,14 +122,14 @@ const Banner = ({ className }: { className?: string }) => {
       </div>
       <button
         type="button"
-        onClick={() => move(-1)}
+        onClick={() => swiper?.slidePrev()}
         className="sr-only focus:not-sr-only focus:absolute focus:bottom-[12px] focus:left-[8px] focus:z-20 focus:rounded focus:bg-black/70 focus:px-[8px] focus:py-[3px] focus:text-white"
       >
         Previous banner
       </button>
       <button
         type="button"
-        onClick={() => move(1)}
+        onClick={() => swiper?.slideNext()}
         className="sr-only focus:not-sr-only focus:absolute focus:bottom-[12px] focus:right-[8px] focus:z-20 focus:rounded focus:bg-black/70 focus:px-[8px] focus:py-[3px] focus:text-white"
       >
         Next banner

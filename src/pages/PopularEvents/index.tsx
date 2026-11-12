@@ -28,7 +28,7 @@ const PopularEvents = () => {
   return (
     <div className={`flex flex-col font-tamoha ${isAuthenticated ? 'py-4' : ''}`}>
       {isPopularEventsLoading ? (
-        <div className="flex justify-center items-center gap-x-1 py-8 text-white">
+        <div className="flex justify-center items-center gap-x-1 py-8 text-[#213b49]">
           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
           Loading events...
         </div>
