@@ -32,7 +32,11 @@ export const useBetSlip = (providedEventId?: string | number | null) => {
     return formatNumber(Number(Math.max(balance, 0).toFixed(2)));
   }, [wallet.bonusBalance, wallet.exposure, wallet.lockedAmount, wallet.mainBalance]);
 
-  const { data: stakes, isLoading: stakesLoader, refetch: refetchStakes } = useGetStakeSetQuery({ type: 'Bet' });
+  const {
+    data: stakes,
+    isLoading: stakesLoader,
+    refetch: refetchStakes,
+  } = useGetStakeSetQuery({ type: 'Bet' });
   const stakesArr = useMemo(
     () =>
       (stakes?.stakeSet ?? []).filter(
@@ -53,15 +57,27 @@ export const useBetSlip = (providedEventId?: string | number | null) => {
     try {
       const res = await placeBet({
         ...betPayload,
-        acceptOddsChange,
+        ...(betPayload.marketType === 'PREMIUM'
+          ? {
+              stake: Number(betPayload.stake),
+              rate: Number(betPayload.rate),
+              acceptOddsChange: false,
+            }
+          : { acceptOddsChange }),
       }).unwrap();
 
       toast.success(res?.message || 'Bet placed successfully', toastId);
+      if (betPayload.marketType === 'PREMIUM') {
+        dispatch(setBetDetails({}));
+        dispatch(setBetPL(0));
+      }
     } catch (err: any) {
       toast.error(err?.data?.message || 'Failed to place bet', toastId);
     } finally {
-      dispatch(setBetDetails({}));
-      dispatch(setBetPL(0));
+      if (betPayload.marketType !== 'PREMIUM') {
+        dispatch(setBetDetails({}));
+        dispatch(setBetPL(0));
+      }
     }
   }, [betDetails, acceptOddsChange, placeBet, dispatch]);
 

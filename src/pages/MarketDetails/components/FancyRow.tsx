@@ -11,6 +11,7 @@ import BetSlip from './BetSlip';
 import FancyExposureModal from './FancyExposureModal';
 import toast from 'react-hot-toast';
 import { formatStakeLimitRange, type StakeLimitValue } from './stakeLimit';
+import { getBlockedStatus } from '@/utils';
 
 const FancyRow = ({
   data,
@@ -37,13 +38,12 @@ const FancyRow = ({
   const runner = Array.isArray(data?.runners) ? data.runners[0] : data?.runners;
   const marketId = String(data?.marketId ?? data?.id ?? '');
   const marketName = data?.marketName ?? data?.name ?? runner?.runnerName ?? '';
-  const marketCategory = data?.marketType ?? data?.marketCategory ?? 'FANCY';
-  const isFancyOneMarket = [data?.marketType, data?.marketCategory].some(
+  const marketCategory = data?.marketCategory ?? data?.marketType ?? 'FANCY';
+  const isFancyOneMarket = [data?.gameType, data?.marketType, data?.marketCategory].some(
     (value) => String(value ?? '').toLowerCase() === 'fancy1'
   );
-  const isSuspended = [data?.status, runner?.status].some(
-    (status) => String(status).toUpperCase() === 'SUSPENDED'
-  );
+  const blockedStatus = getBlockedStatus(runner?.status, data?.gameStatus ?? data?.status);
+  const isSuspended = Boolean(blockedStatus);
   const { data: booksetCalculation } = useGetBooksetCalcQuery({
     eventId: Number(eventId),
   });
@@ -213,7 +213,7 @@ const FancyRow = ({
 
             {isSuspended && (
               <div className="absolute inset-0 flex items-center justify-center bg-slate-700/20 text-xs font-bold text-white">
-                SUSPENDED
+                {blockedStatus}
               </div>
             )}
           </div>

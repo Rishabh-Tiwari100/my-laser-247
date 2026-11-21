@@ -1,4 +1,5 @@
 import { apiSlice } from './apiSlice';
+import type { BettingConfig, FancyMarketItem, PremiumMarket } from '@/types/sportsCatalogue';
 
 export interface CatalogueItem {
   id: string;
@@ -10,8 +11,8 @@ export interface CatalogueItem {
   startTime: string;
   status: string;
   markets: Record<string, Market[]>;
-  fancyMarkets?: any;
-  premiumMarket?: any;
+  fancyMarkets?: Record<string, FancyMarketItem[]>;
+  premiumMarket?: Record<string, PremiumMarket[]>;
   [key: string]: any;
   isFavorite: boolean;
 }
@@ -42,8 +43,9 @@ export interface ExtraMarket {
   [key: string]: any;
 }
 
-interface ApiResponse {
+export interface ApiResponse {
   catalogue: CatalogueItem;
+  betConfig?: BettingConfig;
   message: string;
   success: boolean;
 }

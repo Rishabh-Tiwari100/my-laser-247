@@ -1,14 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { useGetCatalogueByEventIdQuery } from '@/store/api/catalogueApi';
 import { useGetScorecardQuery } from '@/store/api/eventsApi';
-import {
-  formatRunners,
-  getMarketCategories,
-  getOrderedMarkets,
-  getFilteredMarkets,
-} from '../helpers';
-import { Market, FancyMarketItem } from '@/types/market';
+import { getMarketCategories, getOrderedMarkets } from '../helpers';
+import type { FancyMarketItem } from '@/types/sportsCatalogue';
 
 export const marketTypes = ['match odds', 'bookmaker', 'mini bookmaker', 'over/under', 'set'];
 
@@ -36,8 +31,8 @@ export function useMarketDetails(sportName?: string) {
     inplay,
     eventName,
     markets = {},
-    fancyMarkets = [],
-    premiumMarket = [],
+    fancyMarkets = {},
+    premiumMarket = {},
     isFavorite = false,
   } = data?.catalogue ?? {};
 
@@ -45,7 +40,7 @@ export function useMarketDetails(sportName?: string) {
     skip: !eventId || !inplay,
   });
 
-  const fancyMarketsData: Record<string, any[]> = {
+  const fancyMarketsData: Record<string, FancyMarketItem[]> = {
     ...(fancyMarkets.Normal ? { Normal: fancyMarkets.Normal } : {}),
     ...(fancyMarkets.wpmarket ? { wpmarket: fancyMarkets.wpmarket } : {}),
     ...Object.fromEntries(
@@ -59,6 +54,18 @@ export function useMarketDetails(sportName?: string) {
   const allMarkets = getOrderedMarkets(markets, marketTypes);
   const fancyTabs = getMarketCategories(fancyMarketsData);
   const premiumTabs = getMarketCategories(premiumMarket, sportName);
+
+  useEffect(() => {
+    setActiveCatTab('Fancy');
+    setActiveFancyTab('All');
+    setActivePremiumTab('All');
+  }, [eventId]);
+
+  useEffect(() => {
+    if (data && !getMarketCategories(premiumMarket, sportName).includes(activePremiumTab)) {
+      setActivePremiumTab('All');
+    }
+  }, [data, premiumMarket, sportName, activePremiumTab]);
 
   useEffect(() => {
     setPollingInterval(inplay ? 700 : 1000);
@@ -101,6 +108,7 @@ export function useMarketDetails(sportName?: string) {
     categoryTabs,
     startTime,
     eventName,
+    betConfig: data?.betConfig,
     fancyMarketsData,
     fancyTabs,
     premiumTabs,

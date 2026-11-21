@@ -8,12 +8,12 @@ export interface BetPlaceRequest {
   eventName?: string;
   marketName: string;
   marketType: MarketType;
-  marketCategory: string;
+  marketCategory?: string;
   selectionId: string;
   runnerName: string;
   stake: number;
   rate: number;
-  fancyPercentage: number;
+  fancyPercentage?: number;
   betOn: BetOn;
   acceptOddsChange?: boolean; // optional
   min?: string | number;

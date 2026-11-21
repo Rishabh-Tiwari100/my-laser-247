@@ -1,8 +1,7 @@
 import Marquee from '@/components/common/Marquee';
 import EventDetailsHeader from './components/EventDetailsHeader';
 import FancyMarketHeader from './components/FancyMarketHeader';
-import MarketPanel from '@/pages/MarketDetails/components/MarketPanel';
-import { getFilteredMarkets } from './helpers';
+import PremiumMarketPanel from './components/PremiumMarketPanel';
 import { useParams } from 'react-router-dom';
 import { cn } from '@/utils';
 import { useMarketDetails } from './hooks/useMarketDetails';
@@ -61,6 +60,7 @@ function MarketDetails() {
     liveTvUrl,
     startTime,
     eventName,
+    betConfig,
 
     fancyMarketsData,
     fancyTabs,
@@ -73,7 +73,7 @@ function MarketDetails() {
 
   useEffect(() => {
     if (fancyTabs.length <= 1 && premiumTabs.length > 1) setActiveCatTab('Premium');
-  }, [fancyTabs.length, premiumTabs.length, setActiveCatTab]);
+  }, [eventId, fancyTabs.length, premiumTabs.length, setActiveCatTab]);
 
   useEffect(() => {
     try {
@@ -293,7 +293,7 @@ function MarketDetails() {
                 {fancyTabs.length > 1 && (
                   <div
                     className={cn(
-                      'flex h-[30px] items-center',
+                      'flex h-[30px] items-center lg:h-[32px]',
                       activeCatTab === 'Fancy'
                         ? 'bg-gradient-to-b from-[#0a92a5] from-[15%] to-[#076875]'
                         : 'bg-[#243a48]'
@@ -322,7 +322,7 @@ function MarketDetails() {
                     className={cn(
                       'flex h-[30px] items-center gap-[8px] px-[10px] text-left',
                       activeCatTab === 'Premium'
-                        ? 'bg-gradient-to-b from-[#0a92a5] from-[15%] to-[#076875]'
+                        ? 'bg-[linear-gradient(180deg,#ffcc2e_0%,#ffbd14_100%)]'
                         : 'bg-[#243a48]'
                     )}
                   >
@@ -346,8 +346,8 @@ function MarketDetails() {
                     <FancyRow
                       key={`pinned-${getFancyMarketPinKey(market)}`}
                       data={market}
-                      min={market?.minBetAmount ?? 0}
-                      max={market?.maxBetAmount ?? 0}
+                      min={market?.minBetAmount ?? betConfig?.sessionMinBetAmount ?? 0}
+                      max={market?.maxBetAmount ?? betConfig?.sessionMaxBetAmount ?? 0}
                       isPinned
                       onTogglePin={() => togglePinnedFancy(market)}
                     />
@@ -363,8 +363,8 @@ function MarketDetails() {
                       <FancyRow
                         key={marketKey}
                         data={market}
-                        min={market?.minBetAmount ?? 0}
-                        max={market?.maxBetAmount ?? 0}
+                        min={market?.minBetAmount ?? betConfig?.sessionMinBetAmount ?? 0}
+                        max={market?.maxBetAmount ?? betConfig?.sessionMaxBetAmount ?? 0}
                         isPinned={false}
                         onTogglePin={() => togglePinnedFancy(market)}
                       />
@@ -373,28 +373,16 @@ function MarketDetails() {
                 </div>
               )}
               {activeCatTab === 'Premium' && (
-                <>
-                  <CategoryFilter
-                    tabs={premiumTabs}
-                    category="PREMIUM"
-                    activeTab={activePremiumTab}
-                    setActiveTab={setActivePremiumTab}
-                  />
-                  {getFilteredMarkets(premiumMarketsData, activePremiumTab, sport).map(
-                    (market, index) => (
-                      <MarketPanel
-                        key={market.marketId ?? index}
-                        eventName={market.marketName}
-                        marketName={market.marketName}
-                        marketData={market}
-                        runnersData={market.runners ?? []}
-                        marketCategory="PREMIUM"
-                        min={market.minBetAmount}
-                        max={market.maxBetAmount}
-                      />
-                    )
-                  )}
-                </>
+                <PremiumMarketPanel
+                  key={eventId}
+                  markets={premiumMarketsData}
+                  tabs={premiumTabs}
+                  activeTab={activePremiumTab}
+                  onSelectTab={setActivePremiumTab}
+                  onOpenBets={() => setIsOpenBetsVisible(true)}
+                  sport={sport}
+                  betConfig={betConfig}
+                />
               )}
             </>
           )}

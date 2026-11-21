@@ -349,6 +349,18 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
+        {!location.pathname.startsWith('/2fa') && (
+          <div className="flex w-full justify-around gap-[3px] border-y border-[#a6a6a6a3] p-[3px]">
+            <Link to="/deposit" className="flex h-8 w-1/2 items-center justify-center border border-white bg-gradient-to-b from-[#007b15] to-[#138e00] p-1.5 text-center text-xs font-black uppercase text-white">
+              <img src="/icons/deposit.png" alt="" className="mr-[5px] h-auto w-4 max-w-full" />
+              Deposit
+            </Link>
+            <Link to="/withdraw" className="flex h-8 w-1/2 items-center justify-center border border-white bg-gradient-to-b from-[#7b0000] to-[#d10000] p-1.5 text-center text-xs font-black uppercase text-white">
+              <img src="/icons/withdraw.png" alt="" className="mr-[5px] h-auto w-4 max-w-full" />
+              Withdrawal
+            </Link>
+          </div>
+        )}
         {/* Bottom Section: Navigation */}
         <div className="hidden lg:block">
           <TopNavigation
@@ -363,3 +375,4 @@ const Header: React.FC<HeaderProps> = ({
 };
 
 export default Header;
+

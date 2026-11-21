@@ -61,7 +61,7 @@ export default defineConfig({
     open: false,
     proxy: {
       '/api': {
-        target: 'https://api.laserindia.net',
+        target: 'https://api.mylaser247.bike/',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ''),

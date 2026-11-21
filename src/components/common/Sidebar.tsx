@@ -1,6 +1,6 @@
 import React, { useId, useState } from 'react';
 import { mdiChevronRightBoxOutline } from '@mdi/js';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/utils';
 import { sidebarSports } from '@/hooks/useSidebar';
 import { useGetCompetitionByIdQuery } from '@/store/api/sidebarApi';
@@ -189,24 +189,36 @@ const Sidebar: React.FC<SidebarProps> = ({
   isSidebarOpen,
   setIsSidebarOpen,
   reserveDesktopSpace = true,
-}) => (
-  <div className={reserveDesktopSpace ? 'contents lg:block lg:w-[240px] lg:shrink-0' : 'contents'}>
-    <nav
-      aria-label="Sports sidebar"
-      className={cn(
-        'fixed left-0 top-[50px] z-[100] h-[calc(100dvh-50px)] w-[240px] bg-white p-0 font-helvetica shadow-lg lg:top-[98px] lg:z-50 lg:block lg:h-[calc(100vh-98px)] lg:shadow-none',
-        isSidebarOpen ? 'block' : 'hidden'
-      )}
+}) => {
+  const { pathname } = useLocation();
+  const hasDepositWithdrawBar = !pathname.startsWith('/2fa');
+
+  return (
+    <div
+      className={reserveDesktopSpace ? 'contents lg:block lg:w-[240px] lg:shrink-0' : 'contents'}
     >
-      <div className="h-full overflow-y-auto scrollbar-hidden">
-        <ul className="m-0 list-none p-0">
-          {sidebarSports.map(({ label }) => (
-            <SportBranch key={label} label={label} onSelectEvent={() => setIsSidebarOpen(false)} />
-          ))}
-        </ul>
-      </div>
-    </nav>
-  </div>
-);
+      <nav
+        aria-label="Sports sidebar"
+        className={cn(
+          'fixed bottom-0 left-0 z-[100] w-[240px] bg-white p-0 font-helvetica shadow-lg lg:z-50 lg:block lg:shadow-none',
+          hasDepositWithdrawBar ? 'top-[90px] lg:top-[138px]' : 'top-[50px] lg:top-[98px]',
+          isSidebarOpen ? 'block' : 'hidden'
+        )}
+      >
+        <div className="h-full overflow-y-auto scrollbar-hidden">
+          <ul className="m-0 list-none p-0">
+            {sidebarSports.map(({ label }) => (
+              <SportBranch
+                key={label}
+                label={label}
+                onSelectEvent={() => setIsSidebarOpen(false)}
+              />
+            ))}
+          </ul>
+        </div>
+      </nav>
+    </div>
+  );
+};
 
 export default Sidebar;

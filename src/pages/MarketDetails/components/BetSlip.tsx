@@ -83,6 +83,7 @@ const BetSlip = ({ eventId }: { eventId?: string | number | null }) => {
                 type="text"
                 inputMode="decimal"
                 aria-label="Odds"
+                readOnly={marketType === 'PREMIUM'}
                 value={rate ?? ''}
                 onChange={(event) => handleRateChange(event.target.value)}
                 className={cn(inputClassName, !canAdjustOdds && 'rounded-[3px]')}

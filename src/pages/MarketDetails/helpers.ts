@@ -10,8 +10,8 @@ const TAB_MATCHERS: Record<string, RegExp> = {
 };
 
 // this return the filtered market based on category
-export const getFilteredMarkets = (
-  marketObject: Record<string, any[]>,
+export const getFilteredMarkets = <T,>(
+  marketObject: Record<string, T[]>,
   activeTab: string,
   sportName?: string
 ) => {
