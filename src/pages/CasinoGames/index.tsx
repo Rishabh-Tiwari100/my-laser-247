@@ -16,15 +16,15 @@ const CasinoGames: React.FC = () => {
   const navigate = useNavigate();
 
   const {
-    debouncedSearch,
+    searchValue,
+    setSearchValue,
     selectedProvider,
     selectedCategory,
     setSelectedCategory,
     setIsIframeLoaded,
     allGames,
     hasMore,
-    isLoading,
-    isFetching,
+    isLoadingGames,
     error,
     handleProviderSelect,
     handleGameClick,
@@ -36,7 +36,6 @@ const CasinoGames: React.FC = () => {
     sessionLoading,
     isIframeLoaded,
     dispatch,
-    handleToggleFavorite,
   } = useCasinoGames();
 
   const username = useSelector((state: RootState) => state.user.profile?.username);
@@ -154,7 +153,8 @@ const CasinoGames: React.FC = () => {
             type="text"
             placeholder="Search Games..."
             aria-label="Search casino games"
-            onChange={(event) => debouncedSearch(event.target.value.trim())}
+            value={searchValue}
+            onChange={(event) => setSearchValue(event.target.value)}
             className="text-black bg-white w-full border border-[#F44336] h-[25.2px] pl-[10px] pr-[32px] py-[5px] text-[12px] focus:outline-none"
           />
           <span className="absolute right-px top-0 flex items-center justify-center h-[25px] w-[28px] p-[7px] bg-[red] text-white ">
@@ -180,52 +180,29 @@ const CasinoGames: React.FC = () => {
 
       <div className="mt-[10px] min-w-0 flex-1">
         <div className="grid grid-cols-3 gap-[4px] px-[3px] lg:grid-cols-4">
-          {allGames.map((item) => {
-            const isFavorite = Boolean(item.isFavorite ?? item.isFavourite);
-
-            return (
-              <div
-                key={item.id}
-                className="group relative min-w-0 overflow-hidden bg-[#243a48] text-left"
+          {allGames.map((item) => (
+            <div key={item.id} className="min-w-0 overflow-hidden bg-[#243a48] text-left">
+              <button
+                type="button"
+                onClick={() => handleGameClick(item.id)}
+                className="block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label={`Play ${item.name}`}
               >
-                <button
-                  type="button"
-                  onClick={() => handleGameClick(item.id)}
-                  className="block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                  aria-label={`Play ${item.name}`}
-                >
-                  <img
-                    loading="lazy"
-                    className="block h-[80px] w-full max-w-full object-fill lg:h-[115px]"
-                    src={item.gameImage}
-                    alt={item.name}
-                    onError={(e) => (e.currentTarget.src = '/images/casino/casino-fallback.webp')}
-                  />
-                  <span className="flex h-[18px] items-center justify-center overflow-hidden bg-[#243a48] px-[5px] text-center text-[8px] font-semibold uppercase leading-[12px] text-white lg:h-[21px] lg:text-[10px] lg:leading-[15px]">
-                    <span className="truncate">{item.name}</span>
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`absolute left-[3px] top-[3px] flex size-[21px] items-center justify-center rounded-[0px_0px_8px] border border-white/25 bg-black/45 text-white shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition-opacity hover:bg-black/70 focus:outline-none opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-primary ${
-                    isFavorite ? 'text-[#ffc400]' : 'text-white'
-                  }`}
-                  aria-label={`${isFavorite ? 'Remove' : 'Add'} ${item.name} ${
-                    isFavorite ? 'from' : 'to'
-                  } favourites`}
-                  onClick={() => handleToggleFavorite(item.id, isFavorite)}
-                >
-                  {isFavorite ? (
-                    <Icons.fillStar className="h-[15px] w-[15px]" />
-                  ) : (
-                    <Icons.outlineStar className="h-[15px] w-[15px]" />
-                  )}
-                </button>
-              </div>
-            );
-          })}
-          {(isLoading || (isFetching && allGames.length === 0)) &&
+                <img
+                  loading="lazy"
+                  className="block h-[80px] w-full max-w-full object-fill lg:h-[115px]"
+                  src={item.gameImage}
+                  alt={item.name}
+                  onError={(e) => (e.currentTarget.src = '/images/casino/casino-fallback.webp')}
+                />
+                <span className="flex h-[18px] items-center justify-center overflow-hidden bg-[#243a48] px-[5px] text-center text-[8px] font-semibold uppercase leading-[12px] text-white lg:h-[21px] lg:text-[10px] lg:leading-[15px]">
+                  <span className="truncate">{item.name}</span>
+                </span>
+              </button>
+            </div>
+          ))}
+          {isLoadingGames &&
+            allGames.length === 0 &&
             Array.from({ length: 12 }).map((_, index) => (
               <div
                 key={`loading-${index}`}
@@ -246,7 +223,7 @@ const CasinoGames: React.FC = () => {
           </div>
         )}
 
-        {!isLoading && allGames.length === 0 && (
+        {!isLoadingGames && allGames.length === 0 && (
           <div className="py-[40px] text-center text-[#6c757d]">
             <p className="text-lg">No games found</p>
           </div>

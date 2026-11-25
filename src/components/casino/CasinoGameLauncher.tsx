@@ -21,11 +21,23 @@ const CasinoGameLauncher = ({
 }: CasinoGameLauncherProps) => {
   const { gameUrl, isIframeLoaded, sessionLoading, setIsIframeLoaded, closeGame, launchGame } =
     useCasinoGameLauncher({ closePath, onClose });
+  const onCloseRef = React.useRef(onClose);
 
   React.useEffect(() => {
-    if (open && gameId) {
-      void launchGame(gameId);
-    }
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  React.useEffect(() => {
+    if (!open || !gameId) return;
+
+    let cancelled = false;
+    void launchGame(gameId).then((launched) => {
+      if (!launched && !cancelled) onCloseRef.current?.();
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [gameId, launchGame, open]);
 
   if (!open || !gameId) {

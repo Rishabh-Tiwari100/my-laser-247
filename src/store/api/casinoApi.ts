@@ -33,22 +33,23 @@ export const casinoApi = apiSlice.injectEndpoints({
       providesTags: ['Casino'],
     }),
 
-    getCasinoCategories: builder.query<{ games: string[] }, { search?: string; provider?: string }>(
-      {
-        query: ({ search, provider } = {}) => {
-          const params = new URLSearchParams();
-          if (search) params.append('search', search);
-          if (provider) params.append('provider', provider);
+    getCasinoCategories: builder.query<
+      { games: (string | null)[] },
+      { search?: string; provider?: string }
+    >({
+      query: ({ search, provider } = {}) => {
+        const params = new URLSearchParams();
+        if (search) params.append('search', search);
+        if (provider) params.append('provider', provider);
 
-          return {
-            url: `/casino/category${params.toString() ? `?${params.toString()}` : ''}`,
-            method: 'GET',
-            params: { t: Date.now() },
-          };
-        },
-        // providesTags: ['CasinoCategories'],
-      }
-    ),
+        return {
+          url: `/casino/category${params.toString() ? `?${params.toString()}` : ''}`,
+          method: 'GET',
+          params: { t: Date.now() },
+        };
+      },
+      // providesTags: ['CasinoCategories'],
+    }),
 
     getCasinoProviders: builder.query<
       {

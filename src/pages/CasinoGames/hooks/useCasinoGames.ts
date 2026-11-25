@@ -4,24 +4,18 @@ import {
   useGetCasinoProvidersQuery,
   useLazyGetCasinoGamesQuery,
 } from '@/store/api/casinoApi';
-import { useAddToFavoriteMutation } from '@/store/api/casinoHomePageApi';
-import { debounce } from '@/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
-import toast from 'react-hot-toast';
 import { clearCasinoGameDetail, setIsUrlFetched } from '@/store/slices/casinoGameDetailSlice';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { useCasinoGameLauncher } from '@/components/casino/useCasinoGameLauncher';
-import { useIsAuthenticated, useIsDemoUser } from '@/hooks/redux';
 
 export const useCasinoGames = () => {
-
-  const [searchParams] = useSearchParams()
-  const querySearch = searchParams.get('search') || '';
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchValue = searchParams.get('search') ?? '';
+  const selectedCategory = searchParams.get('category') || 'ALL';
   // --- State ---
-  const [searchTerm, setSearchTerm] = useState(querySearch ?? '');
-  const [selectedProvider, setSelectedProvider] = useState('ALL');
-  const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const [searchTerm, setSearchTerm] = useState(searchValue.trim());
   const [allGames, setAllGames] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -29,22 +23,20 @@ export const useCasinoGames = () => {
   // --- Refs ---
   const observerTarget = useRef<HTMLDivElement | null>(null);
   const pageRef = useRef(1); // Tracks actual page to prevent stale closure bugs
+  const filterVersion = useRef(0);
 
   // --- Hooks & Selectors ---
   const location = useLocation();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const isDemoUser = useIsDemoUser();
-  const isAuthenticated = useIsAuthenticated();
   const userId = useSelector((s: RootState) => s.user?.profile?.id);
   const gameId = useSelector((s: RootState) => s.casino.selectedGame?.id);
 
   // --- API Queries ---
-  const [fetchGames, { isFetching, isLoading, error }] = useLazyGetCasinoGamesQuery();
+  const [fetchGames, { isFetching, isUninitialized, error }] = useLazyGetCasinoGamesQuery();
+  const isLoadingGames = isUninitialized || isFetching;
   const { data: categoriesData } = useGetCasinoCategoriesQuery({});
   const { data: providerData } = useGetCasinoProvidersQuery();
-  const [addToFavorite] = useAddToFavoriteMutation();
   const { gameUrl, setGameUrl, isIframeLoaded, setIsIframeLoaded, sessionLoading, launchGame } =
     useCasinoGameLauncher({
       onBeforeLaunch: () => dispatch(setIsUrlFetched(true)),
@@ -52,7 +44,12 @@ export const useCasinoGames = () => {
 
   // --- Memoized Lists ---
   const categoryList = useMemo(
-    () => ['ALL', ...(categoriesData?.games ?? [])],
+    () => [
+      'ALL',
+      ...(categoriesData?.games ?? []).filter(
+        (label): label is string => typeof label === 'string' && label.trim().length > 0
+      ),
+    ],
     [categoriesData?.games]
   );
 
@@ -72,20 +69,35 @@ export const useCasinoGames = () => {
     return [{ id: 'ALL', name: 'ALL' }, ...providers];
   }, [providerData?.providers]);
 
-  const initialProviderFromRoute = useMemo(() => {
-    const path = location.pathname?.toLowerCase() ?? '';
-    if (!path.includes('/casino/evolution')) return null;
+  const isEvolutionRoute =
+    location.pathname.toLowerCase().replace(/\/+$/, '') === '/casino/evolution';
+  const routeProvider = isEvolutionRoute
+    ? providerList.find(({ name }) => name.toLowerCase().includes('evolution'))?.name
+    : undefined;
+  const selectedProvider = searchParams.get('provider') || routeProvider || 'ALL';
 
-    const matchedProvider = providerData?.providers.find((provider) =>
-      provider.provider?.toLowerCase().includes('evolution')
-    )?.provider;
-
-    return matchedProvider ?? null;
-  }, [location.pathname, providerData?.providers]);
+  const updateFilter = useCallback(
+    (key: 'category' | 'provider' | 'search', value: string) => {
+      const nextParams = new URLSearchParams(searchParams);
+      if (
+        !value ||
+        (key !== 'search' && value === 'ALL' && !(key === 'provider' && isEvolutionRoute))
+      ) {
+        nextParams.delete(key);
+      } else {
+        nextParams.set(key, value);
+      }
+      if (nextParams.toString() !== searchParams.toString()) {
+        setSearchParams(nextParams, { replace: key === 'search' });
+      }
+    },
+    [isEvolutionRoute, searchParams, setSearchParams]
+  );
 
   // --- Core Fetch Logic ---
   const loadGames = useCallback(
     async (page: number, isNewFilter: boolean = false) => {
+      const version = filterVersion.current;
       try {
         const result = await fetchGames({
           provider: selectedProvider !== 'ALL' ? selectedProvider : undefined,
@@ -97,6 +109,7 @@ export const useCasinoGames = () => {
           status: 'ACTIVE',
         }).unwrap();
 
+        if (version !== filterVersion.current) return;
         const games = result?.games ?? [];
         if (isNewFilter) {
           setAllGames(games);
@@ -111,6 +124,7 @@ export const useCasinoGames = () => {
         const totalPages = result?.pagination?.totalPage || 1;
         setHasMore(page < totalPages);
       } catch (err) {
+        if (version !== filterVersion.current) return;
         console.error('Failed to load games:', err);
         setHasMore(false);
       }
@@ -119,32 +133,8 @@ export const useCasinoGames = () => {
   );
 
   // --- Handlers ---
-  const handleProviderSelect = useCallback((id: string | number, provider: string) => {
-    setSelectedProvider(provider);
-  }, []);
-
-  const handleToggleFavorite = useCallback(
-    async (id: number, isFav: boolean) => {
-      if (isDemoUser) {
-        toast.error('This feature is not available for demo users.', { id: 'favorite' });
-        return;
-      }
-      if (!isAuthenticated) {
-        toast.error('Login required');
-        navigate('/login');
-        return;
-      }
-      try {
-        const status = isFav ? 'UNFAVORITE' : 'FAVORITE';
-        const result: any = await addToFavorite({ id, status }).unwrap();
-        toast.success(result?.message || 'Favorite updated!', { id: 'favorite' });
-        setAllGames((prev) => prev.map((g) => (g.id === id ? { ...g, isFavorite: !isFav } : g)));
-      } catch (err: any) {
-        toast.error(err?.data?.message || 'Failed to update favourite');
-      }
-    },
-    [addToFavorite, isAuthenticated, isDemoUser, navigate]
-  );
+  const handleProviderSelect = (_id: string | number, provider: string) =>
+    updateFilter('provider', provider);
 
   const handleGameClick = useCallback(
     async (id: number) => {
@@ -156,9 +146,9 @@ export const useCasinoGames = () => {
   // --- Effects ---
 
   useEffect(() => {
-    if (!initialProviderFromRoute) return;
-    setSelectedProvider(initialProviderFromRoute);
-  }, [initialProviderFromRoute]);
+    const timer = window.setTimeout(() => setSearchTerm(searchValue.trim()), 500);
+    return () => window.clearTimeout(timer);
+  }, [searchValue]);
 
   // Handle Search/Filter resets
   useEffect(() => {
@@ -171,15 +161,18 @@ export const useCasinoGames = () => {
     if (observerTarget.current) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+    return () => {
+      filterVersion.current += 1;
+    };
   }, [selectedProvider, selectedCategory, searchTerm, loadGames]);
 
   // Infinite Scroll Intersection Observer
   useEffect(() => {
-    if (!hasMore || isFetching || isLoading) return;
+    if (!hasMore || isLoadingGames) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0]?.isIntersecting && hasMore && !isFetching) {
+        if (entries[0]?.isIntersecting) {
           const nextPage = pageRef.current + 1;
           pageRef.current = nextPage;
           setCurrentPage(nextPage);
@@ -195,7 +188,7 @@ export const useCasinoGames = () => {
     return () => {
       if (target) observer.unobserve(target);
     };
-  }, [hasMore, isFetching, isLoading, loadGames]);
+  }, [hasMore, isLoadingGames, loadGames]);
 
   // Auto-open game if coming from deep links/other pages
   useEffect(() => {
@@ -205,14 +198,11 @@ export const useCasinoGames = () => {
     };
   }, [gameId, handleGameClick, dispatch]);
 
-  const debouncedSearch = useRef(debounce((value: string) => setSearchTerm(value), 500)).current;
-
   return {
-    searchTerm,
+    searchValue,
     selectedProvider,
-    setSelectedProvider,
     selectedCategory,
-    setSelectedCategory,
+    setSelectedCategory: (category: string) => updateFilter('category', category),
     allGames,
     currentPage,
     hasMore,
@@ -227,12 +217,10 @@ export const useCasinoGames = () => {
     dispatch,
     categoryList,
     providerList,
-    isLoading,
-    isFetching,
+    isLoadingGames,
     error,
     handleProviderSelect,
     handleGameClick,
-    handleToggleFavorite,
-    debouncedSearch,
+    setSearchValue: (value: string) => updateFilter('search', value),
   };
 };

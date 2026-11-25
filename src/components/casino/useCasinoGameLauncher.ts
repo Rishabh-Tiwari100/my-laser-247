@@ -44,25 +44,27 @@ export const useCasinoGameLauncher = (options: LaunchOptions = {}) => {
 
       if (isDemoUser) {
         toast.error('Demo users are not allowed to play casino games.', { id: 'game-session' });
-        return;
+        return false;
       }
 
       if (!isAuthenticated) {
         toast.error('Login required');
         navigate('/login');
-        return;
+        return false;
       }
 
       try {
         const result: any = await createSession({ id: gameId, platform: getPlatform() }).unwrap();
 
-        if (result?.url) {
-          setGameUrl(result.url);
-          setIsIframeLoaded(true);
-          onLaunch?.(result.url);
-        }
+        if (!result?.url) throw new Error('Missing casino session URL');
+
+        setGameUrl(result.url);
+        setIsIframeLoaded(true);
+        onLaunch?.(result.url);
+        return true;
       } catch {
         toast.error('Failed to create game session');
+        return false;
       }
     },
     [createSession, isAuthenticated, isDemoUser, navigate, onBeforeLaunch, onLaunch]

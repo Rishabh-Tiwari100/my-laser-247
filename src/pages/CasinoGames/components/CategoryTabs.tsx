@@ -1,4 +1,3 @@
-import { LucideIcon } from 'lucide-react';
 import React from 'react';
 import { categoryIconMap } from '../constant';
 import { referenceCategoryIcons } from '../referenceCategoryIcons';
@@ -11,10 +10,19 @@ interface CategoryTabsProps {
   className?: string;
 }
 
-function categoryIcon(label: string) {
+const fallbackCategoryIcon = '/images/casino/category/three-cards.svg';
+
+function referenceCategoryIcon(label: string) {
   const key = label.toUpperCase().replace(/[^A-Z0-9]/g, '');
   const aliases: Record<string, string> = {
-    ALL: 'OTHERS',
+    BINGO: 'CASINOBINGO',
+    CASINOLIVE: 'LIVE',
+    CASUAL: 'CASUALGAMES',
+    COLOR: 'COLORPREDICTION',
+    HILO: 'HILOW',
+    INSTANT: 'INSTANTGAME',
+    OTHER: 'OTHERS',
+    SCRATCH: 'SCRATCHCARDS',
     SLOTGAMES: 'SLOTS',
     SLOTGAME: 'SLOTS',
     GAMESHOWS: 'LIVEGAMESHOW',
@@ -23,10 +31,10 @@ function categoryIcon(label: string) {
     CARDGAMES: 'CARD',
     CRASHGAME: 'CRASH',
   };
-  const reference =
+  return (
     referenceCategoryIcons[aliases[key] ?? key] ??
-    (key.startsWith('LIVE') ? referenceCategoryIcons[key.slice(4)] : undefined);
-  return reference ?? categoryIconMap[label] ?? '/images/casino/category/three-cards.svg';
+    (key.startsWith('LIVE') ? referenceCategoryIcons[key.slice(4)] : undefined)
+  );
 }
 
 const CategoryTabs: React.FC<CategoryTabsProps> = ({
@@ -98,8 +106,16 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
               )}
             >
               <img
-                src={categoryIcon(label)}
+                src={referenceCategoryIcon(label) ?? categoryIconMap[label] ?? fallbackCategoryIcon}
                 alt=""
+                onError={({ currentTarget }) => {
+                  const currentSource = currentTarget.getAttribute('src');
+                  if (currentSource === fallbackCategoryIcon) return;
+
+                  const localIcon = categoryIconMap[label];
+                  currentTarget.src =
+                    localIcon && currentSource !== localIcon ? localIcon : fallbackCategoryIcon;
+                }}
                 className={cn(
                   'h-[30px] w-[30px] object-contain brightness-0',
                   selectedCategory === label && 'invert'
