@@ -22,11 +22,11 @@ const games = [
     img: '/images/home-images/my-favourites/lightning-instant-super-over.png',
     gameId: 2343,
   },
-  { name: 'Money Heist', img: '/images/home-images/my-favourites/money-heist.webp', gameId: null },
+  { name: 'Money Heist', img: '/images/home-images/my-favourites/money-heist.webp', gameId: 238 },
   {
     name: 'Teen Patti 1 Day',
     img: '/images/home-images/my-favourites/teen-patti-1-day.webp',
-    gameId: 16376,
+    gameId: 3773,
   },
   {
     name: 'Ultimate Andar Bahar',
